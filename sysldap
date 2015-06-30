@@ -18,12 +18,23 @@ function yarra() {
         environment_set|es|set_environment|se|password_set|ps|set_password|sp)
             export sysldap_uri='ldaps://ldap1p.uvic.ca:636/'
 
-            if [ "X$sysldap_pw" == 'X' ]; then
+            if [ "X$SUDO_USER" == 'X' ]; then
                 if [ "X$2" == 'Xprint_note' ]; then
-                    echo -e "\nNote: To avoid entering your system LDAP password for each 'sysldap' command, run the following: 'source sysldap password_set'.\n"
+                    echo -e "\nNote: To avoid entering your NetLink ID for each 'sysldap' command, run the following: 'source sysldap password_set'.\n"
                 fi
 
-                echo -n "Enter your system LDAP password: "
+                echo -n "Enter your NetLink ID: "
+                read -rs netlink_id
+                export SUDO_USER=$netlink_id
+                echo ''
+            fi
+
+            if [ "X$sysldap_pw" == 'X' ]; then
+                if [ "X$2" == 'Xprint_note' ]; then
+                    echo -e "\nNote: To avoid entering your NetLink password for each 'sysldap' command, run the following: 'source sysldap password_set'.\n"
+                fi
+
+                echo -n "Enter your NetLink password: "
                 read -rs sysldap_pw
                 export sysldap_pw=$sysldap_pw
                 echo ''
