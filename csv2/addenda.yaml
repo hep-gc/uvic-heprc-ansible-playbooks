@@ -1,0 +1,20 @@
+i_service_connection:
+-
+    ipv4: '206.12.154.179'
+    ipv4fqdn: 'elephant179.heprc.uvic.ca'
+
+i_virtualhosts:
+-
+    virtualhost: 'elephant179.heprc.uvic.ca'
+
+i_internal_connection:
+-
+    ipv4: '10.200.200.179'
+    ipv4mask: '255.255.254.0'
+    ipv4fqdn: 'elephant179'
+
+i_external_connection:
+-
+    ipv4: '206.12.154.179'
+    ipv4mask: '255.255.255.0'
+    ipv4fqdn: 'elephant179.heprc.uvic.ca'

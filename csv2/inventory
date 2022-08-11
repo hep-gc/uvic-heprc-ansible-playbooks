@@ -1,5 +1,3 @@
 [csv2]
-elephant179.heprc.uvic.ca:22 csv2_fqdn=elephant179.heprc.uvic.ca
-
-#addenda=/root/deploy/staticvms/inventory_host_variables/csv2-test
+elephant179.heprc.uvic.ca:22 csv2_fqdn=elephant179.heprc.uvic.ca addenda=addenda.yaml
 

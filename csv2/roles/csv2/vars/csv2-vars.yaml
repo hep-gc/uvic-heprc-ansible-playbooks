@@ -1,31 +1,10 @@
 # Overriding the following defaults varables (see csv2-default-vars.yaml):
 
-# TEMP to get things working
+cs_git_branch: stable-2.10
+db_upgrade_file: none
+schema_model: stable-2.10.3.rc1
 
-i_service_connection:
--
-    ipv4: '206.12.154.179'
-    ipv4fqdn: 'elephant179.heprc.uvic.ca'
-
-i_virtualhosts:
--
-    virtualhost: 'elephant179.heprc.uvic.ca'
-
-i_internal_connection:
--
-    ipv4: '10.200.200.179'
-    ipv4mask: '255.255.254.0'
-    ipv4fqdn: 'elephant179'
-
-i_external_connection:
--
-    ipv4: '206.12.154.179'
-    ipv4mask: '255.255.255.0'
-    ipv4fqdn: 'elephant179.heprc.uvic.ca'
-
-# -- END OF TEMP
-
-admin_email: heprc-operations@lists.uvic.ca
+admin_email:
 
 install_phpMyAdmin: False
 web_debug: True
@@ -38,6 +17,3 @@ local_web: False
 openstack_vm: True
 ci_target: True
 
-cs_git_branch: stable-2.10
-db_upgrade_file: none
-schema_model: stable-2.10.3.rc1
