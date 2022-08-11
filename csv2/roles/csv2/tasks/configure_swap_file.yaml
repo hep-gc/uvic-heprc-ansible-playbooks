@@ -1,0 +1,61 @@
+
+- name: Get system memory
+  shell: free -m | sed -n '2 p'|awk '{print int($2*1.1)}'
+  register: memory_output
+  ignore_errors: true
+
+- name: Get file system type
+  shell: df -Th | grep "^/dev.* /$" | awk '{print $2}'
+  register: fs_type
+
+- name: Create swap file
+  command: dd if=/dev/zero of=/swapfile count={{ memory_output.stdout }} bs=1M
+           creates="/swapfile"
+  tags:
+    - swap.file.create
+  when: fs_type.stdout == "xfs" and ansible_facts['distribution_major_version'] == "7"
+
+- name: Create swap file
+  command: fallocate -l {{ memory_output.stdout }}M /swapfile
+           creates="/swapfile"
+  tags:
+    - swap.file.create
+  when: fs_type.stdout != "xfs" or ansible_facts['distribution_major_version'] == "8"
+
+- name: Change swap file permissions
+  file: path="/swapfile"
+        owner=root
+        group=root
+        mode=0600
+  tags:
+    - swap.file.permissions
+
+- name: "Check swap file type"
+  command: file /swapfile
+  register: swapfile
+  tags:
+    - swap.file.mkswap
+
+- name: Make swap file
+  command: "sudo mkswap /swapfile"
+  when: swapfile.stdout.find('swap file') == -1
+  tags:
+    - swap.file.mkswap
+
+- name: Write swap entry in fstab
+  mount: name=none
+         src=/swapfile
+         fstype=swap
+         opts=sw
+         passno=0
+         dump=0
+         state=present
+  tags:
+    - swap.fstab
+
+- name: Mount swap
+  command: "swapon /swapfile"
+  when: ansible_swaptotal_mb < 1
+  tags:
+    - swap.file.swapon
+

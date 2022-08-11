@@ -1,0 +1,21 @@
+
+- name: create tester user
+  user:
+    name: tester
+
+- name: ensure ssh dir exists
+  file:
+    path: /home/tester/.ssh/
+    state: directory
+
+- name: copy ssh key to new user
+  copy:
+    remote_src: yes
+    src: /root/.ssh/authorized_keys
+    dest: /home/tester/.ssh/authorized_keys
+    owner: tester
+    group: tester
+
+- name: create tester user in cloudscheduler
+  command: cloudscheduler user add -un tester -upw {{ test_user_password }} -su csv2_default -spw '{{ csv2_default_password }}' -sa {{ csv2_web_address }} -gn default -SU true
+  ignore_errors: yes 

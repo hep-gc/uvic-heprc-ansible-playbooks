@@ -1,0 +1,801 @@
+ansible_deployment_host_ip: '10.200.200.172'
+
+inventory_system: 'staticvms'
+
+inventory_instance: 'csv2-test'
+
+i_external_connection:
+-
+    unitid: 'csv2-test'
+    nic: 'lo'
+    ipv4: '206.12.154.202'
+    ipv4mask: '255.255.255.0'
+    ipv4fqdn: 'elephant202.heprc.uvic.ca'
+    ipv6: '2607:f8f0:c10:70f3:2::202'
+    ipv6fqdn: 'elephant202.heprc6.uvic.ca'
+
+i_users:
+-
+    unitid: 'csv2-test'
+    userid: 'colsond'
+    uid: '115344'
+-
+    unitid: 'csv2-test'
+    userid: 'crlb'
+    uid: '10795'
+-
+    unitid: 'csv2-test'
+    userid: 'danikam1'
+    uid: '157765'
+-
+    unitid: 'csv2-test'
+    userid: 'dmeng'
+    uid: '190019'
+-
+    unitid: 'csv2-test'
+    userid: 'frank'
+    uid: '83062'
+-
+    unitid: 'csv2-test'
+    userid: 'mebert'
+    uid: '248591'
+-
+    unitid: 'csv2-test'
+    userid: 'mfens98'
+    uid: '252242'
+-
+    unitid: 'csv2-test'
+    userid: 'rptaylor'
+    uid: '87076'
+-
+    unitid: 'csv2-test'
+    userid: 'rsobie'
+    uid: '3881'
+-
+    unitid: 'csv2-test'
+    userid: 'seuster'
+    uid: '71428'
+-
+    unitid: 'csv2-test'
+    userid: 'tssulliv'
+    uid: '70635'
+
+i_volumes: []
+
+i_fw_rich_rules: []
+
+i_etc_hosts:
+-
+    unitid: 'accounting'
+    fqdn: 'accounting'
+    ip: '10.200.200.230'
+-
+    unitid: 'accounting'
+    fqdn: 'accounting.heprc.uvic.ca'
+    ip: '206.12.154.230'
+-
+    unitid: 'accounting'
+    fqdn: 'accounting.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::230'
+-
+    unitid: 'babar-hn'
+    fqdn: 'babar-hn'
+    ip: '10.200.200.249'
+-
+    unitid: 'babar-hn'
+    fqdn: 'babar-hn.heprc.uvic.ca'
+    ip: '206.12.154.249'
+-
+    unitid: 'babar-hn'
+    fqdn: 'babar-hn.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::249'
+-
+    unitid: 'babar-web'
+    fqdn: 'babar'
+    ip: '10.200.200.253'
+-
+    unitid: 'babar-web'
+    fqdn: 'babar-web'
+    ip: '10.200.200.253'
+-
+    unitid: 'babar-web'
+    fqdn: 'babar.heprc.uvic.ca'
+    ip: '206.12.154.253'
+-
+    unitid: 'babar-web'
+    fqdn: 'babar.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::253'
+-
+    unitid: 'babar-wiki'
+    fqdn: 'babar-wiki'
+    ip: '10.200.200.248'
+-
+    unitid: 'babar-wiki'
+    fqdn: 'babar-wiki.heprc.uvic.ca'
+    ip: '206.12.154.248'
+-
+    unitid: 'babar-wiki'
+    fqdn: 'babar-wiki.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::248'
+-
+    unitid: 'belle2'
+    fqdn: 'belle2'
+    ip: '10.200.200.251'
+-
+    unitid: 'belle2'
+    fqdn: 'belle2.heprc.uvic.ca'
+    ip: '206.12.154.251'
+-
+    unitid: 'belle2'
+    fqdn: 'belle2.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::251'
+-
+    unitid: 'bellecs'
+    fqdn: 'bellecs.heprc.uvic.ca'
+    ip: '206.12.154.250'
+-
+    unitid: 'bellecs'
+    fqdn: 'bellecs.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::250'
+-
+    unitid: 'csv2'
+    fqdn: 'csv2'
+    ip: '10.200.200.228'
+-
+    unitid: 'csv2'
+    fqdn: 'csv2.heprc.uvic.ca'
+    ip: '206.12.154.228'
+-
+    unitid: 'csv2'
+    fqdn: 'csv2.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::228'
+-
+    unitid: 'csv2-canfar'
+    fqdn: 'csv2-canfar'
+    ip: '10.200.200.234'
+-
+    unitid: 'csv2-canfar'
+    fqdn: 'csv2-canfar.heprc.uvic.ca'
+    ip: '206.12.154.234'
+-
+    unitid: 'csv2-canfar'
+    fqdn: 'csv2-canfar.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::234'
+-
+    unitid: 'csv2-ci'
+    fqdn: 'csv2-ci'
+    ip: '10.200.200.232'
+-
+    unitid: 'csv2-ci'
+    fqdn: 'csv2-ci.heprc.uvic.ca'
+    ip: '206.12.154.232'
+-
+    unitid: 'csv2-ci'
+    fqdn: 'csv2-ci.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::232'
+-
+    unitid: 'csv2-dev'
+    fqdn: 'csv2-dev'
+    ip: '10.200.200.224'
+-
+    unitid: 'csv2-dev'
+    fqdn: 'csv2-dev.heprc.uvic.ca'
+    ip: '206.12.154.224'
+-
+    unitid: 'csv2-dev'
+    fqdn: 'csv2-dev.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::224'
+-
+    unitid: 'csv2-dev2'
+    fqdn: 'csv2-dev2'
+    ip: '10.200.200.223'
+-
+    unitid: 'csv2-dev2'
+    fqdn: 'csv2-dev2.heprc.uvic.ca'
+    ip: '206.12.154.223'
+-
+    unitid: 'csv2-dev2'
+    fqdn: 'csv2-dev2.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::223'
+-
+    unitid: 'csv2-sa'
+    fqdn: 'csv2-sa'
+    ip: '10.200.200.239'
+-
+    unitid: 'csv2-sa'
+    fqdn: 'csv2-sa.heprc.uvic.ca'
+    ip: '206.12.154.239'
+-
+    unitid: 'csv2-sa'
+    fqdn: 'csv2-sa.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::239'
+-
+    unitid: 'csv2-test'
+    fqdn: 'csv2-test'
+    ip: '10.200.200.202'
+-
+    unitid: 'csv2-test'
+    fqdn: 'elephant202'
+    ip: '10.200.200.202'
+-
+    unitid: 'csv2-test'
+    fqdn: 'elephant202.heprc.uvic.ca'
+    ip: '206.12.154.202'
+-
+    unitid: 'csv2-test'
+    fqdn: 'elephant202.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::202'
+-
+    unitid: 'csv2a'
+    fqdn: 'csv2a'
+    ip: '10.200.200.236'
+-
+    unitid: 'csv2a'
+    fqdn: 'csv2a.heprc.uvic.ca'
+    ip: '206.12.154.236'
+-
+    unitid: 'csv2a'
+    fqdn: 'csv2a.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::236'
+-
+    unitid: 'dune-condor'
+    fqdn: 'dune-condor'
+    ip: '10.200.200.217'
+-
+    unitid: 'dune-condor'
+    fqdn: 'dune-condor.heprc.uvic.ca'
+    ip: '206.12.154.217'
+-
+    unitid: 'dune-condor'
+    fqdn: 'dune-condor.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::217'
+-
+    unitid: 'dyn-loadbal01'
+    fqdn: 'dyn-loadbal01'
+    ip: '10.200.200.218'
+-
+    unitid: 'dyn-loadbal01'
+    fqdn: 'dyn-loadbal01.heprc.uvic.ca'
+    ip: '206.12.154.218'
+-
+    unitid: 'dyn-loadbal01'
+    fqdn: 'dyn-loadbal01.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::218'
+-
+    unitid: 'dyn-loadbal02'
+    fqdn: 'dyn-loadbal02'
+    ip: '10.200.200.219'
+-
+    unitid: 'dyn-loadbal02'
+    fqdn: 'dyn-loadbal02.heprc.uvic.ca'
+    ip: '206.12.154.219'
+-
+    unitid: 'dyn-loadbal02'
+    fqdn: 'dyn-loadbal02.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::219'
+-
+    unitid: 'dyn-loadbal03'
+    fqdn: 'dyn-loadbal03'
+    ip: '10.200.200.220'
+-
+    unitid: 'dyn-loadbal03'
+    fqdn: 'dyn-loadbal03.heprc.uvic.ca'
+    ip: '206.12.154.220'
+-
+    unitid: 'dyn-loadbal03'
+    fqdn: 'dyn-loadbal03.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::220'
+-
+    unitid: 'dynafed-atlas'
+    fqdn: 'dynafed-atlas'
+    ip: '10.200.200.233'
+-
+    unitid: 'dynafed-atlas'
+    fqdn: 'dynafed-atlas.heprc.uvic.ca'
+    ip: '206.12.154.233'
+-
+    unitid: 'dynafed-atlas'
+    fqdn: 'dynafed-atlas.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::233'
+-
+    unitid: 'dynafed02'
+    fqdn: 'dynafed02'
+    ip: '10.200.200.252'
+-
+    unitid: 'dynafed02'
+    fqdn: 'dynafed02.heprc.uvic.ca'
+    ip: '206.12.154.252'
+-
+    unitid: 'dynafed02'
+    fqdn: 'dynafed02.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::252'
+-
+    unitid: 'e01'
+    fqdn: 'e01'
+    ip: '10.200.200.1'
+-
+    unitid: 'e01'
+    fqdn: 'elephant01'
+    ip: '10.200.200.1'
+-
+    unitid: 'e01'
+    fqdn: 'elephant01.heprc.uvic.ca'
+    ip: '206.12.154.1'
+-
+    unitid: 'e01'
+    fqdn: 'elephant01.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::1'
+-
+    unitid: 'e02'
+    fqdn: 'e02'
+    ip: '10.200.200.2'
+-
+    unitid: 'e02'
+    fqdn: 'hypervisor02'
+    ip: '10.200.200.2'
+-
+    unitid: 'e02'
+    fqdn: 'hypervisor02.heprc.uvic.ca'
+    ip: '206.12.154.2'
+-
+    unitid: 'e02'
+    fqdn: 'hypervisor02.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::2'
+-
+    unitid: 'e03'
+    fqdn: 'e03'
+    ip: '10.200.200.3'
+-
+    unitid: 'e03'
+    fqdn: 'hypervisor03'
+    ip: '10.200.200.3'
+-
+    unitid: 'e03'
+    fqdn: 'hypervisor03.heprc.uvic.ca'
+    ip: '206.12.154.3'
+-
+    unitid: 'e03'
+    fqdn: 'hypervisor03.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::3'
+-
+    unitid: 'e07'
+    fqdn: 'e07'
+    ip: '10.200.200.7'
+-
+    unitid: 'e07'
+    fqdn: 'hypervisor07'
+    ip: '10.200.200.7'
+-
+    unitid: 'e07'
+    fqdn: 'hypervisor07.heprc.uvic.ca'
+    ip: '206.12.154.7'
+-
+    unitid: 'e07'
+    fqdn: 'hypervisor07.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::7'
+-
+    unitid: 'e09'
+    fqdn: 'e09'
+    ip: '10.200.200.9'
+-
+    unitid: 'e09'
+    fqdn: 'hypervisor09'
+    ip: '10.200.200.9'
+-
+    unitid: 'e09'
+    fqdn: 'hypervisor09.heprc.uvic.ca'
+    ip: '206.12.154.9'
+-
+    unitid: 'e09'
+    fqdn: 'hypervisor09.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::9'
+-
+    unitid: 'e13'
+    fqdn: 'e13'
+    ip: '10.200.200.13'
+-
+    unitid: 'e13'
+    fqdn: 'elephant13'
+    ip: '10.200.200.13'
+-
+    unitid: 'e13'
+    fqdn: 'elephant13.heprc.uvic.ca'
+    ip: '206.12.154.13'
+-
+    unitid: 'e13'
+    fqdn: 'elephant13.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::13'
+-
+    unitid: 'e18'
+    fqdn: 'e18'
+    ip: '10.200.200.18'
+-
+    unitid: 'e18'
+    fqdn: 'hypervisor18'
+    ip: '10.200.200.18'
+-
+    unitid: 'e18'
+    fqdn: 'hypervisor18.heprc.uvic.ca'
+    ip: '206.12.154.18'
+-
+    unitid: 'e18'
+    fqdn: 'hypervisor18.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::18'
+-
+    unitid: 'e23'
+    fqdn: 'e23'
+    ip: '10.200.200.23'
+-
+    unitid: 'e23'
+    fqdn: 'hypervisor23'
+    ip: '10.200.200.23'
+-
+    unitid: 'e23'
+    fqdn: 'hypervisor23.heprc.uvic.ca'
+    ip: '206.12.154.23'
+-
+    unitid: 'e23'
+    fqdn: 'hypervisor23.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::23'
+-
+    unitid: 'e24'
+    fqdn: 'e24'
+    ip: '10.200.200.24'
+-
+    unitid: 'e24'
+    fqdn: 'hypervisor24'
+    ip: '10.200.200.24'
+-
+    unitid: 'e24'
+    fqdn: 'hypervisor24.heprc.uvic.ca'
+    ip: '206.12.154.24'
+-
+    unitid: 'e24'
+    fqdn: 'hypervisor24.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::24'
+-
+    unitid: 'e25'
+    fqdn: 'e25'
+    ip: '10.200.200.25'
+-
+    unitid: 'e25'
+    fqdn: 'hypervisor25'
+    ip: '10.200.200.25'
+-
+    unitid: 'e25'
+    fqdn: 'hypervisor25.heprc.uvic.ca'
+    ip: '206.12.154.25'
+-
+    unitid: 'e25'
+    fqdn: 'hypervisor25.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::25'
+-
+    unitid: 'e33'
+    fqdn: 'e33'
+    ip: '10.200.200.33'
+-
+    unitid: 'e33'
+    fqdn: 'hypervisor33'
+    ip: '10.200.200.33'
+-
+    unitid: 'e33'
+    fqdn: 'hypervisor33.heprc.uvic.ca'
+    ip: '206.12.154.33'
+-
+    unitid: 'e33'
+    fqdn: 'hypervisor33.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::33'
+-
+    unitid: 'e34'
+    fqdn: 'e34'
+    ip: '10.200.200.34'
+-
+    unitid: 'e34'
+    fqdn: 'hypervisor34'
+    ip: '10.200.200.34'
+-
+    unitid: 'e34'
+    fqdn: 'hypervisor34.heprc.uvic.ca'
+    ip: '206.12.154.34'
+-
+    unitid: 'e34'
+    fqdn: 'hypervisor34.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::34'
+-
+    unitid: 'e36'
+    fqdn: 'e36'
+    ip: '10.200.200.36'
+-
+    unitid: 'e36'
+    fqdn: 'elephant36'
+    ip: '10.200.200.36'
+-
+    unitid: 'e36'
+    fqdn: 'elephant36.heprc.uvic.ca'
+    ip: '206.12.154.36'
+-
+    unitid: 'e36'
+    fqdn: 'elephant36.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::36'
+-
+    unitid: 'e38'
+    fqdn: 'e38'
+    ip: '10.200.200.38'
+-
+    unitid: 'e38'
+    fqdn: 'elephant38'
+    ip: '10.200.200.38'
+-
+    unitid: 'e38'
+    fqdn: 'elephant38.heprc.uvic.ca'
+    ip: '206.12.154.38'
+-
+    unitid: 'e38'
+    fqdn: 'elephant38.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::38'
+-
+    unitid: 'ebpf'
+    fqdn: 'ebpf'
+    ip: '10.200.200.231'
+-
+    unitid: 'ebpf'
+    fqdn: 'ebpf.heprc.uvic.ca'
+    ip: '206.12.154.231'
+-
+    unitid: 'ebpf'
+    fqdn: 'ebpf.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::231'
+-
+    unitid: 'ebpf2'
+    fqdn: 'ebpf2'
+    ip: '10.200.200.200'
+-
+    unitid: 'ebpf2'
+    fqdn: 'ebpf2.heprc.uvic.ca'
+    ip: '206.12.154.200'
+-
+    unitid: 'ebpf2'
+    fqdn: 'ebpf2.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::200'
+-
+    unitid: 'elk'
+    fqdn: 'elk'
+    ip: '10.200.200.225'
+-
+    unitid: 'elk'
+    fqdn: 'elk.heprc.uvic.ca'
+    ip: '206.12.154.225'
+-
+    unitid: 'elk'
+    fqdn: 'elk.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::225'
+-
+    unitid: 'elk2'
+    fqdn: 'elk2'
+    ip: '10.200.200.235'
+-
+    unitid: 'elk2'
+    fqdn: 'elk2.heprc.uvic.ca'
+    ip: '206.12.154.235'
+-
+    unitid: 'elk2'
+    fqdn: 'elk2.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::235'
+-
+    unitid: 'elk7'
+    fqdn: 'elk7'
+    ip: '10.200.200.216'
+-
+    unitid: 'elk7'
+    fqdn: 'elk7.heprc.uvic.ca'
+    ip: '206.12.154.216'
+-
+    unitid: 'elk7'
+    fqdn: 'elk7.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::216'
+-
+    unitid: 'ganglia'
+    fqdn: 'ganglia'
+    ip: '10.200.200.221'
+-
+    unitid: 'ganglia'
+    fqdn: 'ganglia.heprc.uvic.ca'
+    ip: '206.12.154.221'
+-
+    unitid: 'ganglia'
+    fqdn: 'ganglia.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::221'
+-
+    unitid: 'hepapache'
+    fqdn: 'hepapache'
+    ip: '10.200.200.244'
+-
+    unitid: 'hepapache'
+    fqdn: 'hepapache.heprc.uvic.ca'
+    ip: '206.12.154.244'
+-
+    unitid: 'hepapache'
+    fqdn: 'hepapache.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::244'
+-
+    unitid: 'shoal'
+    fqdn: 'shoal'
+    ip: '10.200.200.246'
+-
+    unitid: 'shoal'
+    fqdn: 'shoal.heprc.uvic.ca'
+    ip: '206.12.154.246'
+-
+    unitid: 'shoal'
+    fqdn: 'shoal.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::246'
+-
+    unitid: 'squid1'
+    fqdn: 'squid1'
+    ip: '10.200.200.241'
+-
+    unitid: 'squid1'
+    fqdn: 'squid1.heprc.uvic.ca'
+    ip: '206.12.154.241'
+-
+    unitid: 'squid1'
+    fqdn: 'squid1.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::241'
+-
+    unitid: 'squid2'
+    fqdn: 'squid2'
+    ip: '10.200.200.247'
+-
+    unitid: 'squid2'
+    fqdn: 'squid2.heprc.uvic.ca'
+    ip: '206.12.154.247'
+-
+    unitid: 'squid2'
+    fqdn: 'squid2.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::247'
+-
+    unitid: 'stunnel'
+    fqdn: 'stunnel'
+    ip: '10.200.200.237'
+-
+    unitid: 'stunnel'
+    fqdn: 'stunnel.heprc.uvic.ca'
+    ip: '206.12.154.237'
+-
+    unitid: 'stunnel'
+    fqdn: 'stunnel.heprc6.uvic.ca'
+    ip: '2607:f8f0:c10:70f3:2::237'
+
+i_fw_zone_interfaces:
+-
+    unitid: 'csv2-test'
+    int: 'brd'
+    ext: 'n'
+-
+    unitid: 'csv2-test'
+    int: 'brd'
+    ext: 'y'
+-
+    unitid: 'csv2-test'
+    int: 'eth0'
+    ext: 'n'
+-
+    unitid: 'csv2-test'
+    int: 'lo'
+    ext: 'y'
+
+i_internal_connection:
+-
+    unitid: 'csv2-test'
+    nic: 'eth0'
+    ipv4: '10.200.200.202'
+    ipv4mask: '255.255.254.0'
+    ipv4fqdn: 'elephant202'
+    ipv6: '-'
+    ipv6fqdn: '-'
+
+i_sudoers:
+-
+    unitid: 'csv2-test'
+    userid: 'colsond'
+-
+    unitid: 'csv2-test'
+    userid: 'crlb'
+-
+    unitid: 'csv2-test'
+    userid: 'mebert'
+-
+    unitid: 'csv2-test'
+    userid: 'mfens98'
+-
+    unitid: 'csv2-test'
+    userid: 'rsobie'
+-
+    unitid: 'csv2-test'
+    userid: 'seuster'
+-
+    unitid: 'csv2-test'
+    userid: 'tssulliv'
+
+i_connections:
+-
+    unitid: 'csv2-test'
+    nic: 'eth0'
+    mac: '00:00:00:00:00:00'
+    ext: 'n'
+    mtu: '1500'
+    ipv4: '10.200.200.202'
+    ipv4mask: '255.255.254.0'
+    ipv4gw: '10.200.200.1'
+    ipv6: '-'
+    ipv6gw: '-'
+    ipv6len: '-'
+    bridge: 'brd'
+-
+    unitid: 'csv2-test'
+    nic: 'lo'
+    mac: '00:00:00:00:00:00'
+    ext: 'y'
+    mtu: '9000'
+    ipv4: '206.12.154.202'
+    ipv4mask: '255.255.255.0'
+    ipv4gw: '206.12.154.254'
+    ipv6: '2607:f8f0:c10:70f3:2::202'
+    ipv6gw: '2607:f8f0:c10:70f3:2::1'
+    ipv6len: '64'
+    bridge: 'brd'
+
+i_virtualhosts:
+-
+    unitid: 'csv2-test'
+    virtualhost: 'elephant202.heprc.uvic.ca'
+
+i_deleted_users: []
+
+i_user_keys:
+-
+    userid: 'colsond'
+    key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDQVAtd7Ufy5qiNhD0Gm3HlrmvmN9vCv2aPcSxKoILhMGwoVkUyOewKP0dain/tkHtWNL5PZPOPqxCVPiF1QLP18yATD74yScECHg83+ASBx0pxskWAcxsC6DXjSDNZAo882s577hJW9wOSTwVYNSB3SQHMRLiAFnp8oAFVo8ElhiXeyu4aXQWqZej+bvz7RgPpiRrpTXjVKwfzeot9Ge7Nd0CAnCf5Zx6K+qKRpCct0ZnAh9r8czBfkASovEadNJeFd8vyoGg4SQYV4+zlovYNmsNYVzScdwDC3c7NpkEKb1ZmRl9CYg0wlT+vNbTd/eYHIu7FGzy4F18pBWPPxq1AwAH8qPpnT3cW2fsE2gYIeXdF+DBUs9EB0n/eSe97N2blGXgKoeERqrWhHOsd0VcCkQ4sDc42dY4msdqLAY7+SCR3b9lbhtyQ90O1zMOrjQ8iOfDH5zMKGy09FaOylmTR5D7uhoAvCJ8NM4GN2tlo2gDWvRpEZTrWQ0/cTbRQOY9VrQYWeJ1LxqK1hskcGg8VGDU8TbHj+g9lAOoqRUpPMYtq+ZO3UzblVNzw4wDOAghhV6IoCnBklikzw6lRBSFJFcGzjwcPHDvmGC6Xb4kekbsR1FooNGrsaYz5MSd4XwzDSEkQBr6pTdtaEgeKYxjwQ49pYnF8pOxOVUk7AYYV6w== colsond@uvic.ca'
+-
+    userid: 'crlb'
+    key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC0Np20Q4rFkI7E/Vi/08RHWm1i1PAdzXQ848ookdodofiIXuJBozoUgQmVfb/vtt8w7StpJ1Xkj3suXbFOyCW/iJbYPjve91o9Rxllfp0SPu6RV24nrhyCDOYO9DonAnVn4S9+aOVGXcP3+FbmfuvGCWf/QAKnpj+jo2adOO2Ynf/MhpSKMN/yY4lWOdCmAjh+cT7CbHRqFTmhKYBxa5qNR//VO2EGDtAZjSeath8JF0wxDvUBmRqmeoWhSDiYpUpk8kUpewSV23UyI/oVHHGL40wouUZKqU0ewR1gKHQhD9LmZbktXpF8S/Gxziqvsetv25KS4yCd6aFBmZ1byp+9 crlb@heplw34'
+-
+    userid: 'danikam1'
+    key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDJ13KaaMGJ1ifkQpDAuB3CCHEO6wn8XIKJgm5EYBGxEF5uPiyTQlb1/AtwBmruQkPuYJNcfnlG5wk1LTeDBW2Znp5qb3GTnN0zWnj7PmzOKIbH8Wo/sQB3ufW/hA1VorDMXEXM7rCefPhVu/YUoNAnafx4DMX9sszm/BS9O5Z+LprVyJfEaAKH9ZwP15RuzLCB1K4MdbYMULSTcYbdIQ0vBujZz53oRQOEDHfBBrqdiC4MqUfaa6q8OitmglhP5YjYjio1A68kyRwXDuekKhKvP+yqezZZh2PPoKP2q6rHxvfQl2NDJhCmuO4z82iWVTL/RcbGkZEJZhmg1c+oulT1 danikamacdonell@Danikas-MacBook-Pro.local'
+-
+    userid: 'dmeng'
+    key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDK8QD4XKjscOkYYJRwje8lpPPA2kj4RPhaFOtcszJ1BM/VjRHprOhqL3lhOXmChbsN3eyaGKUwuoSN0dwOmWY+aMXSfdznXBVNxh8e+yzsOxTPuRVU1ip21EhHHgk67Cm5qaq1C973vizKkIZt+wHk+ZIoEKj098uNgFmwZdbRovgEhOkd9vKTuLShZkSr/nWyHDVzgNN3Oh6SFq1BU8jugyB2nQkeptMbTiePpSC/cjMuVfQyzVaxA7c2dzZo/Dqnh29ZwjNkbvlHI6x0RDt+6oSKaqtKAvKgv02Crt3trh4enhI7GqbebzTuuoFLhTT47NNx5YmNQPx4YSJ7+Ojgfo81d/oVy0QS8MjPkvDpFL/zPoHbhXxDJ+PfGLzorUDUTD4IyfBlTDn646B5Nqt8/ZFl9qhRYokITBBBCRgJJIW0QlaMOz1T+FspNDWdD0z+zul+OvJ3/IMooYaQ5hgs7ywwmTrqPBPxkcCtKaQGrb6xVDpnjznJeF80XQLv0FFddL+2IpY76I6MTHyIOUbw4RVOcQSLevKY77xGrQUopY3HIX1/OwH2R7eASSaUI/FYeTgubSiA4Ter9vgYWmxqmk9B0AFgVThI3RILN8hO+UowNLEvSYXIqekxPADVT63NjTNVCmQVoGNlsuYovZgkQQ2xob/v0n6B1CZseouSbQ== dmeng@heplw62.phys.uvic.ca'
+-
+    userid: 'frank'
+    key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDYwVT+a4+GbQd0ZZY9o/I94T2BQEjpYTV3SM6TgWmtosG7gPZa0LmCSJWDmApHVIw/b6Q6xBVMJvmslRblHpW3vMs5LE2CVTWguXZbp4dKwEeZxPjcdMKPgl9VO2LB2fnltjnvMNsPdzMVviTaQoMhwvRB/vsAW0Mbse5la0CJAogvb5EA++sRvsk+6ftpDTOC1YFdINtaRAUINYv8NwxnEKri82eWE0pV83xLoA4/+YdRRqhPStGRmRoRyn3u4vOdhLlzcBp85xTc56bLvquODYDOTR9NSRvQpCrWHdIXZwFUbMPW6+ONxbNQTE+47QYDgj2i4tq8DX6Z56Q3C5i5FNrbaARnq4ml+bOR/wqCoWmKK3A7vKi7ng/QZjQu0wi9YFT7roU4uXF1hdsFFuIp+zX9kArbbxG+YdE95Ubwfun1qtqKzJr1/QcBn3KZqcrVKzuS6F5lv9s9VP9Ic7Os4wkwAGr1OlhRszZNcMBW/fHXLIlOO59rJclKNX7I+yjhmYa7W+JKrJxCkwzxuTa9J25Loh9v5z9MH9xGGxuk1scmOO7R8wkJjpjgPJqbw6p6VcV8m3cs556BL7c50++JVP3WaJXEoqSRz4x2+qFSfoZdbmR+7iVoPkU83QW3Ae5FoIjU4H4eiAoTkPtftFbe8lIOWIabe5O7b267voisgQ== frank@eva'
+-
+    userid: 'mebert'
+    key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD1GZnbkRcR8RXilG6P0ga/zv0ubmKI9tguXvnuihUSPkV670D66j/FazU45CLmh4LS9At0oMzsW2aX3SbxhlqL1rfauxxSJRBQr+MeOZ/qmAw3t/l4KdWG40raYa/bS33I9DgCgTVE+6JTpGtudqoHJrmezvmN1Q7ablZHmHHPHCIWyvzA+n9mu25ccui6pFimG1SeI8OJBpNG4UsG8MSrFEOrqq4wnFjHu95SSEy4v/WvKrG6Xu9sLSLeSuOo7RXIEQ9Uh/LT1WV5oTEbFl5FrMqZlNJzFphrDS2kl9dALUDUwaNGM5P3m90EMH3R8aenU/B1LT6XZLQvEX38SQkp mebert@heplw65.phys.uvic.ca'
+-
+    userid: 'mfens98'
+    key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDzjduDJkfzJ0oCqhgrcNkDxoJP1oJHX++1o0ZiKYr00VE4B/jQTH87xXEcQpBPcIvLrdXVGwfyHK4D+WXgiqQBOD+KcVcCqbGAb2MqrFnCjh5kNmvH1NfW0EIgoONuWatHkBDUmCzxd7DQN6bw4G9wZJIdyvnYZ01ErykrKQ8eTPAWkUnEVDH1wCfgFn0Z9bLI5HmaNQu2FhEpZc210TsTQd9Y+IqROYOfoqc195WkF263HOSKZ+xMFjWQ0N0oZk17BsEI1gofbuzGuUOiNF19zcbu9HLhCx02CUfbuGpv21so7zKhsL8PVS1Ad3N9NNSf3PjauU7xuGxGWMn1XVSh mfens98@heplw72'
+-
+    userid: 'rptaylor'
+    key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC5nCWnNvXUGFgW+1cKinQhulovYs6qjjHTv3A1dRjWMuaXfqlz1udRJfTY/aU2qY9dU0slWFW8YKMx7Qdd3lE/YJ60hu8Q85ewLhwlBN8lNBExsCmiYrP7wOfyUZZgVU0cgEVt1sh0Uh9HhB0VXUUuRNcKt3hM0IM7DbHihbFIOv0/FLmNcWaVVJwtqtyMJoFxBl4Wfpk9xnk1sjrDVaBlxnFexIvifJhW0THY68yqpOapRv0+qgp0lecQWqIKgaGDssCGmi8Yq2Z3o4dZBzOZdJiAN0WHR+UPOfcLw86N0MjwBPOhOnWDnluF9Iys+gMxXj9jkXVhQDEMI8JHIShZ7gRuTkjeJ+1CHVXvBRck4vQQz83qHRQR8DFEofqN1h2a8zLQYQ9n310lxOo1LqS0k6qubrbzRIDweEv/Id/+WihhJvgEV9cho7xvm+Xf/s5k0X0xHKlgqCDh7lN6Aabr9s504xDu/HX+D2+w60HiGtZZC76pW5slCZWHlGNKC9C0l/Toe9UOiupD6JJKSHO6SQkZncSUYYuGWic/zYAImsaThvib9zkPU8j8bckxvvTccz6rP2dS7ASXjz0JFxoM9nKlvnFjRCQLxURrW90+w5Qz+rSeIEuzVOBig+qd+mxgG5awkq8+RrCX067oDl8GFy1RMDtoQGCu23SAkE80EQ== workstation'
+-
+    userid: 'rsobie'
+    key: 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAucKrPQuzrcKDndD6hbETQr+KfkPiygCxYZH8Jjk1FX1mClEnF2+xFKZb93fbJoRsxOpKgUW21ADstwnb9x2+OGbWnQ3ii3Dz7Anh0M5UKfplrALGfip3GauuLmBeDl0jPJz7pDGSSzxUKcU9nDlO66Px6egWNaKXAExNxdVYAwO9+EFhZEHGns+/W8907dypn08Y4+MKnAN8DeNaHfwItDtzUPwTM1oUwFmatJ5rOyfYxli5oMFn6hcBEqa0Ol/I//UBDiPTjsvp4OIiW7t24plwfJhp00eKUoIhrpHGMajLYkdRiEzmethGkRQSa83dQV9hx/jYkiy8nXrCCmodiw== rsobie@macsob.phys.UVic.CA'
+-
+    userid: 'rsobie'
+    key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDYR5UINMy2LlnuROtnDJZee7kezzQpSqyfyZ8WYSwwiX05PhRb+ZMVomvyTMxQxt/DD05pbbfD0guEBt1ZEenCotiXHidXXfajjwHOBtAH+xJNFCHvcIkaaF2IJCWYnKudkms+NDEHzvCqOTNF8pjTRGPIuPqV0AmAwf4fEnvkhGs59OpvBG3eze5yBP+/Vy9s3UEV+3OvtWmNDo0HccufeaXNy+CzA9tiF+5AOWiITPde1I6WZmyFK4hUdMC4OR7iHqMvR0E8zOFl4Sa92Wj1+hqN+5Ab4+HPpBPw8zqPtD2MfCy4KC7dg5m+gsLu6gb+vTj3XU0OK0l/w/99ebnJ rsobie@macsob2.phys.uvic.ca'
+-
+    userid: 'seuster'
+    key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCt/DIPLcgyqSrVQI0k4GriSadlSJwmbCMaUI7sxpYxhDXQi96Wfi65Tqal6sfltnSyRrblEVzfM8kPMGWadGiu9a4WqvgH9Tspy2BLdkLYY1U4SUR6vs9KSilmZREn3Dn+gWBWF8CNxdsy22IMpgwjsFf3f8pq+a6rYwywNx8j4ym3j+6tnbX1zRgrUIRE0zGYy0Jls6GUnfbYqPCXyF4CbjEHxaoo+alY0GslvafL1h11KtEmYMSr/hHcYEbAL0oUv9q4Xck6XbAxqjrcdp6ePSaP2SsHWQ6w0em028rnUAFdYObUh3b8IJXsv7E4mIp2TB+Zt3aAn0g2yunYXIFB seuster@heplw62'
+-
+    userid: 'tssulliv'
+    key: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDfJa3bFtI7AJV+hBhLTAsojny70u4EPXAVh3XBheKMOm64FjVEcB7ZBzCqNqzdQmlhaXne79v0tWbRsrzDuf+fM/JiM4OBCnXn7cPF/R732p1l5VZg/MN7rQpt4VItM35hZjr0gT1x8mSBQTAWwdi3iTGPl2JPjMinmZGfBOcQAuTJo54Wn+A0s8W4SUqWyfYsPGpwOYey/6Unbdwhs0hAfT8E5TD6bUk/vJSdZ4F3Lwci2zwmRGBU5DgIk+b4R0oE8WJ8kpL5pF6THkJ97iP/QHgoDfnzkyaV8aDLVoI2fPUOZpWCXwvD6auLPjrQHiiILY6ja7IMOc8LMvj2FQsv tssulliv@heplw64'
+
+i_service_connection:
+-
+    unitid: 'csv2-test'
+    nic: 'lo'
+    ipv4: '206.12.154.202'
+    ipv4fqdn: 'elephant202.heprc.uvic.ca'
+    ipv6: '2607:f8f0:c10:70f3:2::202'
+    ipv6fqdn: 'elephant202.heprc6.uvic.ca'
+
