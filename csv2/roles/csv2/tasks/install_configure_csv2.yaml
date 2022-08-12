@@ -162,31 +162,11 @@
       update: no
       version: master      
 
-- name: list old csv2 services
-  shell:
-    cmd: "ls csv2-*.service || echo"
-    chdir: /etc/systemd/system/
-  register: old_csv2_services
-
-
 - name: list current csv2 services
   shell:
     cmd: "for i in $(ls csv2-*.service.afile); do echo ${i::-6}; done"
     chdir: /opt/cloudscheduler/etc/systemd/system/
   register: current_csv2_services
-
-- name: stop and disable obsolete csv2 services
-  systemd:
-    name: "{{ item }}"
-    enabled: no
-    state: stopped
-  with_items: "{{ (old_csv2_services.stdout_lines | reject('in', current_csv2_services.stdout_lines)) | list }}"
-
-- name: remove obsolete csv2 service files
-  file:
-    path: "/etc/systemd/system/{{ item }}"
-    state: absent
-  with_items: "{{ (old_csv2_services.stdout_lines | reject('in', current_csv2_services.stdout_lines)) | list }}"
 
 - name: create/update csv2 service files in systemd directory
   copy:
