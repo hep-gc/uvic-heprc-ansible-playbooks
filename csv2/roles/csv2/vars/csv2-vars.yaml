@@ -4,7 +4,7 @@ cs_git_branch: stable-2.10
 db_upgrade_file: none
 schema_model: stable-2.10.3.rc1
 
-admin_email:
+admin_email: root@elephant179.heprc.uvic.ca
 
 install_phpMyAdmin: False
 web_debug: True
