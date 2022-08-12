@@ -5,8 +5,8 @@
   set_fact:
     public_mariadb: false
 
-#- name: include_vars
-#  include_vars: "{{ addenda }}"
+- name: include_vars
+  include_vars: "{{ addenda }}"
 - name: include_vars
   include_vars: "csv2-secrets.yaml"
 - name: include_vars

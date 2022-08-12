@@ -26,6 +26,6 @@ M=$(
 # echo $R
 if [ $R -eq 1 ]; then
     /usr/bin/echo -e "copy x509 certificates failed for one or more users:\n$M" | \
-    /usr/bin/mail -s "user key/cert problem on $(hostname)" "{{ admin_email }}"
+    /usr/bin/mail -s "user key/cert problem on $(hostname)" "root@{{ ansible_fqdn }}"
 fi
 

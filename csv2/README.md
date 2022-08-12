@@ -4,7 +4,7 @@
 
 - Ansible
 
-### Recommended VM Configuration
+### Recommended VM Configuration (OpenStack)
 
 ```sh
 OS: CentOS 7
@@ -16,7 +16,7 @@ SSH Key: (some key, enable root SSH)
 
 ### Steps to install csv2 on a pre-configured host
 
-- Ensure that you have an ssh key enabling root access (or some other user with `sudo` privileges)
+- Ensure that you have an ssh key enabling root access
 - Modify the vars (`csv2-vars.yaml`) and secrets (`csv2-secrets.yaml`) files in `roles/csv2/vars` with correct info
 - Modify the inventory file (`inventory` in this folder) with target information
 - Modify addenda (`addenda.yaml`)
@@ -24,8 +24,7 @@ SSH Key: (some key, enable root SSH)
 Run:
 
 ```sh
-cd csv2
-ansible-playbook -i inventory -u root --check staticvms.yaml
+ansible-playbook -i inventory -u root staticvms.yaml
 ```
 
 
