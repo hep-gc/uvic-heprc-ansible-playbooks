@@ -24,7 +24,6 @@ SSH Key: (some key, enable root SSH)
 Run:
 
 ```sh
-cd csv2
 ansible-playbook -i inventory -u root --check staticvms.yaml
 ```
 
