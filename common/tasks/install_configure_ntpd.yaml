@@ -6,9 +6,6 @@
     name: ['ntp']
     state: latest
   ignore_errors: yes
-
-- name: configure ntpd
-  copy: src=etc_ntp.conf dest=/etc/ntp.conf
   notify:
     - restart ntpd
 
