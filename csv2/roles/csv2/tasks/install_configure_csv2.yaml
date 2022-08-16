@@ -2,8 +2,8 @@
 - name: set_fact
   set_fact:
     csv2_host: '{{ i_virtualhosts.0.virtualhost }}'
-    ssl_cert_file: "/etc/letsencrypt/live/{{ i_external_connection.0.ipv4fqdn }}/fullchain.pem"
-    ssl_key_file: "/etc/letsencrypt/live/{{ i_external_connection.0.ipv4fqdn }}/privkey.pem"
+    ssl_cert_file: "/etc/letsencrypt/live/{{ i_service_connection.0.ipv4fqdn }}/fullchain.pem"
+    ssl_key_file: "/etc/letsencrypt/live/{{ i_service_connection.0.ipv4fqdn }}/privkey.pem"
   when: (local_web is undefined) or (local_web == False)
 
 - name: set_fact
@@ -29,7 +29,7 @@
 
 - name: set_fact
   set_fact:
-    db_hostname: "{{ i_external_connection.0.ipv4fqdn }}"
+    db_hostname: "{{ i_service_connection.0.ipv4fqdn }}"
   when:
   - (db_on_localhost is undefined) or (db_on_localhost != true)
 
