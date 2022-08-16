@@ -1,14 +1,1 @@
----
-# This is the original (not like chronyd).
-- name: restart ntpd with service
-  service: name=ntpd enabled=yes state=restarted
-  listen: restart ntpd
-  when: (container is undefined) or (container == False)
-  ignore_errors: yes
-
-- name: restart ntpd with systemd
-  systemd: name=ntpd enabled=yes state=restarted
-  listen: restart ntpd
-  when: 
-  - container is defined
-  - container == True
+../../../../common/handlers//restart_ntpd.yaml

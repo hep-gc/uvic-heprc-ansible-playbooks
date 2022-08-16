@@ -1,6 +1,1 @@
-#!/bin/bash
-  /usr/sbin/ifdown-original $1 $2     
-
-  if [ -f /etc/sysconfig/network-scripts/ifcfg-${1}.old ]; then
-    mv /etc/sysconfig/network-scripts/ifcfg-${1}.old /etc/sysconfig/network-scripts/ifcfg-${1}
-  fi
+../../../../common/files//usr_sbin_ifdown

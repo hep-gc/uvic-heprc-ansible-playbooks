@@ -1,2 +1,1 @@
-# run once a week
-0 0 * * Mon root /usr/local/sbin/copy_certificates_to_users.sh
+../../../../common/files//etc_cron.d_copy-certificates-to-users

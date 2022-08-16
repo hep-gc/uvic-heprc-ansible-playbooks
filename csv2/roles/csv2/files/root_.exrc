@@ -1,1 +1,1 @@
-:set ai nu sw=2 expandtab
+../../../../common/files//root_.exrc

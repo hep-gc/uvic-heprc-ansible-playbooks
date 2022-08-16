@@ -1,0 +1,11 @@
+---
+# restart_network.yaml
+- name: restart network with service
+  service: name=network enabled=yes state=restarted
+  listen: restart network
+  when: ansible_facts['distribution_major_version'] == "7"
+
+- name: Disable NetworkManager
+  service: name=NetworkManager enabled=no state=stopped
+  listen: restart network
+  when: ansible_facts['distribution_major_version'] == "8"

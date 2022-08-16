@@ -1,4 +1,1 @@
----
-# restart_sshd.yaml
-- name: restart sshd
-  service: name=sshd enabled=yes state=restarted
+../../../../common/handlers//restart_sshd.yaml

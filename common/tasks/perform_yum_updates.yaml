@@ -1,0 +1,33 @@
+---
+# file: perform_updates.yaml - but not automatically.
+
+- name: Install elrepo gpg key
+  rpm_key:
+    key: https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+    state: present
+
+- name: Install elrepo repo (RH8)
+  yum:
+    name: https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
+    state: present
+  when: ansible_facts['distribution_major_version'] == "8"
+
+- name: Install elrepo repo (RH7)
+  yum:
+    name: https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
+    state: present
+  when: ansible_facts['distribution_major_version'] == "7"
+
+- name: disable yum auto_updates
+  script: bash-disable_yum_auto_updates creates=/root/ansible_script_logs/bash-disable_yum_auto_updates.log
+
+- name: install other packages
+  yum:
+    name: ['nano', 'mc']
+    state: present
+
+- name: update all installed packages
+  yum:
+    name: '*'
+    state: latest
+  ignore_errors: true
