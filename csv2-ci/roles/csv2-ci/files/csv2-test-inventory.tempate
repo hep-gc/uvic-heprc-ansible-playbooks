@@ -1,0 +1,2 @@
+[csv2]
+{HOST}.heprc.uvic.ca:{PORT} csv2_fqdn={HOST}.heprc.uvic.ca addenda=addenda.yaml

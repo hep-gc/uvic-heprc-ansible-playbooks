@@ -1,0 +1,28 @@
+---
+# install_configure_ci.yaml
+
+- name: update certificate trust
+  command: /usr/bin/update-ca-trust
+  when: target_is_vm == True
+
+- name: pull down uvic-heprc-ansilbe-playbooks
+  git:
+    repo: git@github.com:hep-gc/uvic-heprc-ansible-playbooks.git
+    dest: /opt/deployment/uvic-heprc-ansible-playbooks/
+    force: yes
+    update: yes
+    version: master
+    accept_hostkey: yes
+  become: no
+
+- name: pull down cloudscheduler repo
+  git:
+    repo: https://github.com/hep-gc/cloudscheduler.git
+    dest: /root/cloudscheduler/
+    force: yes
+    update: yes
+    version: "{{ csv2_branch }}"
+
+- name: set timezone
+  timezone:
+    name: "{{ timezone }}"
