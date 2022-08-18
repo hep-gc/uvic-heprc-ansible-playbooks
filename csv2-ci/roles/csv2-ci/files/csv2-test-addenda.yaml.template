@@ -1,0 +1,9 @@
+i_service_connection:
+-
+    ipv4: '{IP}'
+    ipv4fqdn: '{HOST}'
+
+i_virtualhosts:
+-
+    virtualhost: {{ i_service_connection.0.ipv4fqdn }} 
+

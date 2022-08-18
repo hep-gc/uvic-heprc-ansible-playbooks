@@ -12,7 +12,9 @@ if [ "$#" -ne 7 ]; then
     exit 1
  fi
 
-target_name=$1 # elephantxxx
+# $1 is host_number
+host_number=${1}
+target_name=elephant${host_number} # elephantxxx
 host_port=22
 
 branch=$2
@@ -23,14 +25,21 @@ default_pass=$5
 tester_pass=$6
 other_pass=$7
 
-cd /opt/deployment/uvic-heprc-ansible-playbooks
+cd /opt/deployment/uvic-heprc-ansible-playbooks/csv2
 
 # Create inventory file
 cp /opt/deployment/uvic-heprc-ansible-playbooks/csv2-ci/roles/csv2-ci/files/csv2-test-inventory.template inventory
 
 # - Make changes based -i on input above
-sed -i "s/{HOST}/$target_name/g" inventory
+sed -i "s/{HOST}/${target_name}.heprc.uvic.ca/g" inventory
 sed -i "s/{PORT}/$host_port/g" inventory
+
+# Create addenda file
+cp /opt/deployment/uvic-heprc-ansible-playbooks/csv2-ci/roles/csv2-ci/files/csv2-test-addenda.yaml.template addenda.yaml
+
+# - Make changes based -i on input above
+sed -i "s/{HOST}/${target_name}.heprc.uvic.ca/g" addenda.yaml
+sed -i "s/{IP}/206.12.154.${host_number}/g" addenda.yaml
 
 # Create vars and secrets
 
@@ -54,7 +63,8 @@ sed -i "s/{OTHERPASS}/$other_pass/g"     csv2-secrets.yaml
 
 # - Update unit test target
 cd "/root/.csv2/unit-test"
-sed -ri "s#\s*server-address: (.*)#server-address: https://${host_number}.heprc.uvic.ca#g" settings.yaml
+sed -ri "s#\s*server-address: (.*)#server-address: https://${target_name}.heprc.uvic.ca#g" settings.yaml
+sed -ri "s#\s*server-password: (.*)#server-password: ${tester_pass}#g" settings.yaml
 
 # Copy over required files
 cd /root/cloudscheduler/unit_tests/web_tests/misc_files
@@ -63,6 +73,6 @@ cp job_sample.condor job.condor
 cp job_sample.sh job.sh
 sed -i "s/{user}/tester/" job.condor
 
-sudo scp -i /root/.ssh/id_rsa -P $host_port job.condor "tester@${target_name}.heprc.uvic.ca:~"
-sudo scp -i /root/.ssh/id_rsa -P $host_port job.sh "tester@${target_name}.heprc.uvic.ca:~"
-
+sudo ssh -i /root/.ssh/id_rsa -p $host_port root@${target_name}.heprc.uvic.ca "mkdir -p /home/tester"
+sudo scp -i /root/.ssh/id_rsa -P $host_port job.condor "root@${target_name}.heprc.uvic.ca:/home/tester/"
+sudo scp -i /root/.ssh/id_rsa -P $host_port job.sh "root@${target_name}.heprc.uvic.ca:/home/tester/"
