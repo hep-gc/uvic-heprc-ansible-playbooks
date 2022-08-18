@@ -10,7 +10,7 @@
 OS: CentOS 7
 Flavor: s4 (recommended)
 Interface: private (attach floating ip)
-Security groups: default, ssh_only (allow TCP ingress on port 22)
+Security groups: default (allow TCP ingress on port 22), Jenkins (allow TCP ingress on port 8080)
 SSH Key: any	
 ```
 

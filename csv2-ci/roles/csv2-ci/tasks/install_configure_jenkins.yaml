@@ -1,0 +1,82 @@
+---
+# install_configure_jenkins.yaml
+
+- name: get jenkins long term release repo
+  get_url:
+    url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+    dest: /etc/yum.repos.d/jenkins.repo
+
+- name: import jenkins key from url
+  rpm_key:
+    state: present
+    key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+- name: yum update
+  yum:
+    name: '*'
+    state: latest
+
+- name: install jdk
+  yum:
+    name: java-11-openjdk-devel
+    state: present
+
+- name: install jenkins
+  yum:
+    name: jenkins
+    state: latest
+
+- name: change permissions for ansible directories (1/3)
+  file:
+    path: /var/lib/jenkins
+    owner: root
+    group: root
+    recurse: yes
+
+- name: change permissions for ansible directories (2/3)
+  file:
+    path: /var/cache/jenkins
+    owner: root
+    group: root
+    recurse: yes
+
+- name: change permissions for ansible directories (3/3)
+  file:
+    path: /var/log/jenkins
+    owner: root
+    group: root
+    recurse: yes
+
+- name: make jenkins run as root user (1/3)
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/jenkins
+    regexp: '^JENKINS_USER=.*$'
+    line: JENKINS_USER="root"
+
+- name: make jenkins run as root user (2/3)
+  ansible.builtin.lineinfile:
+    path: /usr/lib/systemd/system/jenkins.service
+    regexp: '^User=.*$'
+    line: User=root
+
+- name: make jenkins run as root user (3/3)
+  ansible.builtin.lineinfile:
+    path: /usr/lib/systemd/system/jenkins.service
+    regexp: '^Group=.*$'
+    line: Group=root
+
+- name: daemon-reload to pick up config changes
+  systemd:
+    daemon_reload: yes
+
+- name: open jenkins port
+  firewalld: zone=public port=8080/tcp  state=enabled immediate=true permanent=true
+  notify:
+    - restart firewalld
+  ignore_errors: yes
+
+- name: start jenkins
+  systemd:
+    name: jenkins
+    state: restarted
+    enabled: yes

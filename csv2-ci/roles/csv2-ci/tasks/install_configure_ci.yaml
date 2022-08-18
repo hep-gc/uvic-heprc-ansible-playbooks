@@ -3,7 +3,6 @@
 
 - name: update certificate trust
   command: /usr/bin/update-ca-trust
-  when: target_is_vm == True
 
 - name: pull down uvic-heprc-ansilbe-playbooks
   git:
@@ -26,3 +25,25 @@
 - name: set timezone
   timezone:
     name: "{{ timezone }}"
+
+- name: set up web tests
+  shell: yes | /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_centos.sh ci_install 
+
+- name: ensure csv2 cli config dir exists
+  file:
+    path: /root/.csv2/unit-test
+    state: directory
+
+- name: set cloudscheduler cli default
+  copy:
+    src: ../files/default_server
+    dest: /root/.csv2/default_server
+    owner: root
+    group: root 
+
+- name: set cloudscheduler cli defauit settings
+  copy:
+    src: ../files/settings.yaml
+    dest: /root/.csv2/unit-test/settings.yaml
+    owner: root
+    group: root 

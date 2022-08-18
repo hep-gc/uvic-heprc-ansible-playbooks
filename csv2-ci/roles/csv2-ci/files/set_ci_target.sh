@@ -53,8 +53,10 @@ sed -i "s/{TESTERPASS}/$tester_pass/g"   csv2-secrets.yaml
 sed -i "s/{OTHERPASS}/$other_pass/g"     csv2-secrets.yaml
 
 # - Update unit test target
+mkdir -p "/root/.csv2/unit-test"
 cd "/root/.csv2/unit-test"
 sed -ri "s#\s*server-address: (.*)#server-address: https://${host_number}.heprc.uvic.ca#g" settings.yaml
+sed -ri "s#\s*server-password: (.*)#server-password: https://${tester_pass}#g" settings.yaml
 
 # Copy over required files
 cd /root/cloudscheduler/unit_tests/web_tests/misc_files
