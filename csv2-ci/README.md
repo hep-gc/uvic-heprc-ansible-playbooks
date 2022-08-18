@@ -14,7 +14,7 @@ Security groups: default (allow TCP ingress on port 22), Jenkins (allow TCP ingr
 SSH Key: any	
 ```
 
-### Steps to install csv2 on a pre-configured host
+### Steps to install csv2 ci on a pre-configured host
 
 - Ensure that you have an ssh key enabling root access
 - Modify the vars (`csv2-ci-vars.yaml`) file in `roles/csv2-ci/vars` with correct info
