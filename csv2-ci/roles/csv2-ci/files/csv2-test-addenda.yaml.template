@@ -5,5 +5,5 @@ i_service_connection:
 
 i_virtualhosts:
 -
-    virtualhost: {{ i_service_connection.0.ipv4fqdn }} 
+    virtualhost: '{{ i_service_connection.0.ipv4fqdn }}'
 
