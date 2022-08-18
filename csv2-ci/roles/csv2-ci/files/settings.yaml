@@ -1,0 +1,16 @@
+all: false
+expose-API: false
+force: false
+help: false
+long-help: false
+no-view: false
+only-keys: false
+rotate: false
+server: unit-test
+server-address: placeholder
+server-password: placeholder
+server-user: tester
+use-x509-authentication: false
+version: false
+view-columns: false
+'yes': false

@@ -8,18 +8,10 @@
   when: ansible_facts['distribution'] != "CentOS" 
 
 - name: install other required packages
-  yum: name={{ item }} state=latest
-  with_items:
-  - "@development"
-  - mailx
-  - xauth
-  - xorg-x11-apps
-  - xorg-x11-fonts-Type1
-  - python3
-  - python3-devel
-  - python3-pip
-  - python3-setuptools
-  - Xvfb
+  yum:
+    name: ['@development', 'mailx', 'xauth', 'xorg-x11-apps', 'xorg-x11-fonts-Type1', 'python3', 
+'python3-devel', 'python3-pip', 'python3-setuptools', 'Xvfb']
+    state: latest
 
 - name: upgrade pip3 setuptools
   pip:
