@@ -69,8 +69,8 @@
   systemd:
     daemon_reload: yes
 
-- name: open jenkins port
-  firewalld: zone=public port=8080/tcp  state=enabled immediate=true permanent=true
+- name: open jenkins port (if firewalld is installed)
+  command: firewall-cmd --permanent --immediate --zone=public --add-port=8080/tcp
   notify:
     - restart firewalld
   ignore_errors: yes
