@@ -4,3 +4,6 @@
   roles:
   - csv2
 
+- hosts: csv2-ci
+  roles:
+  - csv2-ci

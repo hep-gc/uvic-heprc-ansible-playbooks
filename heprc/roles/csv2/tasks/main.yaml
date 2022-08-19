@@ -4,15 +4,20 @@
 - name: set_fact
   set_fact:
     public_mariadb: false
+  when: internal_system_install is not defined
 
 - name: include_vars
   include_vars: "{{ addenda }}"
+  when: internal_system_install is not defined
 - name: include_vars
   include_vars: "csv2-secrets.yaml"
+  when: internal_system_install is not defined
 - name: include_vars
   include_vars: "csv2-default-vars.yaml"
+  when: internal_system_install is not defined
 - name: include_vars
   include_vars: "csv2-vars.yaml"
+  when: internal_system_install is not defined
 
 #- name: set_fact
 #  set_fact:
@@ -27,6 +32,7 @@
 - name: set_fact
   set_fact:
     ansible_ssh_port: "{{ ansible_ssh_port }}"
+  when: internal_system_install is not defined
 
 - name: import_tasks
   import_tasks: configure_etc_hosts.yaml

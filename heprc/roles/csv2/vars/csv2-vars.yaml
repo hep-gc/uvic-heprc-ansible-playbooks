@@ -17,3 +17,12 @@ local_web: False
 openstack_vm: True
 ci_target: True
 
+i_service_connection:
+-
+    ipv4: '206.12.154.179'
+    ipv4fqdn: '{{ csv2_fqdn }}'
+
+i_virtualhosts:
+-
+    virtualhost: '{{ i_service_connection.0.ipv4fqdn }}'
+
