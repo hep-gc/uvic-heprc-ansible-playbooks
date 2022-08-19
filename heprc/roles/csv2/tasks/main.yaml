@@ -7,16 +7,13 @@
   when: internal_system_install is not defined
 
 - name: include_vars
-  include_vars: "{{ addenda }}"
+  include_vars: "csv2-public-secrets.yaml"
   when: internal_system_install is not defined
 - name: include_vars
-  include_vars: "csv2-secrets.yaml"
+  include_vars: "csv2-public-default-vars.yaml"
   when: internal_system_install is not defined
 - name: include_vars
-  include_vars: "csv2-default-vars.yaml"
-  when: internal_system_install is not defined
-- name: include_vars
-  include_vars: "csv2-vars.yaml"
+  include_vars: "csv2-public-vars.yaml"
   when: internal_system_install is not defined
 
 #- name: set_fact

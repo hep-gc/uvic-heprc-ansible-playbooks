@@ -25,7 +25,7 @@ default_pass=$5
 tester_pass=$6
 other_pass=$7
 
-cd /opt/deployment/uvic-heprc-ansible-playbooks/csv2
+cd /opt/deployment/uvic-heprc-ansible-playbooks/heprc
 
 # Create inventory file
 cp /opt/deployment/uvic-heprc-ansible-playbooks/heprc/roles/csv2-ci/files/csv2-test-inventory.template inventory
@@ -39,8 +39,8 @@ sed -i "s/{PORT}/$host_port/g" inventory
 cd /opt/deployment/uvic-heprc-ansible-playbooks
 
 # - Copy over secrets from template
-cp csv2-ci/roles/heprc/files/csv2-test-secrets.yaml.template heprc/roles/csv2/vars/csv2-public-secrets.yaml
-cp csv2-ci/roles/heprc/files/csv2-test-vars.yaml.template    heprc/roles/csv2/vars/csv2-public-vars.yaml
+cp heprc/roles/csv2-ci/files/csv2-test-secrets.yaml.template heprc/roles/csv2/vars/csv2-public-secrets.yaml
+cp heprc/roles/csv2-ci/files/csv2-test-vars.yaml.template    heprc/roles/csv2/vars/csv2-public-vars.yaml
 
 cd /opt/deployment/uvic-heprc-ansible-playbooks/heprc/roles/csv2/vars
 
