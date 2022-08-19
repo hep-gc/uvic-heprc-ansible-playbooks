@@ -28,38 +28,32 @@ other_pass=$7
 cd /opt/deployment/uvic-heprc-ansible-playbooks/csv2
 
 # Create inventory file
-cp /opt/deployment/uvic-heprc-ansible-playbooks/csv2-ci/roles/csv2-ci/files/csv2-test-inventory.template inventory
+cp /opt/deployment/uvic-heprc-ansible-playbooks/heprc/roles/csv2-ci/files/csv2-test-inventory.template inventory
 
 # - Make changes based -i on input above
 sed -i "s/{HOST}/${target_name}.heprc.uvic.ca/g" inventory
 sed -i "s/{PORT}/$host_port/g" inventory
-
-# Create addenda file
-cp /opt/deployment/uvic-heprc-ansible-playbooks/csv2-ci/roles/csv2-ci/files/csv2-test-addenda.yaml.template addenda.yaml
-
-# - Make changes based -i on input above
-sed -i "s/{HOST}/${target_name}.heprc.uvic.ca/g" addenda.yaml
-sed -i "s/{IP}/206.12.154.${host_number}/g" addenda.yaml
 
 # Create vars and secrets
 
 cd /opt/deployment/uvic-heprc-ansible-playbooks
 
 # - Copy over secrets from template
-cp csv2-ci/roles/csv2-ci/files/csv2-test-secrets.yaml.template csv2/roles/csv2/vars/csv2-secrets.yaml
-cp csv2-ci/roles/csv2-ci/files/csv2-test-vars.yaml.template    csv2/roles/csv2/vars/csv2-vars.yaml
+cp csv2-ci/roles/heprc/files/csv2-test-secrets.yaml.template heprc/roles/csv2/vars/csv2-public-secrets.yaml
+cp csv2-ci/roles/heprc/files/csv2-test-vars.yaml.template    heprc/roles/csv2/vars/csv2-public-vars.yaml
 
-cd /opt/deployment/uvic-heprc-ansible-playbooks/csv2/roles/csv2/vars
+cd /opt/deployment/uvic-heprc-ansible-playbooks/heprc/roles/csv2/vars
 
 # - Fill in based -i on current git branch
-sed -i "s/{GITBRANCH}/$branch/g" csv2-vars.yaml
-sed -i "s/{DBFILE}/$db_file/g"   csv2-vars.yaml
-sed -i "s/{SCHEMA}/$schema/g"    csv2-vars.yaml
-sed -i "s/{HOST}/$target_name/g" csv2-vars.yaml
+sed -i "s/{GITBRANCH}/$branch/g"            csv2-public-vars.yaml
+sed -i "s/{DBFILE}/$db_file/g"              csv2-public-vars.yaml
+sed -i "s/{SCHEMA}/$schema/g"               csv2-public-vars.yaml
+sed -i "s/{HOST}/$target_name/g"            csv2-public-vars.yaml
+sed -i "s/{IP}/206.12.154.${host_number}/g" csv2-public-vars.yaml
 
-sed -i "s/{DEFAULTPASS}/$default_pass/g" csv2-secrets.yaml
-sed -i "s/{TESTERPASS}/$tester_pass/g"   csv2-secrets.yaml
-sed -i "s/{OTHERPASS}/$other_pass/g"     csv2-secrets.yaml
+sed -i "s/{DEFAULTPASS}/$default_pass/g" csv2-public-secrets.yaml
+sed -i "s/{TESTERPASS}/$tester_pass/g"   csv2-public-secrets.yaml
+sed -i "s/{OTHERPASS}/$other_pass/g"     csv2-public-secrets.yaml
 
 # - Update unit test target
 mkdir -p "/root/.csv2/unit-test"

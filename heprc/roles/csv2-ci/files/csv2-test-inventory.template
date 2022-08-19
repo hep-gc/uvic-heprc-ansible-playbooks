@@ -1,2 +1,2 @@
 [csv2]
-{HOST}:{PORT} csv2_fqdn={HOST} addenda=addenda.yaml
+{HOST}:{PORT} csv2_fqdn={HOST}

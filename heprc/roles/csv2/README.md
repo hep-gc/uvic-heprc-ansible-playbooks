@@ -17,14 +17,6 @@ SSH Key: (some key, enable root SSH)
 ### Steps to install csv2 on a pre-configured host
 
 - Ensure that you have an ssh key enabling root access
-- Modify the vars (`csv2-vars.yaml`) and secrets (`csv2-secrets.yaml`) files in `roles/csv2/vars` with correct info
-- Modify the inventory file (`inventory` in this folder) with target information
-- Modify addenda (`addenda.yaml`)
-
-Run:
-
-```sh
-ansible-playbook -i inventory -u root staticvms.yaml
-```
-
+- Modify the vars (`csv2-public-vars.yaml`) and secrets (`csv2-public-secrets.yaml`) files in `vars` with correct info
+- Modify the inventory file with target information
 

@@ -7,7 +7,7 @@ Directory:
 
 .
 ├── common           - Shared playbook elements
-└── heprc            - heprc project related playbooks
+└── heprc            - HEPRC project related playbooks
     └── roles        
         ├── csv2     - Deployment of cloudscheduler v2 
         └── csv2-ci  - Deployment of continuous integration server for csv2 

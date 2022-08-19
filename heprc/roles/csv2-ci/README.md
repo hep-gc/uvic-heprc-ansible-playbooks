@@ -18,11 +18,5 @@ SSH Key: any
 
 - Ensure that you have an ssh key enabling root access
 - Modify the vars (`csv2-ci-vars.yaml`) file in `roles/csv2-ci/vars` with correct info
-- Modify the inventory file (`inventory` in this folder) with target information
-
-Run:
-
-```sh
-ansible-playbook -i inventory -u root staticvms.yaml
-```
+- Modify the inventory file with target information
 
