@@ -1,1 +1,1 @@
-../../../../common/handlers//restart_mariadb.yaml
+../../../common/handlers//restart_mariadb.yaml

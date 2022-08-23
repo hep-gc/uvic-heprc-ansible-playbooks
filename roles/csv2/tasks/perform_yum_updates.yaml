@@ -1,1 +1,1 @@
-../../../../common/tasks//perform_yum_updates.yaml
+../../../common/tasks//perform_yum_updates.yaml

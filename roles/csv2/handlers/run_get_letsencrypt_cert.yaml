@@ -1,1 +1,1 @@
-../../../../common/handlers//run_get_letsencrypt_cert.yaml
+../../../common/handlers//run_get_letsencrypt_cert.yaml

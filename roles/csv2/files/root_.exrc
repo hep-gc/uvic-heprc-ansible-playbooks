@@ -1,1 +1,1 @@
-../../../../common/files//root_.exrc
+../../../common/files//root_.exrc

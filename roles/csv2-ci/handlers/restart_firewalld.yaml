@@ -1,1 +1,1 @@
-../../../../common/handlers/restart_firewalld.yaml
+../../../common/handlers/restart_firewalld.yaml
