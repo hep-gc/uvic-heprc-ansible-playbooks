@@ -13,7 +13,7 @@ ansible-playbook --limit [hostname] -i inventory -u root staticvms.yaml
 To start a deployment (with role):
 
 ```sh
-ansible -u root -i [hostname], --ssh-extra-args='-p22' -m include_role -a name='<rolename>' [hostname]
+ansible -u root -i [hostname], --ssh-extra-args='-p22' -m include_role -a name='[rolename]' [hostname]
 ```
 
 Note: Don't forget the comma after the hostname in the `-i` flag if there is only a single host.
