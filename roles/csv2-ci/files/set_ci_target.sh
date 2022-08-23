@@ -25,10 +25,10 @@ default_pass=$5
 tester_pass=$6
 other_pass=$7
 
-cd /opt/deployment/uvic-heprc-ansible-playbooks/heprc
+cd /opt/deployment/uvic-heprc-ansible-playbooks
 
 # Create inventory file
-cp /opt/deployment/uvic-heprc-ansible-playbooks/heprc/roles/csv2-ci/files/csv2-test-inventory.template inventory
+cp /opt/deployment/uvic-heprc-ansible-playbooks/roles/csv2-ci/files/csv2-test-inventory.template inventory
 
 # - Make changes based -i on input above
 sed -i "s/{HOST}/${target_name}.heprc.uvic.ca/g" inventory
@@ -39,10 +39,10 @@ sed -i "s/{PORT}/$host_port/g" inventory
 cd /opt/deployment/uvic-heprc-ansible-playbooks
 
 # - Copy over secrets from template
-cp heprc/roles/csv2-ci/files/csv2-test-secrets.yaml.template heprc/roles/csv2/vars/csv2-public-secrets.yaml
-cp heprc/roles/csv2-ci/files/csv2-test-vars.yaml.template    heprc/roles/csv2/vars/csv2-public-vars.yaml
+cp roles/csv2-ci/files/csv2-test-secrets.yaml.template roles/csv2/vars/csv2-public-secrets.yaml
+cp roles/csv2-ci/files/csv2-test-vars.yaml.template    roles/csv2/vars/csv2-public-vars.yaml
 
-cd /opt/deployment/uvic-heprc-ansible-playbooks/heprc/roles/csv2/vars
+cd /opt/deployment/uvic-heprc-ansible-playbooks/roles/csv2/vars
 
 # - Fill in based -i on current git branch
 sed -i "s/{GITBRANCH}/$branch/g"            csv2-public-vars.yaml
