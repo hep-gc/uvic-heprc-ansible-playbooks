@@ -4,13 +4,17 @@ Repository containing to-be-public ansible playbooks to deploy software such as 
 
 Specific pre-deployment instructions are in `roles/*/README.md` for each speficic role.
 
-To start a deployment (with playbook):
+### To start a deployment (with playbook):
+
+Insert into `inventory` file `[hostname]:[port]` in a new line under the correct role tag.
+
+Run:
 
 ```sh
 ansible-playbook --limit [hostname] -i inventory -u root staticvms.yaml
 ```
 
-To start a deployment (with role):
+### To start a deployment (with role):
 
 ```sh
 ansible -u root -i [hostname], --ssh-extra-args='-p22' -m include_role -a name='[rolename]' [hostname]
