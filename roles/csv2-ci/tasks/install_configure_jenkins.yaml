@@ -70,7 +70,7 @@
     daemon_reload: yes
 
 - name: open jenkins port (if firewalld is installed)
-  command: firewall-cmd --permanent --immediate --zone=public --add-port=8080/tcp
+  command: firewall-cmd --permanent --zone=public --add-port=8080/tcp
   notify:
     - restart firewalld
   ignore_errors: yes

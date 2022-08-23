@@ -13,6 +13,12 @@
 'python3-devel', 'python3-pip', 'python3-setuptools', 'Xvfb']
     state: latest
 
+- name: upgrade pip 
+  pip:
+    name: pip
+    executable: pip3
+    state: latest
+
 - name: upgrade pip3 setuptools
   pip:
     name: setuptools
