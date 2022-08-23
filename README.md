@@ -11,5 +11,5 @@ Insert into `inventory` file `[hostname]:[port]` in a new line under the correct
 Run:
 
 ```sh
-ansible-playbook --limit [hostname] -i inventory -u root main.yaml
+ansible-playbook --limit [hostname] -i inventory -u root --ssh-common-args "-o ForwardAgent=yes" main.yaml
 ```
