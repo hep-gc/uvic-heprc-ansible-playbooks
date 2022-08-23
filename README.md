@@ -11,14 +11,5 @@ Insert into `inventory` file `[hostname]:[port]` in a new line under the correct
 Run:
 
 ```sh
-ansible-playbook --limit [hostname] -i inventory -u root staticvms.yaml
+ansible-playbook --limit [hostname] -i inventory -u root main.yaml
 ```
-
-### To start a deployment (with role):
-
-```sh
-ansible -u root -i [hostname], --ssh-extra-args='-p22' -m include_role -a name='[rolename]' [hostname]
-```
-
-Note: Don't forget the comma after the hostname in the `-i` flag if there is only a single host.
-
