@@ -27,6 +27,6 @@
 
 - name: install required python3 modules
   pip:
-    name: ["ansible", "pytest==7.0.1", "pytest-rerunfailures==10.2"]
+    name: ["ansible", "pytest==7.0.1", "pytest-rerunfailures==10.2", "requests_toolbelt"]
     executable: pip3
   
