@@ -36,3 +36,5 @@ default_grid_mapfile:
         - '"{{ htcondor_worker_gsi_dn }}" condor'
         - '"/CN={{ ansible_fqdn }}" condor'
 
+register_ELK: False
+ELK_server: <REPLACE ME>
