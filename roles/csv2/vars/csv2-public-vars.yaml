@@ -2,9 +2,9 @@
 
 csv2_fqdn: elephant179.heprc.uvic.ca
 
-cs_git_branch: stable-2.10
+cs_git_branch: stable-2.10.4
 db_upgrade_file: none
-schema_model: stable-2.10.3.rc1
+schema_model: stable-2.10.4.rc1
 
 admin_email: root@elephant179.heprc.uvic.ca
 
