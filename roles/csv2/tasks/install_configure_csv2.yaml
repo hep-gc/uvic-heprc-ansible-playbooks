@@ -102,6 +102,14 @@
   yum:
     name: python2-bcrypt
 
+- name: install qemu-img
+  yum:
+    name: qemu-img
+
+- name: install virt-sparsify
+  yum:
+    name: libguestfs-tools-c
+
 - name: upgrade pip3 to latest version before install certbot
   command: pip3 install --upgrade pip
 

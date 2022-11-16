@@ -154,7 +154,7 @@ name: csv2
 #-------------------------- Elasticsearch output ------------------------------
 #output.elasticsearch:
 #  # Array of hosts to connect to.
-#  hosts: ["206.12.154.225:19200"]
+#  hosts: []
 #
 #  # Optional protocol and basic auth credentials.
 #  protocol: "https"
@@ -164,7 +164,7 @@ name: csv2
 #----------------------------- Logstash output --------------------------------
 output.logstash:
   # The Logstash hosts
-  hosts: ["elk.heprc.uvic.ca:15044"]
+  hosts: ["{{ ELK_server }}"]
   protocol: "https"
 
   ssl:
@@ -183,8 +183,8 @@ output.logstash:
   #ssl.key: "/etc/pki/client/cert.key"
 
 #setup.kibana:
-#  host: "https://206.12.154.225:15601"
-#  host: "https://elk.heprc.uvic.ca:15601"
+#  host:
+#  host: 
 
 #================================ Logging =====================================
 

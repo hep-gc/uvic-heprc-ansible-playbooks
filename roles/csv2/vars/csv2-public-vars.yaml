@@ -1,12 +1,12 @@
 # Overriding the following defaults varables (see csv2-public-default-vars.yaml):
 
-csv2_fqdn: elephant179.heprc.uvic.ca
+csv2_fqdn: <REPLACE ME> #full domain name of your target csv2 host ex
 
-cs_git_branch: stable-2.10
+cs_git_branch: stable-2.10.4
 db_upgrade_file: none
-schema_model: stable-2.10.3.rc1
+schema_model: stable-2.10.4.rc1
 
-admin_email: root@elephant179.heprc.uvic.ca
+admin_email: <REPLACE ME> # Email address you'd like to recieve admin mail to, usually the root on the csv2 host
 
 install_phpMyAdmin: False
 web_debug: True
@@ -21,7 +21,7 @@ ci_target: True
 
 i_service_connection:
 -
-    ipv4: '206.12.154.179'
+    ipv4: <REPLACE ME> # IPV4 address of your target csv2 host
     ipv4fqdn: '{{ csv2_fqdn }}'
 
 i_virtualhosts:

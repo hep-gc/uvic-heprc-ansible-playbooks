@@ -107,5 +107,9 @@
   import_tasks: install_and_start_condor_poller.yaml
 - name: import_tasks
   import_tasks: install_configure_filebeat.yaml
+  when:
+  - register_ELK is defined
+  - register_ELK == True
+  - ELK_server is defined
 - name: import_tasks
   import_tasks: install_influxdb.yaml
