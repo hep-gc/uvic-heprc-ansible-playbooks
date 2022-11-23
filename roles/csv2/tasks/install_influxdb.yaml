@@ -21,6 +21,11 @@
     name: ['influxdb']
     state: latest
 
+- name: install influxDB configuration file
+  copy:
+    src: etc_influxdb_influxdb.conf
+    dest: /etc/influxdb/influxdb.conf 
+
 - name: Start service InfluxDB
   service:
     name: influxdb
