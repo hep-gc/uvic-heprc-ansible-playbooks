@@ -12,6 +12,17 @@ M=$(
 #        {% endif %}
 #    {% endfor %}
 #{% else %}
+{% if csv2_fqdn is defined %}
+    {% for user in certificate_users %}
+/bin/cp -f /etc/letsencrypt/live/{{ csv2_fqdn }}/fullchain.pem {{ user.globus }}/{{ user.pfx }}cert.pem 2>&1 &&
+        {% if loop.last %}
+/bin/cp -f /etc/letsencrypt/live/{{ csv2_fqdn }}/privkey.pem {{ user.globus }}/{{ user.pfx }}key.pem 2>&1
+        {% else %}
+/bin/cp -f /etc/letsencrypt/live/{{ csv2_fqdn }}/privkey.pem {{ user.globus }}/{{ user.pfx }}key.pem 2>&1 &&
+        {% endif %}
+    {% endfor %}
+#{% endif %}
+{% else %}
     {% for user in certificate_users %}
 /bin/cp -f /etc/letsencrypt/live/{{ user.host }}/fullchain.pem {{ user.globus }}/{{ user.pfx }}cert.pem 2>&1 &&
         {% if loop.last %}
@@ -20,9 +31,8 @@ M=$(
 /bin/cp -f /etc/letsencrypt/live/{{ user.host }}/privkey.pem {{ user.globus }}/{{ user.pfx }}key.pem 2>&1 &&
         {% endif %}
     {% endfor %}
-#{% endif %}
+{% endif %}
 ) || R=1
-
 # echo $R
 if [ $R -eq 1 ]; then
     /usr/bin/echo -e "copy x509 certificates failed for one or more users:\n$M" | \
