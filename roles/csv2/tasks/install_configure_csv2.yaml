@@ -476,15 +476,15 @@
 - name: import_tasks
   import_tasks: configure_EL7_HTCondor.yaml
 
- - name: install influxDB ssl configuration file
-   copy:
-       src: etc_influxdb_influxdb.conf
-       dest: /etc/influxdb/influxdb.conf 
+- name: install influxDB ssl configuration file
+  copy:
+    src: etc_influxdb_influxdb.conf
+    dest: /etc/influxdb/influxdb.conf 
 
 - name: Start service InfluxDB
   service:
-      name: influxdb
-      state: restarted
+    name: influxdb
+    state: restarted
 
 # name: add users to the cloudscheduler group
 # user:
