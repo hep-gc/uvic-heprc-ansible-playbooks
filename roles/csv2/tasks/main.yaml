@@ -93,6 +93,8 @@
 - name: import_tasks
   import_tasks: install_fetch_crl.yaml
 - name: import_tasks
+  import_tasks: install_influxdb.yaml
+- name: import_tasks
   import_tasks: install_EL7_HTCondor.yaml
 - name: import_tasks
   import_tasks: install_configure_csv2.yaml
@@ -111,5 +113,3 @@
   - register_ELK is defined
   - register_ELK == True
   - ELK_server is defined
-- name: import_tasks
-  import_tasks: install_influxdb.yaml

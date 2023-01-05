@@ -751,13 +751,40 @@
     dest: /usr/bin/cloudscheduler
     state: link
 
+- name: create influx admin user
+  command: influx -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
+
+- name: create influx reader user:
+  command: influx -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
+
+- name: create influx writer user:
+  command: influx -execute "CREATE USER csv2_writer WITH PASSWORD '{{ influx_writer_pass }}'
+
+- name: set permissions for influx read user
+  command: influx -execute "GRANT READ ON csv2_timeseries TO csv2_read"
+
+- name: set permissions for influx write user
+  command: influx -execute "GRANT WRITE on csv2_timeseries TO csv2_writer"
+
+- name: install influxDB configuration file to enable ssl
+  copy:
+    src: etc_influxdb_influxdb.conf
+    dest: /etc/influxdb/influxdb.conf
+
+- name: open firewall port for influxdb over ssl
+  command: firewall-cmd --zone=public --add-port=8086/tcp --permanent
+
+- name: restart influxdb on ssl
+  service:
+    name: influxdb
+    state: restarted
+
 - name: ensure csv2 services are enabled and running
   systemd:
     name: "{{ item }}"
     enabled: yes
     state: restarted
   with_items: "{{ current_csv2_services.stdout_lines }}"
-
 
 - name: create new default group "default"
   command: "cloudscheduler group add -su csv2_default -spw '{{ csv2_default_password }}' -sa {{ csv2_web_address }} -gn default -un csv2_default -htcf {{ condor_manager }}"
