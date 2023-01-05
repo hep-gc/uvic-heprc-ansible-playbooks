@@ -7,8 +7,8 @@ if [[ ! -f "/root/.ssh/id_rsa" ]]; then echo "Passwordless ssh key for root acce
 
 set -xe # Stop if step fails
 
-if [ "$#" -ne 7 ]; then
-    echo "Usage: ./set_ci_target.sh host_number git_branch db_upgrade_file schema_file default_pass tester_pass other_pass"
+if [ "$#" -ne 8 ]; then
+    echo "Usage: ./set_ci_target.sh host_number git_branch db_upgrade_file schema_file default_pass tester_pass other_pass influx_pass"
     exit 1
  fi
 
