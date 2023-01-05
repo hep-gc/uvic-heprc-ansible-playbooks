@@ -2,16 +2,6 @@
 
 R=0
 M=$(
-#{% if htcondor_cert is defined and htcondor_key is defined and htcondor_worker_cert is defined and htcondor_worker_key is defined %}
-#    {% for user in certificate_users %}
-#/bin/cp -f /usr/local/etc/certificates/{{ user.host }}/cert.pem {{ user.globus }}/{{ user.pfx }}cert.pem 2>&1 &&
-#        {% if loop.last %}
-#/bin/cp -f /usr/local/etc/certificates/{{ user.host }}/privkey.pem {{ user.globus }}/{{ user.pfx }}key.pem 2>&1
-#        {% else %}
-#/bin/cp -f /usr/local/etc/certificates/{{ user.host }}/privkey.pem {{ user.globus }}/{{ user.pfx }}key.pem 2>&1 &&
-#        {% endif %}
-#    {% endfor %}
-#{% else %}
 {% if csv2_fqdn is defined %}
     {% for user in certificate_users %}
 /bin/cp -f /etc/letsencrypt/live/{{ csv2_fqdn }}/fullchain.pem {{ user.globus }}/{{ user.pfx }}cert.pem 2>&1 &&
@@ -21,7 +11,6 @@ M=$(
 /bin/cp -f /etc/letsencrypt/live/{{ csv2_fqdn }}/privkey.pem {{ user.globus }}/{{ user.pfx }}key.pem 2>&1 &&
         {% endif %}
     {% endfor %}
-#{% endif %}
 {% else %}
     {% for user in certificate_users %}
 /bin/cp -f /etc/letsencrypt/live/{{ user.host }}/fullchain.pem {{ user.globus }}/{{ user.pfx }}cert.pem 2>&1 &&
