@@ -24,6 +24,7 @@ schema=$4
 default_pass=$5
 tester_pass=$6
 other_pass=$7
+influx_pass=$8
 
 cd /opt/deployment/uvic-heprc-ansible-playbooks
 
@@ -54,6 +55,7 @@ sed -i "s/{IP}/206.12.154.${host_number}/g" csv2-public-vars.yaml
 sed -i "s/{DEFAULTPASS}/$default_pass/g" csv2-public-secrets.yaml
 sed -i "s/{TESTERPASS}/$tester_pass/g"   csv2-public-secrets.yaml
 sed -i "s/{OTHERPASS}/$other_pass/g"     csv2-public-secrets.yaml
+sed -i "s/{INFLUXPASS}/$influx_pass/g"   csv2-public-secrets.yaml
 
 # - Update unit test target
 mkdir -p "/root/.csv2/unit-test"
