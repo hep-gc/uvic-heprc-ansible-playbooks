@@ -7,3 +7,7 @@
 - hosts: csv2-ci
   roles:
   - csv2-ci
+
+- hosts: xrootd
+  roles:
+  - xrootd

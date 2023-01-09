@@ -1,0 +1,5 @@
+# Configure timezone
+
+- name: Configure timezone
+  timezone:
+    name: America/Vancouver
