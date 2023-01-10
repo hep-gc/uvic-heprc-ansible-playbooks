@@ -1,5 +1,1 @@
-# Configure timezone
-
-- name: Configure timezone
-  timezone:
-    name: America/Vancouver
+../../../common/tasks/configure_timezone.yaml

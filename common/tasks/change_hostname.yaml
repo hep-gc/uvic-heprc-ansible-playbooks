@@ -1,0 +1,3 @@
+- name: change_hostname
+  hostname:
+    name: "elephant{{suffix}}.heprc.uvic.ca"

@@ -1,3 +1,1 @@
-- name: change_hostname
-  hostname:
-    name: "elephant{{suffix}}.heprc.uvic.ca"
+../../../common/tasks/change_hostname.yaml

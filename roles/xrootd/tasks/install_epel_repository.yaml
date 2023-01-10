@@ -1,4 +1,1 @@
-  - name: Install epel repository
-    yum:
-      name: epel-release
-      state: latest
+../../../common/tasks/install_epel_repository.yaml
