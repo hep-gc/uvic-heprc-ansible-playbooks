@@ -1,0 +1,6 @@
+---
+# file: csv2-ci.yaml
+- hosts: csv2-ci
+  roles:
+    - common
+    - csv2-ci
