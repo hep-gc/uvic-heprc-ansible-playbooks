@@ -10,7 +10,7 @@
 - Modify the inventory file and supply the following host variables 'hostcert' 'hostkey' and 'ansible_user'
 
 Example
-'''
+```
 [xrootd]
 elephant102.heprc.uvic.ca hostcert=102_cert.pem hostkey=102_key.pem ansible_user=centos
-'''
+```
