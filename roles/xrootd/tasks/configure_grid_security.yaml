@@ -1,8 +1,5 @@
 # file: configure_grid_security.yaml
-#
-# Depends on the following variables:
-# "{{hostcert}}"
-# "{{hostkey}}"
+---
 
 - name: Create grid-mapfile
   copy:
@@ -16,14 +13,16 @@
 
 - name: Copy hostcert
   copy: 
-    src: "{{hostcert}}"
+    #src: "{{hostcert}}"
+    src: credentials/{{inventory_hostname}}_cert.pem
     dest: /etc/grid-security/hostcert.pem
     owner: root
     group: root
 
 - name: Copy hostkey
   copy:
-    src: "{{hostkey}}"
+    #src: "{{hostkey}}"
+    src: credentials/{{inventory_hostname}}_key.pem
     dest: /etc/grid-security/hostkey.pem
     owner: root
     group: root
@@ -31,16 +30,18 @@
 
 - name: Add xrdcert
   copy:
-    src: "{{hostcert}}"
+    remote_src: true
+    src: /etc/grid-security/hostcert.pem
     dest: /etc/grid-security/xrd/xrdcert.pem
-    owner: "{{ansible_user}}"
-    group: "{{ansible_user}}"
+    owner: xrootd
+    group: xrootd
 - name: Add xrdkey
   copy:
-    src: "{{hostkey}}"
+    remote_src: true
+    src: /etc/grid-security/hostkey.pem
     dest: /etc/grid-security/xrd/xrdkey.pem
-    owner: "{{ansible_user}}"
-    group: "{{ansible_user}}"
+    owner: xrootd
+    group: xrootd
     mode: 0600
 
 - name: Ensure belle directory exists

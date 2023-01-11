@@ -4,7 +4,8 @@
   include_vars: xrootd_vars.yaml
 
 - name: Setup Xrootd
-  include_tasks: "{{ item }}"
+  loop_control:
+    loop_var: tasks
   loop:
   - configure_timezone.yaml
   - change_hostname.yaml
@@ -13,3 +14,4 @@
   - install_fetch_crl.yaml
   - install_and_configure_xrootd.yaml
   - configure_grid_security.yaml
+  include_tasks: "{{tasks}}"
