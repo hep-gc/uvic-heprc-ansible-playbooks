@@ -1,29 +1,36 @@
+# file: install_and_configure_xrootd.yaml
+
 - name: Install XrootD packages
-  yum:
+  package:
     name: xrootd, voms, xrootd-voms
     state: latest
 - name: Add xrootd configuration
-  copy:
+  template:
     src: tpc-macaroons.conf
-    dest: /home/centos/tpc-macaroons.conf
+    dest: "{{xrddir}}/tpc-macaroons.conf"
+    owner: "{{ansible_user}}"
+    group: "{{ansible_user}}"
 - name: Add Authfile
-  copy:
+  template:
     src: Authfile
-    dest: /home/centos/Authfile
+    dest: "{{xrddir}}/Authfile"
+    owner: "{{ansible_user}}"
+    group: "{{ansible_user}}"
 - name: Make data directory
   file:
-    path: /home/centos/data
+    path: "{{data_dir}}"
     state: directory
-    owner: centos
-    group: centos
+    owner: "{{ansible_user}}"
+    group: "{{ansible_user}}"
 - name: Add the tpc script
   copy:
     src: tpc.sh
-    dest: /home/centos/tpc.sh
-    owner: centos
-    group: centos
+    dest: "{{xrddir}}/tpc.sh"
+    owner: "{{ansible_user}}"
+    group: "{{ansible_user}}"
     mode: u+x
 - name: Generate macaroon secret
   command: 
-    cmd: openssl rand -base64 -out /home/centos/macaroon-secret 64
-    creates: /home/centos/macaroon-secret
+    cmd: openssl rand -base64 -out {{xrddir}}/macaroon-secret 64
+    creates: "{{xrddir}}/macaroon-secret"
+    

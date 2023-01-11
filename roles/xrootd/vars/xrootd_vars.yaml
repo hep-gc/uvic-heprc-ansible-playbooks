@@ -1,0 +1,9 @@
+local_timezone: undef
+xrddir: undef(hint="Replace with a directory to store XrootD related files")
+data_dir: undef(hint="Replace with a directory to use for data storage")
+redirector_hostname: undef(hint="Specify the hostname of the redirector server")
+
+#local_timezone: America/Vancouver
+#xrddir: /home/centos
+#data_dir: /home/centos/data
+#redirector_hostname: elephant101.heprc.uvic.ca

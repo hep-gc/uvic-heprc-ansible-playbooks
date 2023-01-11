@@ -1,4 +1,7 @@
+  # file: install_epel_repository.yaml
+  
   - name: Install epel repository
-    yum:
+    package:
       name: epel-release
       state: latest
+      

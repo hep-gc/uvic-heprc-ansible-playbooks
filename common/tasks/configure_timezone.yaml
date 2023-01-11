@@ -1,5 +1,9 @@
-# Configure timezone
+# file: configure_timezone.yaml
+# Set the timezone to the one defined in the inventory or default to the timezone of the controller node.
 
 - name: Configure timezone
   timezone:
-    name: America/Vancouver
+    #name: {{ local_timezone | default(ansible_facts['date_time']['tz']) }}
+    name: "{{ local_timezone }}"
+  when: local_timezone is defined
+  

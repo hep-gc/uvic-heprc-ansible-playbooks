@@ -1,5 +1,8 @@
 # Xrootd server setup yaml
 ---
+- name: Include_vars
+  include_vars: xrootd_vars.yaml
+
 - name: Setup Xrootd
   include_tasks: "{{ item }}"
   loop:
@@ -10,4 +13,3 @@
   - install_fetch_crl.yaml
   - install_and_configure_xrootd.yaml
   - configure_grid_security.yaml
-...
