@@ -93,8 +93,6 @@
 - name: import_tasks
   import_tasks: install_fetch_crl.yaml
 - name: import_tasks
-  import_tasks: install_influxdb.yaml
-- name: import_tasks
   import_tasks: install_EL7_HTCondor.yaml
 - name: import_tasks
   import_tasks: install_influxdb.yaml
