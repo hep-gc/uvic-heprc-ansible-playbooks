@@ -3,6 +3,7 @@
 # Depends on the following variables:
 # {{xrddir}}
 # {{data_dir}}
+# {{localroot}}
 
 - name: Install XrootD packages
   package:
@@ -10,7 +11,7 @@
     state: latest
 - name: Add xrootd configuration
   template:
-    src: tpc-macaroons.conf
+    src: xrootd-tpc.cfg
     dest: "{{xrddir}}/xrootd-tpc.cfg"
     owner: xrootd
     group: xrootd
@@ -22,7 +23,7 @@
     group: xrootd
 - name: Make data directory
   file:
-    path: "{{data_dir}}"
+    path: "{{localroot}}{{data_dir}}"
     state: directory
     owner: xrootd
     group: xrootd
