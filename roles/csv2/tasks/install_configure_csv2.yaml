@@ -136,7 +136,7 @@
 
 - name: install mysql python packages
   pip:
-    name: ["mysqlclient", "mysql-connector", "sqlparse"]
+    name: ["mysqlclient", "mysql-connector", "sqlparse" ]
     executable: pip3
 
 - name: save any changes in the git repository that we are about to pull down
@@ -313,15 +313,41 @@
   notify:
     restart httpd
 
+- name: install firewalld 
+  yum:
+    name: firewalld
+
+- name: install python firewalld for ansible
+  yum:
+    name: python-firewall
+
+- name: enable firewalld
+  systemd:
+    name: firewalld
+    enabled: yes
+    state: restarted
+
 - name: open https port
   firewalld:
     service: https
     permanent: true
     state: enabled 
     immediate: true
-  when: (container is undefined) or (container == False)
-  ignore_errors: yes
 
+- name: open http port
+  firewalld:
+    service: http
+    permanent: true
+    state: enabled 
+    immediate: true
+
+- name: open influxdb ssl port
+  firewalld:
+    port: 8086/tcp
+    permanent: true
+    state: enabled 
+    immediate: true
+ 
 ### HAProxy ####################################################################################################################################################
 
 - name: import_tasks
@@ -763,27 +789,19 @@
     state: link
 
 - name: create influx admin user
-  command: influx -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
+  command: influx -ssl -unsafeSsl -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
 
-- name: create influx reader user:
-  command: influx -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
+- name: create influx reader user
+  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
 
-- name: create influx writer user:
-  command: influx -execute "CREATE USER csv2_writer WITH PASSWORD '{{ influx_writer_pass }}'
+- name: create influx writer user
+  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_writer WITH PASSWORD '{{ influx_writer_pass }}'"
 
 - name: set permissions for influx read user
-  command: influx -execute "GRANT READ ON csv2_timeseries TO csv2_read"
+  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "GRANT READ ON csv2_timeseries TO csv2_read"
 
 - name: set permissions for influx write user
-  command: influx -execute "GRANT WRITE on csv2_timeseries TO csv2_writer"
-
-- name: install influxDB configuration file to enable ssl
-  copy:
-    src: etc_influxdb_influxdb.conf
-    dest: /etc/influxdb/influxdb.conf
-
-- name: open firewall port for influxdb over ssl
-  command: firewall-cmd --zone=public --add-port=8086/tcp --permanent
+  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "GRANT WRITE on csv2_timeseries TO csv2_writer"
 
 - name: restart influxdb on ssl
   service:
