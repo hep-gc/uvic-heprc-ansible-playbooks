@@ -7,8 +7,8 @@ if [[ ! -f "/root/.ssh/id_rsa" ]]; then echo "Passwordless ssh key for root acce
 
 set -xe # Stop if step fails
 
-if [ "$#" -ne 8 ]; then
-    echo "Usage: ./set_ci_target.sh host_number git_branch db_upgrade_file schema_file default_pass tester_pass other_pass influx_pass"
+if [ "$#" -ne 9 ]; then
+    echo "Usage: ./set_ci_target.sh host_number git_branch db_upgrade_file schema_file default_pass tester_pass other_pass influx_pass influx_admin_pass"
     exit 1
  fi
 
@@ -25,6 +25,7 @@ default_pass=$5
 tester_pass=$6
 other_pass=$7
 influx_pass=$8
+influx_admin_pass=$9
 
 cd /opt/deployment/uvic-heprc-ansible-playbooks
 
@@ -56,6 +57,7 @@ sed -i "s/{DEFAULTPASS}/$default_pass/g" csv2-public-secrets.yaml
 sed -i "s/{TESTERPASS}/$tester_pass/g"   csv2-public-secrets.yaml
 sed -i "s/{OTHERPASS}/$other_pass/g"     csv2-public-secrets.yaml
 sed -i "s/{INFLUXPASS}/$influx_pass/g"   csv2-public-secrets.yaml
+sed -i "s/{INFLUXADMINPASS}/$influx_admin_pass/g"   csv2-public-secrets.yaml
 
 # - Update unit test target
 mkdir -p "/root/.csv2/unit-test"

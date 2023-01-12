@@ -9,7 +9,7 @@
   pip:
     name: ["requests", "influxdb"]
 
-- name: Add InfluxDB `repository
+- name: Add InfluxDB repository
   yum_repository:
     name: influxdb-repo
     description: InfluxDB YUM repo
