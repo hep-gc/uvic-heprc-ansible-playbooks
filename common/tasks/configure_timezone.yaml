@@ -1,0 +1,8 @@
+# file: configure_timezone.yaml
+# Set the timezone to the one defined or skip if none is given
+
+- name: Configure timezone
+  timezone:
+    name: "{{ local_timezone }}"
+  when: local_timezone is defined
+  

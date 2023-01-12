@@ -1,9 +1,5 @@
 ---
-
-- hosts: csv2
-  roles:
-  - csv2
-
-- hosts: csv2-ci
-  roles:
-  - csv2-ci
+# file main.yaml
+- import_playbook: csv2.yaml
+- import_playbook: csv2-ci.yaml
+- import_playbook: xrootd.yaml

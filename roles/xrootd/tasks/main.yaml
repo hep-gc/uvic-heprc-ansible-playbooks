@@ -1,0 +1,17 @@
+# Xrootd server setup yaml
+---
+- name: Include_vars
+  include_vars: xrootd_vars.yaml
+
+- name: Setup Xrootd
+  loop_control:
+    loop_var: tasks
+  loop:
+  - configure_timezone.yaml
+  - change_hostname.yaml
+  - install_EGI_trust_anchors.yaml
+  - install_epel_repository.yaml
+  - install_fetch_crl.yaml
+  - install_and_configure_xrootd.yaml
+  - configure_grid_security.yaml
+  include_tasks: "{{tasks}}"

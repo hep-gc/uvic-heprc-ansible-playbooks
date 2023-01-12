@@ -1,0 +1,6 @@
+---
+# file: xrootd.yaml
+- hosts: xrootd
+  roles:
+    - common
+    - xrootd

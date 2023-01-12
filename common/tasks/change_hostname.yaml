@@ -1,0 +1,5 @@
+# file: change_hostname.yaml - change the hostname to match what is given in the inventory
+
+- name: change_hostname
+  hostname:
+    name: "{{ansible_host}}"

@@ -1,0 +1,55 @@
+# file: configure_grid_security.yaml
+---
+
+- name: Create grid-mapfile
+  copy:
+    src: grid-mapfile
+    dest: /etc/grid-security/grid-mapfile
+
+- name: Ensure xrd directory exists
+  file:
+    path: /etc/grid-security/xrd
+    state: directory
+
+- name: Copy hostcert
+  copy: 
+    #src: "{{hostcert}}"
+    src: credentials/{{inventory_hostname}}_cert.pem
+    dest: /etc/grid-security/hostcert.pem
+    owner: root
+    group: root
+
+- name: Copy hostkey
+  copy:
+    #src: "{{hostkey}}"
+    src: credentials/{{inventory_hostname}}_key.pem
+    dest: /etc/grid-security/hostkey.pem
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Add xrdcert
+  copy:
+    remote_src: true
+    src: /etc/grid-security/hostcert.pem
+    dest: /etc/grid-security/xrd/xrdcert.pem
+    owner: xrootd
+    group: xrootd
+- name: Add xrdkey
+  copy:
+    remote_src: true
+    src: /etc/grid-security/hostkey.pem
+    dest: /etc/grid-security/xrd/xrdkey.pem
+    owner: xrootd
+    group: xrootd
+    mode: 0600
+
+- name: Ensure belle directory exists
+  file:
+    path: /etc/grid-security/vomsdir/belle
+    state: directory
+
+- name: Add KEK voms file
+  copy:
+    src: voms.cc.kek.jp.lsc
+    dest: /etc/grid-security/vomsdir/belle/voms.cc.kek.jp.lsc
