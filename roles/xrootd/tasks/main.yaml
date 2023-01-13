@@ -7,8 +7,6 @@
   loop_control:
     loop_var: tasks
   loop:
-  - configure_timezone.yaml
-  - change_hostname.yaml
   - install_EGI_trust_anchors.yaml
   - install_epel_repository.yaml
   - install_fetch_crl.yaml
