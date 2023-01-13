@@ -1,0 +1,6 @@
+#file: install_xrootd.yaml
+
+- name: Install XrootD packages
+  package:
+    name: xrootd, xrootd-voms
+    state: latest
