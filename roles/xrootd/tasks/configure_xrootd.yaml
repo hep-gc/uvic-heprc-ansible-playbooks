@@ -1,13 +1,9 @@
-# file: install_and_configure_xrootd.yaml
+# file: configure_xrootd.yaml
 #
 # Depends on the following variables:
 # {{data_dir}}
 # {{localroot}}
 
-- name: Install XrootD packages
-  package:
-    name: xrootd, xrootd-voms
-    state: latest
 - name: Add xrootd configuration
   template:
     src: xrootd-tpc.cfg
