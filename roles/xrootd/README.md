@@ -6,6 +6,6 @@
 - Server certificates
 
 ### Steps to install
-- Update /xrootd/vars/xrootd_vars.yaml and specify a directory to store xrootd files, a directory to store the data you want to serve, and the hostname of the redirector server.
+- Update /xrootd/vars.yaml and specify the directory you want to export, where those files are mounted, and the hostname of the redirector server.
 
-- Rename the host keys and certificates to XXX_cert.pem and XXX_key.pem where XXX is the hostname in the inventory and place all of them in the credentials directory.
+- Make sure that the host certificate and the host key are already present on the system in /etc/grid-security/
