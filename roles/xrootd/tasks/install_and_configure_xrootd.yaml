@@ -1,27 +1,31 @@
 # file: install_and_configure_xrootd.yaml
 #
 # Depends on the following variables:
-# {{xrddir}}
 # {{data_dir}}
 # {{localroot}}
 
 - name: Install XrootD packages
   package:
-    name: xrootd, voms, xrootd-voms
+    name: xrootd, xrootd-voms
     state: latest
 - name: Add xrootd configuration
   template:
     src: xrootd-tpc.cfg
-    dest: "{{xrddir}}/xrootd-tpc.cfg"
+    dest: "/etc/xrootd/xrootd-tpc.cfg"
     owner: xrootd
     group: xrootd
 - name: Add Authfile
   template:
     src: Authfile
-    dest: "{{xrddir}}/Authfile"
+    dest: "/etc/xrootd/Authfile"
     owner: xrootd
     group: xrootd
-- name: Make data directory
+- name: Check if data directory exists
+  stat:
+    path: "{{localroot}}{{data_dir}}"
+  register: data_dir_stat
+- name: Change ownership of data directory if it exists
+  when: data_dir_stat.stat.exists and data_dir_stat.stat.isdir
   file:
     path: "{{localroot}}{{data_dir}}"
     state: directory
@@ -30,14 +34,14 @@
 - name: Add the tpc script
   copy:
     src: tpc.sh
-    dest: "{{xrddir}}/tpc.sh"
+    dest: "/etc/xrootd/tpc.sh"
     owner: xrootd
     group: xrootd
     mode: u+x
 - name: Generate macaroon secret
   command: 
-    cmd: openssl rand -base64 -out {{xrddir}}/macaroon-secret 64
-    creates: "{{xrddir}}/macaroon-secret"
+    cmd: openssl rand -base64 -out /etc/xrootd/macaroon-secret 64
+    creates: "/etc/xrootd/macaroon-secret"
 - name: Enable XRootD service
   systemd:
     name: xrootd@tpc

@@ -1,9 +1,4 @@
 local_timezone:
-xrddir: /etc/xrootd
-
-#data_dir: undef(hint="Replace with a directory to use for data storage")
-#redirector_hostname: undef(hint="Specify the hostname of the redirector server")
-
 localroot: /etc/xrootd
 data_dir: /data
 redirector_hostname: elephant101.heprc.uvic.ca
