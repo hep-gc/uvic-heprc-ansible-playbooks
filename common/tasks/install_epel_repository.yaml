@@ -1,7 +1,7 @@
-  # file: install_epel_repository.yaml
-  
-  - name: Install epel repository
-    package:
-      name: epel-release
-      state: latest
+---
+# file: install_epel_repository.yaml
+- name: Install epel repository
+  package:
+    name: epel-release
+    state: latest
       
