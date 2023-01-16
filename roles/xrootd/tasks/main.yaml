@@ -1,16 +1,10 @@
 # Xrootd server setup yaml
 ---
-- name: Include_vars
-  include_vars: xrootd_vars.yaml
+- include_vars: xrootd_vars.yaml
 
-- name: Setup Xrootd
-  loop_control:
-    loop_var: tasks
-  loop:
-  - install_EGI_trust_anchors.yaml
-  - install_epel_repository.yaml
-  - install_fetch_crl.yaml
-  - install_xrootd.yaml
-  - configure_grid_security.yaml
-  - configure_xrootd.yaml
-  include_tasks: "{{tasks}}"
+- import_tasks: install_EGI_trust_anchors.yaml
+- import_tasks: install_epel_repository.yaml
+- import_tasks: install_fetch_crl.yaml
+- import_tasks: install_xrootd.yaml
+- import_tasks: configure_grid_security.yaml
+- import_tasks: configure_xrootd.yaml
