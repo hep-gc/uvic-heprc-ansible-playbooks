@@ -16,17 +16,18 @@
     dest: "/etc/xrootd/Authfile"
     owner: xrootd
     group: xrootd
-- name: Check if data directory exists
+- name: Check if localroot exists
   stat:
-    path: "{{localroot}}{{data_dir}}"
-  register: data_dir_stat
-- name: Change ownership of data directory if it exists
-  when: data_dir_stat.stat.exists and data_dir_stat.stat.isdir
+    path: "{{localroot}}"
+  register: localroot_stat
+- name: Change ownership of localroot and sub-directories if it exists
+  when: localroot_stat.stat.exists and localroot_stat.stat.isdir
   file:
-    path: "{{localroot}}{{data_dir}}"
+    path: "{{localroot}}"
     state: directory
     owner: xrootd
     group: xrootd
+    recurse: true
 - name: Add the tpc script
   copy:
     src: tpc.sh
