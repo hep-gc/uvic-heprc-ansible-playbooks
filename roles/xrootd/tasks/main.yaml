@@ -5,6 +5,8 @@
 - import_tasks: install_EGI_trust_anchors.yaml
 - import_tasks: install_epel_repository.yaml
 - import_tasks: install_fetch_crl.yaml
+- import_tasks: install_OSG_repository.yaml
+- import_tasks: install_OSG_certs.yaml
 - import_tasks: install_xrootd.yaml
 - import_tasks: configure_grid_security.yaml
 - import_tasks: configure_xrootd.yaml
