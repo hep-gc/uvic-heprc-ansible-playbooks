@@ -27,10 +27,6 @@
     owner: xrootd
     group: xrootd
     recurse: true
-- name: print dict
-  debug:
-    msg: "{{localroot_stat}}"
-
 - name: Add the tpc script
   copy:
     src: tpc.sh

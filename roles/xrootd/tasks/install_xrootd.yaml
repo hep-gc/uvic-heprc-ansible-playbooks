@@ -2,5 +2,5 @@
 
 - name: Install XrootD packages
   package:
-    name: xrootd, xrootd-voms
+    name: xrootd, xrootd-voms, xrootd-client
     state: latest
