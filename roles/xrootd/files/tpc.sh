@@ -1,20 +1,29 @@
 #!/bin/sh
 set -- `getopt S: -S 1 $*`
-while [ $# -gt 0 ]
+
+OTHERARGS=()
+while [[ $# -gt 0 ]]
 do
-  case $1 in
-  -S)
-      ((nstreams=$2-1))
-      [ $nstreams -ge 1 ] && TCPstreamOpts="-S $nstreams"
-      shift 2
-      ;;
-  --)
+  key="$1"
+  case $key in
+    -S)
+      STREAMS=$2
       shift
-      break
-      ;;
+      shift
+    ;;
+    *://*)
+      SRC="$1"
+      shift
+    ;;
+    /*)
+      DST="$1"
+      shift
+    ;;
+    *)
+      OTHERARGS+=("$1")
+      shift
+    ;;
   esac
 done
 
-src=$1
-dst=$2
-xrdcp --server $TCPstreamOpts -f $src root://$XRDXROOTD_PROXY/${dst}
+/bin/xrdcp -d3 --server -S $STREAMS $SRC $DST
