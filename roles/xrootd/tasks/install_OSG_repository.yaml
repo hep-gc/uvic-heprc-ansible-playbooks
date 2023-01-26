@@ -5,7 +5,7 @@
     name: yum-plugin-priorities
     state: latest
 
-- name: Install OSG 3.6 for EL7
+- name: Install OSG 3.6
   yum:
-    name: https://repo.opensciencegrid.org/osg/3.6/osg-3.6-el7-release-latest.rpm
+    name: "https://repo.opensciencegrid.org/osg/3.6/osg-3.6-el{{ansible_distribution_version.split('.')[0]}}-release-latest.rpm"
     state: present

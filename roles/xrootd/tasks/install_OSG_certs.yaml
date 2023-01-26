@@ -1,6 +1,0 @@
----
-# file: install_OSG_certs.yaml
-- name: Install osg-ca-certs
-  yum:
-    name: osg-ca-certs
-    state: latest
