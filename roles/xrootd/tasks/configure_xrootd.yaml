@@ -30,7 +30,7 @@
 - name: Add the tpc script
   copy:
     src: tpc.sh
-    dest: "/etc/xrootd/tpc.sh"
+    dest: "/etc/xrootd/xrootd-tpc.sh"
     owner: xrootd
     group: xrootd
     mode: u+x
