@@ -1,6 +1,7 @@
 #!/bin/sh
-logfile="/var/log/xrootd/s3/tpc.log"
+logfile="/var/log/xrootd/tpc/tpc.log"
 
+echo "+++++++++++++++++++++++++++++++++++++" | tee -a $logfile 2>&1
 echo -e "\nDATE: $(date)" | tee -a $logfile 2>&1
 echo "All args:" | tee -a $logfile 2>&1
 printf '%s\n' "$*" | tee -a $logfile 2>&1
@@ -39,4 +40,8 @@ echo "Source: $SRC" | tee -a $logfile 2>&1
 echo "Destination: $DST" | tee -a $logfile 2>&1
 echo "Other Args: ${OTHERARGS[@]}" | tee -a $logfile 2>&1
 
-xrdcp --server -S $STREAMS $SRC - | s3cmd put - s3:/$DST
+echo "=====================================" | tee -a $logfile 2>&1
+
+echo "xrdcp --server -S $STREAMS $SRC - | s3cmd -c /etc/xrootd/.s3cfg put - s3:/$DST" | tee -a $logfile 2>&1
+
+xrdcp --server -S $STREAMS $SRC - | s3cmd -c /etc/xrootd/.s3cfg - s3:/$DST
