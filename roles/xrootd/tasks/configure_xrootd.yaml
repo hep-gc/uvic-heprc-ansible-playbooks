@@ -4,22 +4,34 @@
 # {{data_dir}}
 # {{localroot}}
 
-- name: Add xrootd configuration
+- name: Add xrootd server configuration
   template:
     src: xrootd-tpc.cfg
     dest: "/etc/xrootd/xrootd-tpc.cfg"
     owner: xrootd
     group: xrootd
+  when: inventory_hostname in groups['servers']
+
+- name: Add xrootd s3 configuration
+  template:
+    src: xrootd-s3.cfg
+    dest: "/etc/xrootd/xrootd-tpc.cfg"
+    owner: xrootd
+    group: xrootd
+  when: inventory_hostname in groups['s3_proxies']
+
 - name: Add Authfile
   template:
     src: Authfile
     dest: "/etc/xrootd/Authfile"
     owner: xrootd
     group: xrootd
+
 - name: Ensure localroot exists
   file:
     path: "{{localroot}}"
     state: directory
+
 - name: Change ownership of localroot and sub-directories if it exists
   file:
     path: "{{localroot}}"
@@ -27,17 +39,30 @@
     owner: xrootd
     group: xrootd
     recurse: true
-- name: Add the tpc script
+
+- name: Add the server tpc script
   copy:
     src: tpc.sh
-    dest: "/etc/xrootd/xrootd-tpc.sh"
+    dest: "/etc/xrootd/tpc.sh"
     owner: xrootd
     group: xrootd
     mode: u+x
+  when: inventory_hostname in groups['servers']
+
+- name: Add the s3 tpc script
+  copy:
+    src: tpc-s3.sh
+    dest: "/etc/xrootd/tpc.sh"
+    owner: xrootd
+    group: xrootd
+    mode: u+x
+  when: inventory_hostname in groups['s3_proxies']
+
 - name: Generate macaroon secret
   command: 
     cmd: openssl rand -base64 -out /etc/xrootd/macaroon-secret 64
     creates: "/etc/xrootd/macaroon-secret"
+
 - name: Enable XRootD service
   systemd:
     name: xrootd@tpc
