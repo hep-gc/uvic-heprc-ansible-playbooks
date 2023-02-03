@@ -44,4 +44,4 @@ echo "=====================================" | tee -a $logfile 2>&1
 
 echo "xrdcp --server -S $STREAMS $SRC - | s3cmd -c /etc/xrootd/.s3cfg put - s3:/$DST" | tee -a $logfile 2>&1
 
-xrdcp --server -S $STREAMS $SRC - | s3cmd -c /etc/xrootd/.s3cfg - s3:/$DST
+xrdcp --server -S $STREAMS $SRC - | s3cmd -c /etc/xrootd/.s3cfg put - s3:/$DST
