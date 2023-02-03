@@ -1,3 +1,3 @@
 localroot: /data
 data_dir: /
-redirector_hostname: elephant101.heprc.uvic.ca
+redirector_hostname: example_hostname.com
