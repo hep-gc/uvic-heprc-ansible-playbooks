@@ -1,3 +1,9 @@
 localroot: /data
-data_dir: /
-redirector_hostname: elephant101.heprc.uvic.ca
+export_path: /
+redirector_hostname: example_hostname.com
+
+s3_host: http://elephant102.heprc.uvic.ca:9000
+bucket_name: bucket
+# TOOD: change this so the secret key isn't hardcoded
+access_key: LUiJ1pAY2RKkDeg6
+secret_key: hEPXaKHKBN7ltk8AYA8YhbMw6f7DoTVQ

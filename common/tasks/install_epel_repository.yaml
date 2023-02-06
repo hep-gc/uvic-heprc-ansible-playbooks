@@ -3,5 +3,5 @@
 - name: Install epel repository
   package:
     name: epel-release
-    state: latest
+    state: present
       
