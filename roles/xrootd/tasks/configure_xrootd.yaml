@@ -1,7 +1,7 @@
 # file: configure_xrootd.yaml
 #
 # Depends on the following variables:
-# {{data_dir}}
+# {{export_path}}
 # {{localroot}}
 
 - name: Add xrootd server configuration
@@ -56,6 +56,12 @@
     owner: xrootd
     group: xrootd
     mode: u+x
+  when: inventory_hostname in groups['s3_proxies']
+
+- name: Create directory matching bucket name as a workaround for pss
+  file:
+    path: "{{bucket_name}}"
+    state: directory
   when: inventory_hostname in groups['s3_proxies']
 
 - name: Generate macaroon secret
