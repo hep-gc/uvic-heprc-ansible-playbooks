@@ -1,5 +1,13 @@
 ---
 # file: xrootd.yaml
-- hosts: xrootd
+- hosts: xrootd_standalone
+  vars:
+    server_type: standalone
+  roles:
+    - xrootd
+
+- hosts: xrootd_s3
+  vars:
+    server_type: s3_proxy
   roles:
     - xrootd

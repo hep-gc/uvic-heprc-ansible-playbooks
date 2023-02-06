@@ -6,19 +6,10 @@
 
 - name: Add xrootd server configuration
   template:
-    src: xrootd-tpc.cfg
-    dest: "/etc/xrootd/xrootd-tpc.cfg"
+    src: xrootd-configuration
+    dest: "/etc/xrootd/xrootd-{{server_type}}.cfg"
     owner: xrootd
     group: xrootd
-  when: inventory_hostname in groups['servers']
-
-- name: Add xrootd s3 configuration
-  template:
-    src: xrootd-s3.cfg
-    dest: "/etc/xrootd/xrootd-tpc.cfg"
-    owner: xrootd
-    group: xrootd
-  when: inventory_hostname in groups['s3_proxies']
 
 - name: Add Authfile
   template:
@@ -40,14 +31,14 @@
     group: xrootd
     recurse: true
 
-- name: Add the server tpc script
+- name: Add the standalone tpc script
   copy:
     src: tpc.sh
     dest: "/etc/xrootd/tpc.sh"
     owner: xrootd
     group: xrootd
     mode: u+x
-  when: inventory_hostname in groups['servers']
+  when: server_type == "standalone"
 
 - name: Add the s3 tpc script
   copy:
@@ -56,13 +47,13 @@
     owner: xrootd
     group: xrootd
     mode: u+x
-  when: inventory_hostname in groups['s3_proxies']
+  when: server_type == "s3_proxy"
 
 - name: Create directory matching bucket name as a workaround for pss
   file:
     path: "{{bucket_name}}"
     state: directory
-  when: inventory_hostname in groups['s3_proxies']
+  when: server_type == "s3_proxy"
 
 - name: Generate macaroon secret
   command: 
@@ -71,6 +62,6 @@
 
 - name: Enable XRootD service
   systemd:
-    name: xrootd@tpc
+    name: xrootd@{{server_type}}
     enabled: true
-    state: started
+    state: restarted
