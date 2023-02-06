@@ -502,6 +502,9 @@
 - name: import_tasks
   import_tasks: configure_EL7_HTCondor.yaml
 
+- name: create influx admin user
+  command: influx -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
+
 - name: install influxDB ssl configuration file
   copy:
     src: etc_influxdb_influxdb.conf
@@ -788,20 +791,18 @@
     dest: /usr/bin/cloudscheduler
     state: link
 
-- name: create influx admin user
-  command: influx -ssl -unsafeSsl -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
 
 - name: create influx reader user
-  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
+  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -database 'csv2_timeseries'  -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
 
 - name: create influx writer user
-  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_writer WITH PASSWORD '{{ influx_writer_pass }}'"
+  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -database 'csv2_timeseries' -execute "CREATE USER csv2_writer WITH PASSWORD '{{ influx_writer_pass }}'"
 
 - name: set permissions for influx read user
-  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "GRANT READ ON csv2_timeseries TO csv2_read"
+  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -database 'csv2_timeseries' -execute "GRANT READ ON csv2_timeseries TO csv2_read"
 
 - name: set permissions for influx write user
-  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "GRANT WRITE on csv2_timeseries TO csv2_writer"
+  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -database 'csv2_timeseries' -execute "GRANT WRITE on csv2_timeseries TO csv2_writer"
 
 - name: restart influxdb on ssl
   service:

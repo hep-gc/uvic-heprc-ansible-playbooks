@@ -34,3 +34,4 @@
   influxdb_database:
       database_name: "csv2_timeseries"
       udp_port: 4444
+  ignore_errors: true
