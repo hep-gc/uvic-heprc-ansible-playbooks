@@ -8,15 +8,15 @@
 
 # It seems to be necessary to install xrootd from the OSG repo to have fully working TPC
 - import_tasks: install_OSG_repository.yaml
-  when: inventory_hostname in groups['servers']
+  when: server_type == "standalone"
 
 - import_tasks: install_xrootd.yaml
 
 - import_tasks: install_s3_tools.yaml
-  when: inventory_hostname in groups['s3_proxies']
+  when: server_type == "s3_proxy"
 
 - import_tasks: add_s3_credentials.yaml
-  when: inventory_hostname in groups['s3_proxies']
+  when: server_type == "s3_proxy"
 
 - import_tasks: configure_grid_security.yaml
 - import_tasks: configure_xrootd.yaml
