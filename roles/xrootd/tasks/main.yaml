@@ -1,5 +1,6 @@
 # Xrootd server setup yaml
 ---
+- include_vars: s3_credentials_dict.yaml
 - include_vars: xrootd_vars.yaml
 
 - import_tasks: install_EGI_trust_anchors.yaml
