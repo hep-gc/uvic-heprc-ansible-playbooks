@@ -1,7 +1,6 @@
 set redirector = {{redirector_hostname}}
 
-
-all.manager $(redirector):1095 if redirector != ''
+all.manager $(redirector):1095
 
 
 # Debugging output
@@ -15,7 +14,7 @@ all.manager $(redirector):1095 if redirector != ''
 
 all.export {{export_path}}
 
-# TODO: find a conditional that can distinguish between the two
+# The names used here must match what is going to be passed as server_type
 if named s3_proxy
   # Proxy setup
   all.role proxy server
@@ -39,20 +38,21 @@ xrd.tls /etc/grid-security/xrd/xrdcert.pem /etc/grid-security/xrd/xrdkey.pem
 xrd.tlsca certdir /etc/grid-security/certificates
 xrootd.tls all
 
-if named redirector_node
+if $redirector
   all.role manager
   http.desthttps yes
 else
   xrootd.seclib libXrdSec.so
   sec.protocol gsi -dlgpxy:request \
-                  -exppxy:=creds \
-                  -ca:verify \
-                  -crl:try \
-                  -gmapopt:nomap \
-                  -vomsat:require \
-                  -vomsfun:default
+                   -exppxy:=creds \
+                   -ca:verify \
+                   -crl:try \
+                   -gmapopt:nomap \
+                   -vomsat:require \
+                   -vomsfun:default
 fi
 
+xrootd.seclib libXrdSec.so
 http.secxtractor libXrdHttpVOMS.so
 
 if exec xrootd
