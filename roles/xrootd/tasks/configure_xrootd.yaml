@@ -18,12 +18,7 @@
     owner: xrootd
     group: xrootd
 
-- name: Ensure localroot exists
-  file:
-    path: "{{localroot}}"
-    state: directory
-
-- name: Change ownership of localroot and sub-directories if it exists
+- name: Change ownership of localroot and sub-directories
   file:
     path: "{{localroot}}"
     state: directory
