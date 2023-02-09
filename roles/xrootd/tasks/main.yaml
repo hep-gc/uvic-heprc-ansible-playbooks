@@ -21,3 +21,4 @@
 
 - import_tasks: configure_grid_security.yaml
 - import_tasks: configure_xrootd.yaml
+- import_tasks: configure_cmsd.yaml

@@ -1,0 +1,13 @@
+# file: configure_xrootd.yaml
+- name: Ensure /run/xrootd exists
+  file:
+    path: /run/xrootd/
+    state: directory
+    owner: xrootd
+    group: xrootd
+  
+- name: Restart cmsd
+  systemd:
+    name: cmsd@{{server_type}}
+    enabled: true
+    state: restarted
