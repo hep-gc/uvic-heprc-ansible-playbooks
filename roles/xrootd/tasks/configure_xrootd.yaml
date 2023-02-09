@@ -27,7 +27,7 @@
     recurse: true
 
 - name: Add the standalone tpc script
-  copy:
+  template:
     src: tpc.sh
     dest: "/etc/xrootd/tpc.sh"
     owner: xrootd
@@ -36,7 +36,7 @@
   when: server_type == "standalone"
 
 - name: Add the s3 tpc script
-  copy:
+  template:
     src: tpc-s3.sh
     dest: "/etc/xrootd/tpc.sh"
     owner: xrootd
