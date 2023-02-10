@@ -1,6 +1,6 @@
 localroot: /data
 export_path: /
-redirector_hostname: elephant109.heprc.uvic.ca
+redirector_hostname: www.example.com
 
 
 server_type: "{{ (inventory_hostname in s3_proxy_dict.keys()) | ternary('s3_proxy', 'standalone')}}"
