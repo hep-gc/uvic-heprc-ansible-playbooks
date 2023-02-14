@@ -75,11 +75,17 @@ ofs.tpc xfr 100
 ofs.tpc autorm
 ofs.tpc pgm /etc/xrootd/tpc.sh
 
+if $redirector
+{% for host in ansible_play_hosts if host != redirector_hostname %}
+  ofs.tpc redirect {{host}}:1094
+{% endfor %}
+fi
+
 http.exthandler xrdtpc libXrdHttpTPC.so
 http.header2cgi Authorization authz
 
 # Macaroon setup
 http.exthandler xrdmacaroons libXrdMacaroons.so
 macaroons.secretkey /etc/xrootd/macaroon-secret
-all.sitename {{inventory_hostname}}
+all.sitename test-sitename
 ofs.authlib libXrdMacaroons.so
