@@ -25,12 +25,9 @@ else if named s3_proxy
   pss.origin {{s3_host}}
   pss.localroot {{bucket_name}}
 
-  # XRootD doesn't seem to like reading files directly into environment variables
-  set ACCESS_KEY < /etc/xrootd/access_key
-  set SECRET_KEY < /etc/xrootd/secret_key
+  setenv AWS_ACCESS_KEY_ID < /etc/xrootd/access_key
+  setenv AWS_SECRET_ACCESS_KEY < /etc/xrootd/secret_key
 
-  setenv AWS_ACCESS_KEY_ID = $ACCESS_KEY
-  setenv AWS_SECRET_ACCESS_KEY = $SECRET_KEY
 else if named standalone
   all.role server
   oss.localroot {{localroot}}
