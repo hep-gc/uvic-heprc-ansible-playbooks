@@ -3,6 +3,8 @@
 - include_vars: s3_credentials_dict.yaml
 - include_vars: xrootd_vars.yaml
 
+- import_tasks: change_hostname.yaml
+
 - import_tasks: install_EGI_trust_anchors.yaml
 - import_tasks: install_epel_repository.yaml
 - import_tasks: install_fetch_crl.yaml
