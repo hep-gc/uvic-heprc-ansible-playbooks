@@ -9,10 +9,6 @@
 - import_tasks: install_epel_repository.yaml
 - import_tasks: install_fetch_crl.yaml
 
-# It seems to be necessary to install xrootd from the OSG repo to have fully working TPC
-- import_tasks: install_OSG_repository.yaml
-  when: server_type == "standalone"
-
 - import_tasks: install_xrootd.yaml
 
 - import_tasks: install_s3_tools.yaml

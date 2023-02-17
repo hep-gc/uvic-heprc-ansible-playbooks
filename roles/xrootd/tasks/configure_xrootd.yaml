@@ -11,6 +11,11 @@
     owner: xrootd
     group: xrootd
 
+- name: Add robots.txt
+  copy:
+    src: robots.txt
+    dest: /etc/xrootd/robots.txt
+
 - name: Add Authfile
   template:
     src: Authfile
