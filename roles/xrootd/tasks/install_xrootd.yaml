@@ -1,5 +1,11 @@
 #file: install_xrootd.yaml
 
+- name: Add xrootd repository
+  copy:
+    src: xrootd-stable-slc7.repo
+    dest: /etc/yum.repos.d/xrootd-stable-slc7.repo
+    mode: 0755
+
 - name: Install XrootD packages
   package:
     name: xrootd, xrootd-voms, xrootd-client

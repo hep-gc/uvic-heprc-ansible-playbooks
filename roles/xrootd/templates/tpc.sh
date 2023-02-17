@@ -38,10 +38,10 @@ echo "Other Args: ${OTHERARGS[@]}" | tee -a $logfile 2>&1
       
 if [[ "$SRC" == *"root"* ]]
 then
-  echo "Running: /usr/bin/xrdcp --server -S $STREAMS $SRC $DST"
+  echo "Running: xrdcp --server -S $STREAMS $SRC $DST"
   xrdcp --server -S $STREAMS $SRC $DST
 elif [[ "$SRC" == *"https"* ]] || [[ "$SRC" == *"davs"* ]]
 then
- echo "Running: /usr/bin/gfal-copy -n $STREAMS $SRC $DST"
+ echo "Running: gfal-copy -n $STREAMS $SRC $DST"
  gfal-copy -n $STREAMS $SRC $DST
 fi  >> $logfile 2> >(tee -a $logfile >&2)

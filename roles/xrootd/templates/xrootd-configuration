@@ -36,7 +36,7 @@ fi
 # TLS Setup
 xrd.tls /etc/grid-security/xrd/xrdcert.pem /etc/grid-security/xrd/xrdkey.pem
 xrd.tlsca certdir /etc/grid-security/certificates
-xrootd.tls all
+xrootd.tls all -data
 
 if $redirector
   # Pass
@@ -78,6 +78,7 @@ ofs.tpc pgm /etc/xrootd/tpc.sh
 
 http.exthandler xrdtpc libXrdHttpTPC.so
 http.header2cgi Authorization authz
+http.staticpreload http://static/robots.txt /etc/xrootd/robots.txt
 
 # Macaroon setup
 http.exthandler xrdmacaroons libXrdMacaroons.so
