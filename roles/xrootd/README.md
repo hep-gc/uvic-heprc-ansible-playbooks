@@ -25,3 +25,7 @@ Installs, configures, and starts an XRootD server that is capable of third party
   
 ### Authorization
 Access to files in `export_path` can be further restricted and made available to only certain clients by editing the authorization database file in `templates/Authfile` based on the [XRootD documentation](https://xrootd.slac.stanford.edu/doc/dev56/sec_config.htm#_Toc119617472)
+
+### Notes
+
+The macaroon-secret is generated on the controller node so ansible should be either be run against all nodes in the xrootd cluster or the secret should be manually changed such that they match.
