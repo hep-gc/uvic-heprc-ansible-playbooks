@@ -6,7 +6,7 @@
 
 - name: Add xrootd server configuration
   template:
-    src: xrootd-configuration
+    src: xrootd-configuration.j2
     dest: "/etc/xrootd/xrootd-{{server_type}}.cfg"
     owner: xrootd
     group: xrootd

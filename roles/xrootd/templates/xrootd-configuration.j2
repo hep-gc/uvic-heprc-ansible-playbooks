@@ -1,4 +1,4 @@
-set redirector = {{redirector_hostname}}
+set redirector = {{redirector_hostname | default('www.example.com', true)}}
 
 all.manager $(redirector):1095
 
