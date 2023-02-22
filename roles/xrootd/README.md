@@ -13,7 +13,7 @@ Installs, configures, and starts an XRootD server that is capable of third party
 
 - Edit `xrootd_vars.yaml` and set `export_path` to the base path that contains all of the data you want to share and set `localroot` to a path that you want to be automatically prefixed to every request.
 
-- If you want a node to act as a redirector then set its hostname as the `redirector_hostname` variable, otherwise set it to some valid but unreachable hostname. 
+- If you want a node to act as a redirector then set its hostname as the `redirector_hostname` variable, otherwise set it to some valid but unreachable hostname or leave it blank. 
 
 - If you want a node to act as a proxy for an S3 bucket then you need to provide the credentials for the bucket in `s3_credentials_dict.yaml`; this file has a dictionary called `s3_proxy_dict` where the keys are the hostnames of the nodes you want to install as S3 proxies and the values are another dictionary with information about the bucket they are going to serve. They key-value pairs are as follows:
   - `s3_host` The hostname for the S3 server.
