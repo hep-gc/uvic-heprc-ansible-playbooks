@@ -55,12 +55,6 @@
     state: directory
   when: server_type == "s3_proxy"
 
-- name: Create directory matching bucket name as a workaround for pss
-  file:
-    path: "{{bucket_name}}"
-    state: directory
-  when: inventory_hostname in groups['s3_proxies']
-
 - name: Generate macaroon secret
   command: 
      cmd: openssl rand -base64 -out {{role_path}}/files/macaroon-secret 64
