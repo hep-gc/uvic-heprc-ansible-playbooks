@@ -1,9 +1,11 @@
 localroot: /data
 export_path: /
-redirector_hostname: example_hostname.com
+redirector_hostname:
 
-s3_host: http://elephant102.heprc.uvic.ca:9000
-bucket_name: bucket
-# TOOD: change this so the secret key isn't hardcoded
-access_key: LUiJ1pAY2RKkDeg6
-secret_key: hEPXaKHKBN7ltk8AYA8YhbMw6f7DoTVQ
+
+server_type: "{{ (inventory_hostname in s3_proxy_dict.keys()) | ternary('s3_proxy', 'standalone')}}"
+
+s3_host: "{{s3_proxy_dict[inventory_hostname]['s3_host'] if (server_type == 's3_proxy') else '<Configured as standalone>'}}"
+bucket_name: "{{s3_proxy_dict[inventory_hostname]['bucket_name'] if (server_type == 's3_proxy') else '<Configured as standalone>'}}"
+access_key: "{{s3_proxy_dict[inventory_hostname]['access_key'] if (server_type == 's3_proxy')}}"
+secret_key: "{{s3_proxy_dict[inventory_hostname]['secret_key'] if (server_type == 's3_proxy')}}"
