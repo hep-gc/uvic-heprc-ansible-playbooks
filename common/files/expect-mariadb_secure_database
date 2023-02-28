@@ -3,7 +3,8 @@ log_file /root/ansible_script_logs/expect-mariadb_secure_database.log
 set mysql_root [lindex $argv 0]
 set mysql_root_original [lindex $argv 1]
 set c_1 0
-spawn /usr/bin/mysql_secure_installation
+#spawn /usr/bin/mysql_secure_installation
+spawn /usr/bin/mariadb-secure-installation
 expect { 
     "Enter current password for root" {
         if { $c_1 == 0 } {

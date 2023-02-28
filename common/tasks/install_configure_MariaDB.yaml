@@ -20,21 +20,38 @@
   - (container is undefined) or (container == False)
   ignore_errors: yes
 
-- name: setup the MariaDB repository
-  copy:
-    src: etc_yum.repos.d_MariaDB.repo
-    dest: /etc/yum.repos.d/MariaDB.repo
-    owner: root
-    group: root
-    mode: 0644
+- name: Get MariaDB setup script repo
+  get_url: 
+    url: "https://downloads.mariadb.com/MariaDB/mariadb_repo_setup"
+    dest: "/tmp/mariadb_repo_setup"
+    mode: +x
+#  creates: /etc/yum.repos.d/mariadb.repo
 
-- name: install mariadb (MySQL) packages
-  yum:
-    name: ['expect', 'MariaDB-server', 'MariaDB-client', 'MariaDB-devel', 'MariaDB-compat', 'MariaDB-common',
-           'MariaDB-shared', 'zlib-devel', 'openssl-devel', 'MySQL-python','python2-PyMySQL']
+- name: Setup MariaDB repo
+  shell: "/tmp/mariadb_repo_setup"
+#  creates: /etc/yum.repos.d/mariadb.repo
+
+#- name: Setup MariaDB repo
+#  shell: /tmp/mariadb_repo_setup
+
+#- name: install mariadb (MySQL) packages
+#  yum:
+#    name: ['expect', 'MariaDB-server', 'MariaDB-client', 'MariaDB-devel', 'MariaDB-compat', 'MariaDB-common',
+#           'MariaDB-shared', 'zlib-devel', 'openssl-devel', 'MySQL-python','python2-PyMySQL']
+#    state: latest
+#  notify:
+#  - restart mariadb
+
+- name: install mariadb packages
+  package:
+    name: expect, MariaDB-server, MariaDB-client, MariaDB-devel, MariaDB-common, MariaDB-shared, zlib-devel, openssl-devel, gcc
     state: latest
-  notify:
-  - restart mariadb
+  notify: restart mariadb
+
+- name: install python mySQL packages
+  pip:
+    name: mysqlclient
+
 
 #- name: install pip3 mysqlclient
 #  command: pip3 install mysqlclient
@@ -52,6 +69,7 @@
 # when:
 # - etc_my_cnf_d is defined
 
+# These need a create keyword but that also seems to break ansible atm
 - name: ensure mariadb is running and enabled with service
   service: name=mariadb state=restarted enabled=yes
   when: (container is undefined) or (container == False)
@@ -81,7 +99,7 @@
   - container == True
 
 - name: secure mariadb database
-  script: expect-mariadb_secure_database "{{ database_user_passwords['root'] }}" "{{ database_user_passwords['change_from_old_root'] }}" creates=/root/ansible_script_logs/expect-mariadb_secure_database.log
+  script: expect-mariadb_secure_database {{ database_user_passwords['root'] }} {{ database_user_passwords['change_from_old_root'] }} creates=/root/ansible_script_logs/expect-mariadb_secure_database.log
 
   #- name: allow mariadb admin on internal subnet
   #script: bash-mariadb_allow_admin_on_internal_subnet "{{ i_internal_connection.0.ipv4fqdn }}" "{{ database_user_passwords['root'] }}" creates=/root/ansible_script_logs/bash-mariadb_allow_admin_on_internal_subnet.log
