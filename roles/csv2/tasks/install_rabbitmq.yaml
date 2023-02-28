@@ -1,0 +1,27 @@
+- name: Update crypto policies
+  shell:
+    cmd: update-crypto-policies --set LEGACY
+
+# TODO also have a creates statement here
+- name: Get RabbitMQ repo script
+  get_url:
+    url: https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh
+    dest: /tmp/rabbitmq_script.sh
+    mode: +x
+
+- name: Get erlang repo
+  get_url:
+    url: https://packagecloud.io/install/repositories/rabbitmq/erlang/script.rpm.sh
+    dest: /tmp/erlang_script.sh
+    mode: +x
+
+- name: Setup RabbitMQ repo script
+  shell: /tmp/rabbitmq_script.sh
+
+- name: Setup erlang 
+  shell: /tmp/erlang_script.sh
+
+- name: install RabbitMQ-server
+  package:
+    name: rabbitmq-server
+    state: latest

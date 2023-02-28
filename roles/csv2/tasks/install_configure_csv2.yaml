@@ -85,22 +85,29 @@
 
 ### install software ###########################################################################################################################################
 
-- name: import_tasks
-  import_tasks: install_python3_mod_wsgi.yaml
+- import_tasks: install_python3_mod_wsgi.yaml
+
+#- name: install other prerequisite packages for cloudscheduler
+#  yum:
+#    name:
+#      - libvirt
+#      - libvirt-devel
+#      - ca_policy_igtf-classic
+#      - apr-util-mysql
+#      - rabbitmq-server
+#    state: latest
 
 - name: install other prerequisite packages for cloudscheduler
-  yum:
-    name:
-      - libvirt
-      - libvirt-devel
-      - ca_policy_igtf-classic
-      - apr-util-mysql
-      - rabbitmq-server
-    state: latest
+  package:
+    name: libvirt, libvirt-devel, ca_policy_igtf-classic, apr-util-mysql
 
-- name: install ansible (still uses python 2.7) module prerequisites
-  yum:
-    name: python2-bcrypt
+# Change so this is only done for rhel 9
+- import_tasks: install_rabbitmq.yaml
+
+# TODO check if this is optional might need another repo or replace with python3-bcrypt
+#- name: install ansible (still uses python 2.7) module prerequisites
+#  yum:
+#    name: python2-bcrypt
 
 - name: install qemu-img
   yum:
@@ -253,7 +260,7 @@
 
 - name: recreate favicon link.
   file:
-    src: "/opt/cloudscheduler/images/cs_{{ favicon_colour }}.ico"
+    src: "/opt/cloudscheduler/images/cs_{{ favicon_colour | default('red', True)}}.ico"
     dest: "/opt/cloudscheduler/web_frontend/cloudscheduler/csv2/static/img/favicon.ico"
     state: link
     force: yes
@@ -350,9 +357,10 @@
  
 ### HAProxy ####################################################################################################################################################
 
-- name: import_tasks
-  import_tasks: install_CentOS_HAProxy.yaml
+# TODO this still probably isnt needed for rhel9 and maybe in general because mod_wsgi is installed at an earlier step
+- import_tasks: install_CentOS_HAProxy.yaml
 
+# This probably just needs to be changed to a more direct call to haproxy
 - name: install HAProxy service wrapper
   copy:
     remote_src: yes
@@ -390,11 +398,9 @@
 
 - name: ensure HAProxy service is enabled and running
   systemd:
-    name: "{{ item }}"
+    name: HAProxy.service
     enabled: yes
     state: restarted
-  with_items:
-  - HAProxy.service
 
 ### container configuration ####################################################################################################################################
 
