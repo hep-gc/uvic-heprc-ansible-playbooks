@@ -1,0 +1,21 @@
+# install_HTCondor.yaml
+
+- name: configure HTCondor repository
+  get_url:
+    url: https://get.htcondor.org
+    dest: /tmp/htcondor_repo_setup
+    mode: +x
+
+- name: setup HTCondor repo
+  shell: /tmp/htcondor_repo_setup --no-dry-run
+
+#- name: install HTCondor repository GPG keys
+#  rpm_key:
+#    key: http://research.cs.wisc.edu/htcondor/yum/RPM-GPG-KEY-HTCondor
+#    state: present
+
+#- name: install HTCondor
+#  yum:
+#    name: ['condor-all']
+#    state: latest
+
