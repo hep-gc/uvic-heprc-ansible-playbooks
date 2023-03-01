@@ -13,6 +13,10 @@
     warn: false
   when: ansible_facts['distribution_major_version'] == "9"
 
+#- name: install other required packages
+#  yum:
+#    name: ['@development', 'mailx', 'xauth', 'xorg-x11-apps', 'xorg-x11-fonts-Type1']
+
 # TODO see if xorg-x11-apps is really needed
 - name: install other required packages
   package:
