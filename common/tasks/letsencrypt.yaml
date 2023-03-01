@@ -4,6 +4,12 @@
 # Note: Set the variable "letsencrypt_test: true" to use the letsencrypt test
 # server. This variable is referenced by the handler "run get_letsencrypt_cert".
 
+- name: Ensure archive directory exists
+  file:
+    name: /var/log/letsencrypt
+    state: directory
+
+# Is defining it here a good idea?
 - name: set_fact letsencrypt_archive if undefined
   set_fact:
     letsencrypt_archive: /usr/local/archive/letsencrypt
@@ -119,6 +125,11 @@
   when: 
   - initial_letsencrypt_status.stat.exists == False
   - archive_status.stat.exists == False
+
+- name: Fail if no virtual hosts were provided
+  fail:
+    msg: No entries for i_virtualhosts provided no letsencrypt certificates would be installed
+  when: not i_virtualhosts
 
 - name: install the virtual hosts configuration file
   template:
