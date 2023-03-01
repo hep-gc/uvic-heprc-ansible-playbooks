@@ -1,15 +1,24 @@
 ---
 # file: install_CentOS_HAProxy.yaml
 
-- name: install the python3 mod_wsgi repository
-  yum:
-    name:
-      - centos-release-scl-rh
-    state: latest
+# TODO check if this whole script is redundant as thes tasks seem to be run earlier
 
-- name: install the python3 mod_wsgi module (rpm places it in /opt)
-  yum:
-    name:
-      - rh-haproxy18
-    state: latest
+#- name: install the mod_wsgi python package
+#  pip:
+#    name: mod_wsgi-express
 
+#- name: install the python3 mod_wsgi repository
+#  yum:
+#    name:
+#      - centos-release-scl-rh
+#    state: latest
+
+#- name: install the python3 mod_wsgi module (rpm places it in /opt)
+#  yum:
+#    name:
+#      - rh-haproxy18
+#    state: latest
+
+- name: install HAProxy
+  package:
+    name: haproxy

@@ -361,16 +361,16 @@
 - import_tasks: install_CentOS_HAProxy.yaml
 
 # This probably just needs to be changed to a more direct call to haproxy
-- name: install HAProxy service wrapper
-  copy:
-    remote_src: yes
-    src: /opt/cloudscheduler/usr/local/sbin/haproxy_wrapper.afile
-    dest: /usr/local/sbin/haproxy_wrapper
-    owner: root
-    group: root
-    mode: 0744
-  notify:
-    restart httpd
+#- name: install HAProxy service wrapper
+#  copy:
+#    remote_src: yes
+#    src: /opt/cloudscheduler/usr/local/sbin/haproxy_wrapper.afile
+#    dest: /usr/local/sbin/haproxy_wrapper
+#    owner: root
+#    group: root
+#    mode: 0744
+#  notify:
+#    restart httpd
 
 - name: configure HAProxy
   template:
@@ -382,23 +382,25 @@
   notify:
       restart httpd
 
-- name: create/update HAProxy service file in systemd directory
-  copy:
-    remote_src: yes
-    src: "/opt/cloudscheduler/etc/systemd/system/{{ item }}.afile"
-    dest: "/etc/systemd/system/{{ item }}"
-    owner: root
-    group: root
-    mode: 0644
-  with_items:
-  - HAProxy.service
+#- name: create/update HAProxy service file in systemd directory
+#  copy:
+#    remote_src: yes
+#    src: "/opt/cloudscheduler/etc/systemd/system/{{ item }}.afile"
+#    dest: "/etc/systemd/system/{{ item }}"
+#    owner: root
+#    group: root
+#    mode: 0644
+#  with_items:
+#  - HAProxy.service
 
 - name: reload daemons 
   command: systemctl daemon-reload
 
+# TODO we do not have the right configuration at this time
 - name: ensure HAProxy service is enabled and running
   systemd:
-    name: HAProxy.service
+    #name: HAProxy.service
+    name: haproxy.service
     enabled: yes
     state: restarted
 
@@ -501,6 +503,10 @@
   with_sequence: start=1 end=4
 
 ### cloudscheduler #############################################################################################################################################
+# TODO remove this and actually define influx_admin_pass in ansible systems
+- name: Define place holder values for influx credentials
+  set_fact:
+    influx_admin_pass: 1234
 
 - name: import_tasks
   import_tasks: copy_certificates_to_users.yaml
