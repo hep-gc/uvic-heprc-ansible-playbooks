@@ -20,7 +20,7 @@
            creates="/swapfile"
   tags:
     - swap.file.create
-  when: fs_type.stdout != "xfs" or ansible_facts['distribution_major_version'] == "8"
+  when: fs_type.stdout != "xfs" or ansible_facts['distribution_major_version'] != "7"
 
 - name: Change swap file permissions
   file: path="/swapfile"
