@@ -13,12 +13,13 @@
     warn: false
   when: ansible_facts['distribution_major_version'] == "9"
 
-#- name: install other required packages
-#  yum:
-#    name: ['@development', 'mailx', 'xauth', 'xorg-x11-apps', 'xorg-x11-fonts-Type1']
+- name: install other required packages for EL7 and EL8
+  yum:
+    name: ['@development', 'mailx', 'xauth', 'xorg-x11-apps', 'xorg-x11-fonts-Type1']
+  when: ansible_facts['distribution_major_version'] in ("7", "8")
 
-# TODO see if xorg-x11-apps is really needed
 - name: install other required packages
   package:
-    name: ['@development', 's-nail', 'xauth', 'xorg-x11-fonts-Type1']
+    name: ['@development', 's-nail', 'xauth', 'xorg-x11-fonts-Type1', 'xterm']
     state: latest
+  when: ansible_facts['distribution_major_version'] == "9"
