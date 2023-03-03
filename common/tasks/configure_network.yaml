@@ -2,18 +2,23 @@
 # file: configure_network.yaml - inventory variables provide network configuration.
 
 - name: Install epel repo
-  dnf:
-    name: ['epel-release']
+  package:
+    name: epel-release
     state: latest
-  when: ansible_facts['distribution_major_version'] == "8"
 
 - name: update certificate trust
   command: /usr/bin/update-ca-trust
 
 - name: install packages required for network configuration
-  yum:
-    name: ['bridge-utils']
+  package:
+    name: bridge-utils
     state: latest
+
+- name: Install ifdown script
+  package:
+    name: NetworkManager-initscripts-updown
+    state: latest
+  when: ansible_facts['distribution_major_version'] == "9"
 
 - name: save the original ifdown command
   command: mv /usr/sbin/ifdown /usr/sbin/ifdown-original creates=/usr/sbin/ifdown-original
