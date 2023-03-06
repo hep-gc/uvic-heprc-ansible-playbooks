@@ -14,7 +14,7 @@
 
 - set_fact:
     favicon_colour: "{{favicon_colours[ansible_fqdn]}}"
-  when: "{{ansible_fqdn in favicon_colours.keys()}}"
+  when: favicon_colours is defined and ansible_fqdn in favicon_colours.keys()
 
 - set_fact:
     ansible_ssh_port: "{{ ansible_ssh_port }}"
@@ -23,7 +23,6 @@
 
 - import_tasks: configure_etc_hosts.yaml
 
-
 - import_tasks: configure_sshd.yaml
   when: ansible_ssh_port != 22
 
@@ -31,14 +30,15 @@
 
 - import_tasks: create_installation_directories.yaml
 
-
 - import_tasks: configure_other_required_repositories.yaml
 
 - import_tasks: perform_yum_updates.yaml
 
 - import_tasks: install_other_required_packages.yaml
 
-#- import_tasks: add_grid_canada_certificates.yaml
+- import_tasks: install_EGI_trust_anchors.yaml
+
+- import_tasks: add_grid_canada_certificates.yaml
 
 
 - import_tasks: install_python3.yaml
@@ -75,19 +75,21 @@
 - import_tasks: install_configure_MariaDB.yaml
 
 - import_tasks: create_mysqldb_csv2.yaml
-- name: include
-  include: install_configure_httpd.yaml
+
+- import_tasks: install_configure_httpd.yaml
 
 - import_tasks: install_configure_phpmyadmin.yaml
   when:
   - install_phpMyAdmin is defined
   - install_phpMyAdmin == True
 
-- import_tasks: install_EGI_trust_anchors.yaml
-
 - import_tasks: install_fetch_crl.yaml
 
-- import_tasks: install_EL7_HTCondor.yaml
+- name: gather installed packages
+  package_facts:
+
+- import_tasks: install_HTCondor.yaml
+  when: "'condor' not in ansible_facts.packages"
 
 - import_tasks: install_influxdb.yaml
 
