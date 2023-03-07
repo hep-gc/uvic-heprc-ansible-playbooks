@@ -13,11 +13,11 @@
   echo `date` "Running $0" > ${logfile}.partial_log 2>&1
 
   echo -e "\n1. mv ca-bundle.crt ca-bundle.crt-${now}" >>${logfile}.partial_log
-  mv ca-bundle.crt ca-bundle.crt-${now}
+  cp /etc/pki/tls/certs/ca-bundle.crt /etc/pki/tls/certs/ca-bundle.crt-${now}
 
   echo -e "\n1. cat GridCanada.pem >> ca-bundle.crt" >>${logfile}.partial_log
-  cat /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem /etc/grid-security/certificates/GridCanada.pem >/etc/pki/tls/certs/ca-bundle.crt
-    >>${logfile}.partial_log 2>&1 \
+  cat /etc/grid-security/certificates/GridCanada.pem >> /etc/pki/tls/certs/ca-bundle.crt
+
 
   if [ $rc == 0 ]; then 
     mv ${logfile}.partial_log ${logfile}.log
