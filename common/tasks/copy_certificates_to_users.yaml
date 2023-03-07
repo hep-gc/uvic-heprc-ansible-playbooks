@@ -13,6 +13,7 @@
   - "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}"
   - "/etc/grid-security/condor-worker"
   - "/var/lib/condor/.globus"
+  - "/var/lib/mysql/.globus"
   when:
   - htcondor_cert is defined
   - htcondor_key is defined
@@ -31,6 +32,7 @@
   - {src: "{{ htcondor_cert }}", dest: "/etc/grid-security/hostcert.pem"}
   - {src: "{{ htcondor_worker_cert }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/cert.pem"}
   - {src: "{{ htcondor_worker_cert }}", dest: "/var/lib/condor/.globus/usercert.pem"}
+  - {src: "{{ htcondor_worker_cert }}", dest: "/var/lib/mysql/.globus/usercert.pem"}
   - {src: "{{ htcondor_worker_cert }}", dest: "/etc/grid-security/condor-worker/hostcert.pem"}
   when:
   - htcondor_cert is defined
@@ -50,6 +52,7 @@
   - {src: "{{ htcondor_key }}", dest: "/etc/grid-security/hostkey.pem"}
   - {src: "{{ htcondor_worker_key }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/privkey.pem"}
   - {src: "{{ htcondor_worker_key }}", dest: "/var/lib/condor/.globus/userkey.pem"}
+  - {src: "{{ htcondor_worker_key }}", dest: "/var/lib/mysql/.globus/userkey.pem"}
   - {src: "{{ htcondor_worker_key }}", dest: "/etc/grid-security/condor-worker/hostkey.pem"}
   when:
   - htcondor_cert is defined
@@ -124,3 +127,14 @@
   when:
   - certificate_users is defined
 
+- name: link hostcert for influxDB
+  file:
+    src: /etc/grid-security/hostcert.pem
+    dest: /etc/ssl/hostcert.pem
+    state: link
+
+- name: link hostkey for influxDB
+  file:
+    src: /etc/grid-security/hostkey.pem
+    dest: /etc/ssl/hostkey.pem
+    state: link
