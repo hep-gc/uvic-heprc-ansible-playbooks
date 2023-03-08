@@ -1,6 +1,6 @@
 # Overriding the following defaults varables (see csv2-default-vars.yaml):
 
-csv2_fqdn: {HOST}.{DOMAINE}
+csv2_fqdn: {HOST}.heprc.uvic.ca
 
 cs_git_branch: {GITBRANCH}
 db_upgrade_file: {DBFILE}
