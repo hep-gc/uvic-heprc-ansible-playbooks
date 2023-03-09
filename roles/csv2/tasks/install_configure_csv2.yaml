@@ -1,13 +1,11 @@
 
-- name: set_fact
-  set_fact:
+- set_fact:
     csv2_host: '{{ i_virtualhosts.0.virtualhost }}'
     ssl_cert_file: "/etc/letsencrypt/live/{{ i_service_connection.0.ipv4fqdn }}/fullchain.pem"
     ssl_key_file: "/etc/letsencrypt/live/{{ i_service_connection.0.ipv4fqdn }}/privkey.pem"
   when: (local_web is undefined) or (local_web == False)
 
-- name: set_fact
-  set_fact:
+- set_fact:
     csv2_host: localhost
     ssl_cert_file: /local_ssl/localhost.crt
     ssl_key_file: /local_ssl/localhost.key
@@ -15,27 +13,23 @@
   - local_web is defined
   - local_web == True    
 
-- name: set_fact
-  set_fact:
+- set_fact:
     ssl_ca_cert_arg: 'SSLCACertificatePath /etc/grid-security/certificates/'
   when: (container is undefined) or (container == False)
 
-- name: set_fact
-  set_fact:
+- set_fact:
     ssl_ca_cert_arg: 'SSLCACertificateFile /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem'
   when: 
   - container is defined
   - container == True
 
-- name: set_fact
-  set_fact:
+- set_fact:
     db_hostname: "{{ i_service_connection.0.ipv4fqdn }}"
   when:
   - (db_on_localhost is undefined) or (db_on_localhost != true)
 
-- name: set_fact
-  set_fact:
-    public_mariadb: False
+#- set_fact:
+#    public_mariadb: False
 
 - name: set_fact
   set_fact:
@@ -46,20 +40,18 @@
 
 - name: set_fact
   set_fact:
-    htcondor_gsi_dn: "/CN=csv2-sa.heprc.uvic.ca"
-  when:
-  - htcondor_gsi_dn is undefined
+    hostname: "{{ i_service_connection.0.ipv4fqdn }}"
 
-- name: set_fact
-  set_fact:
-    htcondor_worker_gsi_dn: "/CN=csv2-sa-worker.heprc.uvic.ca"
-  when:
-  - htcondor_worker_gsi_dn is undefined
+- name: set active hostname
+  command: hostname {{ hostname }}
+
+- name: set hostname
+  command: echo {{hostname}} > /etc/hostname
+
 
 - name: create cloudscheduler user
   user:
     name: cloudscheduler
-# register: cloudscheduler_user
 
 - name: change the group ownership of the phpmyadmin directories
   file:
@@ -100,7 +92,7 @@
 
 - name: install ansible (still uses python 2.7) module prerequisites
   yum:
-    name: python2-bcrypt
+    name: python*-bcrypt
 
 - name: install qemu-img
   yum:
@@ -313,19 +305,19 @@
   notify:
     restart httpd
 
-- name: install firewalld 
-  yum:
-    name: firewalld
+#- name: install firewalld 
+#  yum:
+#    name: firewalld
 
 - name: install python firewalld for ansible
   yum:
     name: python-firewall
 
-- name: enable firewalld
-  systemd:
-    name: firewalld
-    enabled: yes
-    state: restarted
+#- name: enable firewalld
+#  systemd:
+#    name: firewalld
+#    enabled: yes
+#    state: restarted
 
 - name: open https port
   firewalld:
@@ -501,6 +493,9 @@
 
 - name: import_tasks
   import_tasks: configure_EL7_HTCondor.yaml
+
+#- name: create influx admin user
+#  command: influx -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
 
 - name: install influxDB ssl configuration file
   copy:
@@ -789,19 +784,19 @@
     state: link
 
 - name: create influx admin user
-  command: influx -ssl -unsafeSsl -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
+  command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
 
 - name: create influx reader user
-  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
+  command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
 
 - name: create influx writer user
-  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_writer WITH PASSWORD '{{ influx_writer_pass }}'"
+  command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_writer WITH PASSWORD '{{ influx_writer_pass }}'"
 
 - name: set permissions for influx read user
-  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "GRANT READ ON csv2_timeseries TO csv2_read"
+  command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute "GRANT READ ON csv2_timeseries TO csv2_read"
 
 - name: set permissions for influx write user
-  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "GRANT WRITE on csv2_timeseries TO csv2_writer"
+  command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute "GRANT WRITE on csv2_timeseries TO csv2_writer"
 
 - name: restart influxdb on ssl
   service:
