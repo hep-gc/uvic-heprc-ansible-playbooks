@@ -9,14 +9,13 @@
     name: /var/log/letsencrypt
     state: directory
 
-# Is defining it here a good idea?
-- name: set_fact letsencrypt_archive if undefined
+- name: set default for letsencrypt_archive if undefined
   set_fact:
     letsencrypt_archive: /usr/local/archive/letsencrypt
   when:
     letsencrypt_archive is undefined
 
-- name: set_fact letsencrypt_test
+- name: set default for letsencrypt_test
   set_fact:
     letsencrypt_test: false
   when:
