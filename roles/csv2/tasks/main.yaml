@@ -20,9 +20,6 @@
     ansible_ssh_port: "{{ ansible_ssh_port }}"
   when: internal_system_install is not defined
 
-
-- import_tasks: configure_etc_hosts.yaml
-
 - import_tasks: configure_sshd.yaml
   when: ansible_ssh_port != 22
 
@@ -85,11 +82,7 @@
 
 - import_tasks: install_fetch_crl.yaml
 
-- name: gather installed packages
-  package_facts:
-
 - import_tasks: install_HTCondor.yaml
-  when: "'condor' not in ansible_facts.packages"
 
 - import_tasks: install_influxdb.yaml
 
