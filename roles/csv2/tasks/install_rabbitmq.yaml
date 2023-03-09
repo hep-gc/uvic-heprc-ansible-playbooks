@@ -2,24 +2,30 @@
   shell:
     cmd: update-crypto-policies --set LEGACY
 
-# TODO also have a creates statement here
+# There isnt an el9 version of rabbitmq so the workaround is to just install the el8 version
 - name: Get RabbitMQ repo script
   get_url:
     url: https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh
     dest: /tmp/rabbitmq_script.sh
     mode: +x
+    creates: /tmp/rabbitmq_script.sh
 
 - name: Get erlang repo
   get_url:
     url: https://packagecloud.io/install/repositories/rabbitmq/erlang/script.rpm.sh
     dest: /tmp/erlang_script.sh
     mode: +x
+    creates: /tmp/erlang_script.sh
 
 - name: Setup RabbitMQ repo script
-  shell: /tmp/rabbitmq_script.sh
+  shell: 
+    cmd: os=el dist=8 /tmp/rabbitmq_script.sh
+    creates: /etc/yum.repos.d/rabbitmq_rabbitmq-server.repo
 
 - name: Setup erlang 
-  shell: /tmp/erlang_script.sh
+  shell: 
+    cmd: os=el dist=8 /tmp/erlang_script.sh
+    creates: /etc/yum.repos.d/rabbitmq_rabbitmq-server.repo
 
 - name: install RabbitMQ-server
   package:
