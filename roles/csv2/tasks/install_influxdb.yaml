@@ -4,10 +4,20 @@
 - name: Install python2 pip
   yum:
     name: python2-pip
+  when: ansible_facts['distribution_major_version'] == "7"
+
+- name: Install certifi python package
+  pip:
+    name: certifi<=2020.4.5.1
+
+- name: Install requests python package version for influx.
+  pip:
+    name: requests
+    version: 2.24.0
 
 - name: Install InfluxDB python package.
   pip:
-    name: ["requests", "influxdb"]
+    name: influxdb
 
 - name: Add InfluxDB repository
   yum_repository:
@@ -34,3 +44,4 @@
   influxdb_database:
       database_name: "csv2_timeseries"
       udp_port: 4444
+  ignore_errors: true
