@@ -36,22 +36,6 @@
   notify:
   - restart mariadb
 
-#- name: install pip3 mysqlclient
-#  command: pip3 install mysqlclient
-
-# name: configure mariadb server
-# template:
-#   src: "etc_my.cnf.d_{{ item }}.j2"
-#   dest: "/etc/my.cnf.d/{{ item }}"
-#   owner: root
-#   group: root
-#   mode: 0644
-# with_items: "{{ etc_my_cnf_d }}"
-# notify:
-# - restart mariadb
-# when:
-# - etc_my_cnf_d is defined
-
 - name: ensure mariadb is running and enabled with service
   service: name=mariadb state=restarted enabled=yes
   when: (container is undefined) or (container == False)
@@ -83,5 +67,3 @@
 - name: secure mariadb database
   script: expect-mariadb_secure_database "{{ database_user_passwords['root'] }}" "{{ database_user_passwords['change_from_old_root'] }}" creates=/root/ansible_script_logs/expect-mariadb_secure_database.log
 
-  #- name: allow mariadb admin on internal subnet
-  #script: bash-mariadb_allow_admin_on_internal_subnet "{{ i_internal_connection.0.ipv4fqdn }}" "{{ database_user_passwords['root'] }}" creates=/root/ansible_script_logs/bash-mariadb_allow_admin_on_internal_subnet.log
