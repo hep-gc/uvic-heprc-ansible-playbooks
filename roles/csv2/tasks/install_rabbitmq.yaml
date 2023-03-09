@@ -8,14 +8,12 @@
     url: https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh
     dest: /tmp/rabbitmq_script.sh
     mode: +x
-    creates: /tmp/rabbitmq_script.sh
 
 - name: Get erlang repo
   get_url:
     url: https://packagecloud.io/install/repositories/rabbitmq/erlang/script.rpm.sh
     dest: /tmp/erlang_script.sh
     mode: +x
-    creates: /tmp/erlang_script.sh
 
 - name: Setup RabbitMQ repo script
   shell: 
