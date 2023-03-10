@@ -9,21 +9,21 @@
     dest: /tmp/rabbitmq_script.sh
     mode: +x
 
-- name: Get erlang repo
+- name: Get erlang repo script
   get_url:
     url: https://packagecloud.io/install/repositories/rabbitmq/erlang/script.rpm.sh
     dest: /tmp/erlang_script.sh
     mode: +x
 
-- name: Setup RabbitMQ repo script
+- name: Setup RabbitMQ repo
   shell: 
     cmd: os=el dist=8 /tmp/rabbitmq_script.sh
     creates: /etc/yum.repos.d/rabbitmq_rabbitmq-server.repo
 
-- name: Setup erlang 
+- name: Setup erlang repo
   shell: 
     cmd: os=el dist=8 /tmp/erlang_script.sh
-    creates: /etc/yum.repos.d/rabbitmq_rabbitmq-server.repo
+    creates: /etc/yum.repos.d/rabbitmq_erlang.repo
 
 - name: install RabbitMQ-server
   package:
