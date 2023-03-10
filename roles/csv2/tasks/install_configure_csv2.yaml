@@ -86,28 +86,40 @@
 ### install software ###########################################################################################################################################
 
 - import_tasks: install_python3_mod_wsgi.yaml
+  when: ansible_facts['distribution_major_version'] in ("7", "8")
 
-#- name: install other prerequisite packages for cloudscheduler
-#  yum:
-#    name:
-#      - libvirt
-#      - libvirt-devel
-#      - ca_policy_igtf-classic
-#      - apr-util-mysql
-#      - rabbitmq-server
-#    state: latest
+- name: install the mod_wsgi python package
+  package:
+    name: python3-mod_wsgi
+    state: latest
+  when: ansible_facts['distribution_major_version'] == "9"
+
 
 - name: install other prerequisite packages for cloudscheduler
   package:
     name: libvirt, libvirt-devel, ca_policy_igtf-classic, apr-util-mysql
+    state: latest
 
-# Change so this is only done for rhel 9
+- name: install rabbitmq-server for EL7
+  package:
+    name: rabbitmq-server
+    state: latest
+  when: ansible_facts['distribution_major_version'] == "7"
+
 - import_tasks: install_rabbitmq.yaml
+  when: ansible_facts['distribution_major_version'] != "7"
 
-# TODO check if this is optional might need another repo or replace with python3-bcrypt
-#- name: install ansible (still uses python 2.7) module prerequisites
-#  yum:
-#    name: python2-bcrypt
+
+- name: install ansible (still uses python 2.7) module prerequisites
+  yum:
+    name: python2-bcrypt
+  when: ansible_facts['distribution_major_version'] in ("7", "8")
+
+- name: install python bcrypt
+  package:
+    name: python3-bcrypt
+  when: ansible_facts['distribution_major_version'] == "9"
+
 
 - name: install qemu-img
   yum:
@@ -357,8 +369,7 @@
  
 ### HAProxy ####################################################################################################################################################
 
-# TODO this still probably isnt needed for rhel9 and maybe in general because mod_wsgi is installed at an earlier step
-- import_tasks: install_CentOS_HAProxy.yaml
+- import_tasks: install_HAProxy.yaml
 
 # This probably just needs to be changed to a more direct call to haproxy
 #- name: install HAProxy service wrapper
@@ -450,13 +461,17 @@
     - local_web is defined
     - local_web == True
 
+
+# TODO: the problem likely is that this is always skipped
 - name: set default settings for cloudsheduler command
   command: "cloudscheduler defaults set -s default -su csv2_default -spw {{ csv2_default_password }} -sa {{ csv2_web_address}}"
-  when:
-    - container is defined
-    - container == True
-    - local_web is defined
-    - local_web == True
+  
+  
+#  when:
+#    - container is defined
+#    - container == True
+#    - local_web is defined
+#    - local_web == True
 
 - name: ensure mysql pid is down
   shell: pkill -9 mysql
@@ -503,19 +518,13 @@
   with_sequence: start=1 end=4
 
 ### cloudscheduler #############################################################################################################################################
-# TODO remove this and actually define influx_admin_pass in ansible systems
-- name: Define place holder values for influx credentials
-  set_fact:
-    influx_admin_pass: 1234
 
-- name: import_tasks
-  import_tasks: copy_certificates_to_users.yaml
+- import_tasks: copy_certificates_to_users.yaml
 
-- name: import_tasks
-  import_tasks: configure_EL7_HTCondor.yaml
+- import_tasks: configure_EL7_HTCondor.yaml
 
-- name: create influx admin user
-  command: influx -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
+#- name: create influx admin user
+#  command: influx -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
 
 - name: install influxDB ssl configuration file
   copy:
@@ -526,6 +535,48 @@
   service:
     name: influxdb
     state: restarted
+
+- block:
+  - name: Get influxDB users
+    shell:
+      cmd: influx user list
+    register: influx_user_list
+    changed_when: False
+    
+  - set_fact:
+      influx_user_list: "{{influx_user_list.stdout_lines[1:] | map('regex_search', '(?<=\\t)[^\\t]*$') | list}}"
+  rescue:
+  - name: Set influx user list as empty when not found
+    set_fact:
+      user_list: "{{[]}}"
+
+# TODO: change these such that they match the earlier step probably best to create all users at once
+# TODO: add a check so this is idempotent because these tasks also can't be run twice
+# TODO fixup these user create commands by generalizing the organization, reducing the permissions
+
+#- name: create influx admin user
+#  command: influx -ssl -unsafeSsl -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
+
+- name: setup initial influx user and bucket
+  command: influx setup -f --username admin --password {{influx_admin_pass}} --org admin --bucket csv2_timeseries --retention 0
+  when: "'admin' not in {{influx_user_list}}"
+
+- name: create influx reader user
+  #command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -database 'csv2_timeseries' -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
+  command: influx user create -n csv2_read -p csv2_public -o admin
+  when: "'csv2_read' not in {{influx_user_list}}"
+
+- name: create influx writer user
+  #command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_writer WITH PASSWORD '{{ influx_writer_pass }}'"
+  command: influx user create -n csv2_writer -p {{influx_writer_pass}} -o admin
+  when: "'csv2_writer' not in {{influx_user_list}}"
+
+#- name: set permissions for influx read user
+#  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "GRANT READ ON csv2_timeseries TO csv2_read"
+
+#- name: set permissions for influx write user
+#  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "GRANT WRITE on csv2_timeseries TO csv2_writer"
+
 
 # name: add users to the cloudscheduler group
 # user:
@@ -651,9 +702,10 @@
       name: mariadb
       state: restarted
 
+# TODO this task fails if run twice
 - name: install csv2 database schema
   command: "/opt/cloudscheduler/utilities/db_upgrade {{ schema_model }} -i {{ db_upgrade_file }} -r live"
-  register: db_upgrade
+  #ignore_errors: true  # Apparently we should just ignore when this fails
 
 - name: retrieve privileges for remote users
   command: "/opt/cloudscheduler/utilities/mysql_privileges {{ item.0 }},{{ item.1 }} {{ item.2 }}"
@@ -803,25 +855,12 @@
     dest: /usr/bin/cloudscheduler
     state: link
 
-- name: create influx admin user
-  command: influx -ssl -unsafeSsl -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
-
-- name: create influx reader user
-  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
-
-- name: create influx writer user
-  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_writer WITH PASSWORD '{{ influx_writer_pass }}'"
-
-- name: set permissions for influx read user
-  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "GRANT READ ON csv2_timeseries TO csv2_read"
-
-- name: set permissions for influx write user
-  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "GRANT WRITE on csv2_timeseries TO csv2_writer"
-
-- name: restart influxdb on ssl
-  service:
-    name: influxdb
-    state: restarted
+# TODO: moved this up in the playbook to avoid rerunning this whole playbook
+- name: list current csv2 services
+  shell:
+    cmd: "for i in $(ls csv2-*.service.afile); do echo ${i::-6}; done"
+    chdir: /opt/cloudscheduler/etc/systemd/system/
+  register: current_csv2_services
 
 - name: ensure csv2 services are enabled and running
   systemd:
