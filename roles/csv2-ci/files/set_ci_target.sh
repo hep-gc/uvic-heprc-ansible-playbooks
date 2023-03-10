@@ -13,8 +13,9 @@ if [ "$#" -ne 9 ]; then
  fi
 
 # $1 is host_number
-host_number=${1}
-target_name=elephant${host_number} # elephantxxx
+host_machine=${1}
+host_number=$(curl ifconfig.me 2>/dev/null|cut -d. -f 4)
+target_name=$(echo $host_machine|cut -d. -f1)
 host_port=22
 
 branch=$2
@@ -33,7 +34,7 @@ cd /opt/deployment/uvic-heprc-ansible-playbooks
 cp /opt/deployment/uvic-heprc-ansible-playbooks/roles/csv2-ci/files/csv2-test-inventory.template inventory
 
 # - Make changes based -i on input above
-sed -i "s/{HOST}/${target_name}.heprc.uvic.ca/g" inventory
+sed -i "s/{HOST}/${host_machine}/g" inventory
 sed -i "s/{PORT}/$host_port/g" inventory
 
 # Create vars and secrets
@@ -50,8 +51,8 @@ cd /opt/deployment/uvic-heprc-ansible-playbooks/roles/csv2/vars
 sed -i "s/{GITBRANCH}/$branch/g"            csv2-public-vars.yaml
 sed -i "s/{DBFILE}/$db_file/g"              csv2-public-vars.yaml
 sed -i "s/{SCHEMA}/$schema/g"               csv2-public-vars.yaml
-sed -i "s/{HOST}/$target_name/g"            csv2-public-vars.yaml
-sed -i "s/{IP}/206.12.154.${host_number}/g" csv2-public-vars.yaml
+sed -i "s/{HOST}/${host_machine}/g"            csv2-public-vars.yaml
+sed -i "s/{IP}/$(curl ifconfig.me)/g" csv2-public-vars.yaml
 
 sed -i "s/{DEFAULTPASS}/$default_pass/g" csv2-public-secrets.yaml
 sed -i "s/{TESTERPASS}/$tester_pass/g"   csv2-public-secrets.yaml
@@ -63,7 +64,7 @@ sed -i "s/{INFLUXADMINPASS}/$influx_admin_pass/g"   csv2-public-secrets.yaml
 mkdir -p "/root/.csv2/unit-test"
 cd "/root/.csv2/unit-test"
 
-sed -ri "s#\s*server-address: (.*)#server-address: https://${target_name}.heprc.uvic.ca#g" settings.yaml
+sed -ri "s#\s*server-address: (.*)#server-address: https://${host_machine}#g" settings.yaml
 sed -ri "s#\s*server-password: (.*)#server-password: ${tester_pass}#g" settings.yaml
 
 # Copy over required files
@@ -73,6 +74,6 @@ cp job_sample.condor job.condor
 cp job_sample.sh job.sh
 sed -i "s/{user}/tester/" job.condor
 
-sudo ssh -i /root/.ssh/id_rsa -p $host_port root@${target_name}.heprc.uvic.ca "mkdir -p /home/tester"
-sudo scp -i /root/.ssh/id_rsa -P $host_port job.condor "root@${target_name}.heprc.uvic.ca:/home/tester/"
-sudo scp -i /root/.ssh/id_rsa -P $host_port job.sh "root@${target_name}.heprc.uvic.ca:/home/tester/"
+sudo ssh -i /root/.ssh/id_rsa -p $host_port root@${host_machine} "mkdir -p /home/tester"
+sudo scp -i /root/.ssh/id_rsa -P $host_port job.condor "root@${host_machine}:/home/tester/"
+sudo scp -i /root/.ssh/id_rsa -P $host_port job.sh "root@${host_machine}:/home/tester/"
