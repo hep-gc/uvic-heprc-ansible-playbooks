@@ -1,17 +1,22 @@
 # Xrootd server setup yaml
 ---
-- name: Include_vars
-  include_vars: xrootd_vars.yaml
+- include_vars: s3_credentials_dict.yaml
+- include_vars: xrootd_vars.yaml
 
-- name: Setup Xrootd
-  loop_control:
-    loop_var: tasks
-  loop:
-  - configure_timezone.yaml
-  - change_hostname.yaml
-  - install_EGI_trust_anchors.yaml
-  - install_epel_repository.yaml
-  - install_fetch_crl.yaml
-  - install_and_configure_xrootd.yaml
-  - configure_grid_security.yaml
-  include_tasks: "{{tasks}}"
+- import_tasks: change_hostname.yaml
+
+- import_tasks: install_EGI_trust_anchors.yaml
+- import_tasks: install_epel_repository.yaml
+- import_tasks: install_fetch_crl.yaml
+
+- import_tasks: install_xrootd.yaml
+
+- import_tasks: install_s3_tools.yaml
+  when: server_type == "s3_proxy"
+
+- import_tasks: add_s3_credentials.yaml
+  when: server_type == "s3_proxy"
+
+- import_tasks: configure_grid_security.yaml
+- import_tasks: configure_xrootd.yaml
+- import_tasks: configure_cmsd.yaml

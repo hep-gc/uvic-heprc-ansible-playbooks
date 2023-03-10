@@ -65,12 +65,38 @@
     regexp: '^Group=.*$'
     line: Group=root
 
+- name: install jenkins certificate keystore conversion script (depends on letsencrypt)
+  template:
+    src: usr_local_sbin_prepare_copy_jenkins_keystore.j2
+    dest: /usr/local/sbin/prepare_copy_jenkins_keystore
+    owner:
+    group:
+    mode: 0700
+  notify:
+  - run prepare_copy_jenkins_keystore
+
+- name: install custom jenkins config for SSL
+  template:
+    src: etc_systemd_system_jenkins.service.d_override.conf.j2
+    dest: /etc/systemd/system/jenkins.service.d/override.conf
+    owner: root
+    group: root
+    mode: 0700
+
+- name: install jenkins keystore conversion cron task
+  copy:
+    src: etc_cron.d_prepare_copy_jenkins_keystore
+    dest: /etc/cron.d/prepare_copy_jenkins_keystore
+    owner: root
+    group: root
+    mode: 0644
+
 - name: daemon-reload to pick up config changes
   systemd:
     daemon_reload: yes
 
-- name: open jenkins port (if firewalld is installed)
-  command: firewall-cmd --permanent --zone=public --add-port=8080/tcp
+- name: open jenkins ssl port (if firewalld is installed)
+  command: firewall-cmd --permanent --zone=public --add-port=8443/tcp
   notify:
     - restart firewalld
   ignore_errors: yes

@@ -1,4 +1,5 @@
 # file: configure_grid_security.yaml
+# Assumes: /etc/grid-security/hostcert.pem and /etc/grid-security/hostkey.pem exist on the host node.
 ---
 
 - name: Create grid-mapfile
@@ -10,23 +11,6 @@
   file:
     path: /etc/grid-security/xrd
     state: directory
-
-- name: Copy hostcert
-  copy: 
-    #src: "{{hostcert}}"
-    src: credentials/{{inventory_hostname}}_cert.pem
-    dest: /etc/grid-security/hostcert.pem
-    owner: root
-    group: root
-
-- name: Copy hostkey
-  copy:
-    #src: "{{hostkey}}"
-    src: credentials/{{inventory_hostname}}_key.pem
-    dest: /etc/grid-security/hostkey.pem
-    owner: root
-    group: root
-    mode: 0600
 
 - name: Add xrdcert
   copy:

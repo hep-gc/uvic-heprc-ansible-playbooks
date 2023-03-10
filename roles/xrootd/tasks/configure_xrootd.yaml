@@ -1,0 +1,77 @@
+# file: configure_xrootd.yaml
+#
+# Depends on the following variables:
+# {{export_path}}
+# {{localroot}}
+
+- name: Add xrootd server configuration
+  template:
+    src: xrootd-configuration.j2
+    dest: "/etc/xrootd/xrootd-{{server_type}}.cfg"
+    owner: xrootd
+    group: xrootd
+
+- name: Add robots.txt
+  copy:
+    src: robots.txt
+    dest: /etc/xrootd/robots.txt
+
+- name: Add Authfile
+  template:
+    src: Authfile
+    dest: "/etc/xrootd/Authfile"
+    owner: xrootd
+    group: xrootd
+
+- name: Change ownership of localroot and sub-directories
+  file:
+    path: "{{localroot}}"
+    state: directory
+    owner: xrootd
+    group: xrootd
+    recurse: true
+
+- name: Add the standalone tpc script
+  template:
+    src: tpc.sh
+    dest: "/etc/xrootd/tpc.sh"
+    owner: xrootd
+    group: xrootd
+    mode: u+x
+  when: server_type == "standalone"
+
+- name: Add the s3 tpc script
+  template:
+    src: tpc-s3.sh
+    dest: "/etc/xrootd/tpc.sh"
+    owner: xrootd
+    group: xrootd
+    mode: u+x
+  when: server_type == "s3_proxy"
+
+- name: Create directory matching bucket name as a workaround for pss
+  file:
+    path: "{{bucket_name}}"
+    state: directory
+  when: server_type == "s3_proxy"
+
+- name: Generate macaroon secret
+  command: 
+     cmd: openssl rand -base64 -out {{role_path}}/files/macaroon-secret 64
+     creates: "{{role_path}}/files/macaroon-secret"
+  delegate_to: 127.0.0.1
+  run_once: True
+
+- name: Copy macaroon secret
+  copy:
+    src: macaroon-secret
+    dest: "/etc/xrootd/macaroon-secret"
+    owner: xrootd
+    group: xrootd
+    mode: 0600
+
+- name: Enable XRootD service
+  systemd:
+    name: xrootd@{{server_type}}
+    enabled: true
+    state: restarted

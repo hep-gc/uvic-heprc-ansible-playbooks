@@ -7,5 +7,6 @@
 - include: install_other_required_packages.yaml
 - include: install_configure_ntpd.yaml
 - include: configure_root_mail_forwarding.yaml
+- include: letsencrypt.yaml
 - include: install_configure_ci.yaml
 - include: install_configure_jenkins.yaml
