@@ -1,9 +1,11 @@
-local_timezone:
-xrddir: /etc/xrootd
+localroot: /data
+export_path: /
+redirector_hostname:
 
-#data_dir: undef(hint="Replace with a directory to use for data storage")
-#redirector_hostname: undef(hint="Specify the hostname of the redirector server")
 
-localroot: /etc/xrootd
-data_dir: /data
-redirector_hostname: elephant101.heprc.uvic.ca
+server_type: "{{ (inventory_hostname in s3_proxy_dict.keys()) | ternary('s3_proxy', 'standalone')}}"
+
+s3_host: "{{s3_proxy_dict[inventory_hostname]['s3_host'] if (server_type == 's3_proxy') else '<Configured as standalone>'}}"
+bucket_name: "{{s3_proxy_dict[inventory_hostname]['bucket_name'] if (server_type == 's3_proxy') else '<Configured as standalone>'}}"
+access_key: "{{s3_proxy_dict[inventory_hostname]['access_key'] if (server_type == 's3_proxy')}}"
+secret_key: "{{s3_proxy_dict[inventory_hostname]['secret_key'] if (server_type == 's3_proxy')}}"

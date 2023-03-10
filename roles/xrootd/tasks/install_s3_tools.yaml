@@ -1,0 +1,11 @@
+#file: install_s3_tools.yaml
+
+- name: Install xrdcl-http
+  package:
+    name: xrdcl-http
+    state: latest
+
+- name: Install s3cmd
+  package:
+    name: s3cmd
+    state: latest
