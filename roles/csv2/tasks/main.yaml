@@ -1,7 +1,6 @@
 ---
 # cloudscheduler (v2) server maim.yaml
 
-
 - set_fact:
     public_mariadb: false
   when: internal_system_install is not defined
@@ -12,7 +11,6 @@
   when: internal_system_install is not defined
 - include_vars: "csv2-public-vars.yaml"
   when: internal_system_install is not defined
-
 
 - import_tasks: configure_root_mail_forwarding.yaml
 
@@ -27,6 +25,7 @@
 
 
 
+
 - import_tasks: install_python3.yaml
 
 - import_tasks: letsencrypt.yaml
@@ -38,7 +37,6 @@
   - local_web == True
 
 - import_tasks: install_configure_ntpd.yaml
-
 
 - import_tasks: install_configure_MariaDB.yaml
 

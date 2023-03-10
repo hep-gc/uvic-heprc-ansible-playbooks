@@ -7,39 +7,39 @@
 - set_fact:
     homedir: "{{ lookup('ansible.builtin.env', 'HOME') }}"
 
-- name: set_fact
+- name: set_fact letsencrypt_archive if undefined
   set_fact:
     letsencrypt_archive: "{{ homedir }}/archive/letsencrypt"
   when:
     letsencrypt_archive is undefined
 
-- name: set_fact
+- name: set_fact letsencrypt_test
   set_fact:
     letsencrypt_test: false
   when:
     letsencrypt_test is undefined
 
-- name: stat
+- name: get initial python3 status
   stat:
     path: /usr/bin/python3
   register: initial_python3_status
 
-- name: stat
+- name: stat letsencrypt opt dir
   stat:
     path: /opt/letsencrypt
   register: initial_optdir_status
 
-- name: stat
+- name: stat certbot dir
   stat:
     path: /opt/letsencrypt/bin/certbot
   register: initial_certbot_status
 
-- name: stat
+- name: stat letsencrypt status
   stat:
     path: /etc/letsencrypt
   register: initial_letsencrypt_status
 
-- name: stat
+- name: stat letsencrypt archive status
   stat:
     path: "{{ letsencrypt_archive }}/{{ i_service_connection.0.ipv4fqdn }}.tar.gz"
   register: archive_status

@@ -494,8 +494,8 @@
 - name: import_tasks
   import_tasks: configure_EL7_HTCondor.yaml
 
-#- name: create influx admin user
-#  command: influx -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
+- name: create influx admin user
+  command: influx -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
 
 - name: install influxDB ssl configuration file
   copy:

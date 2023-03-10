@@ -6,7 +6,7 @@ cs_git_branch: {GITBRANCH}
 db_upgrade_file: {DBFILE}
 schema_model: {SCHEMA}
 
-admin_email: root@{HOST}.heprc.uvic.ca
+admin_email: root@{{ csv2_fqdn }}
 
 install_phpMyAdmin: False
 web_debug: True

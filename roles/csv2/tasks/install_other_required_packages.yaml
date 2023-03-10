@@ -7,17 +7,14 @@
     warn: false
   when: ansible_facts['distribution_major_version'] == "8"
 
+- name: enable CRB for EL9
+  command: dnf config-manager --set-enabled crb
+  args:
+    warn: false
+  when: ansible_facts['distribution_major_version'] == "9"
+
+# TODO see if xorg-x11-apps is really needed
 - name: install other required packages
-  yum:
-    name: ['@development', 'mailx', 'xauth', 'xorg-x11-apps', 'xorg-x11-fonts-Type1']
+  package:
+    name: ['@development', 's-nail', 'xauth', 'xorg-x11-fonts-Type1']
     state: latest
-
-- name: add grid canada to ca bundle
-  script: bash-add_grid_canada_to_ca_bundle creates=/root/ansible_script_logs/bash-add_grid_canada_to_ca_bundle.log
-
-- name: create symbolic link for CABundle.crt
-  file:
-    src: "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"
-    dest: "/etc/ssl/certs/CABundle.crt"
-    state: link
-

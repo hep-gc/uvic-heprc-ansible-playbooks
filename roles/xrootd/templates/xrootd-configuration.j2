@@ -1,0 +1,87 @@
+set redirector = {{redirector_hostname | default('www.example.com', true)}}
+
+all.manager $(redirector):1095
+
+
+# Debugging output
+#xrd.trace all
+#xrootd.trace all
+#ofs.trace all
+#sec.trace all
+#pss.trace all
+#http.trace all
+
+
+all.export {{export_path}}
+
+# The names used here must match what is going to be passed as server_type
+if $redirector
+  all.role manager
+  http.desthttps yes
+else if named s3_proxy
+  # Proxy setup
+  all.role server
+  ofs.osslib libXrdPss.so
+  pss.origin {{s3_host}}
+  pss.localroot {{bucket_name}}
+
+  setenv AWS_ACCESS_KEY_ID < /etc/xrootd/access_key
+  setenv AWS_SECRET_ACCESS_KEY < /etc/xrootd/secret_key
+
+else if named standalone
+  all.role server
+  oss.localroot {{localroot}}
+fi
+
+# TLS Setup
+xrd.tls /etc/grid-security/xrd/xrdcert.pem /etc/grid-security/xrd/xrdkey.pem
+xrd.tlsca certdir /etc/grid-security/certificates
+xrootd.tls all -data
+
+if $redirector
+  # Pass
+else
+  xrootd.seclib libXrdSec.so
+  sec.protocol gsi -dlgpxy:request \
+                   -exppxy:=creds \
+                   -ca:verify \
+                   -crl:try \
+                   -gmapopt:nomap \
+                   -vomsat:require \
+                   -vomsfun:default
+fi
+
+xrootd.seclib libXrdSec.so
+http.secxtractor libXrdHttpVOMS.so
+
+if exec xrootd
+  xrd.protocol http libXrdHttp.so
+fi
+
+# Authorization configuration
+ofs.authorize
+acc.audit deny grant
+acc.authdb /etc/xrootd/Authfile
+
+# TPC Setup
+xrootd.chksum adler32
+
+ofs.tpc fcreds ?gsi =X509_USER_PROXY
+ofs.tpc require client gsi
+ofs.tpc scan stderr
+ofs.tpc echo
+ofs.tpc ttl 300 600
+ofs.tpc xfr 100
+ofs.tpc autorm
+ofs.tpc pgm /etc/xrootd/tpc.sh
+
+
+http.exthandler xrdtpc libXrdHttpTPC.so
+http.header2cgi Authorization authz
+http.staticpreload http://static/robots.txt /etc/xrootd/robots.txt
+
+# Macaroon setup
+http.exthandler xrdmacaroons libXrdMacaroons.so
+macaroons.secretkey /etc/xrootd/macaroon-secret
+all.sitename test-sitename
+ofs.authlib libXrdMacaroons.so

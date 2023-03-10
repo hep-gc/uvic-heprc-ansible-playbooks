@@ -1,0 +1,9 @@
+# This is doesn't work on almalinux and breaks ssl functionality
+- name: add grid canada to ca bundle
+  script: bash-add_grid_canada_to_ca_bundle creates=/root/ansible_script_logs/bash-add_grid_canada_to_ca_bundle.log
+
+- name: create symbolic link for CABundle.crt
+  file:
+    src: "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"
+    dest: "/etc/ssl/certs/CABundle.crt"
+    state: link
