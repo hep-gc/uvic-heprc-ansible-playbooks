@@ -13,10 +13,6 @@
   when: internal_system_install is not defined
 
 - set_fact:
-    favicon_colour: "{{favicon_colours[ansible_fqdn]}}"
-  when: favicon_colours is defined and ansible_fqdn in favicon_colours.keys()
-
-- set_fact:
     ansible_ssh_port: "{{ ansible_ssh_port }}"
   when: internal_system_install is not defined
 
