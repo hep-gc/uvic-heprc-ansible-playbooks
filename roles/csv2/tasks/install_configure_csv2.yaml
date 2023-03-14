@@ -371,17 +371,8 @@
 
 - import_tasks: install_HAProxy.yaml
 
+# TODO make this compatible with EL9 or try to replace the functionality
 # This probably just needs to be changed to a more direct call to haproxy
-#- name: install HAProxy service wrapper
-#  copy:
-#    remote_src: yes
-#    src: /opt/cloudscheduler/usr/local/sbin/haproxy_wrapper.afile
-#    dest: /usr/local/sbin/haproxy_wrapper
-#    owner: root
-#    group: root
-#    mode: 0744
-#  notify:
-#    restart httpd
 
 - name: configure HAProxy
   template:
@@ -393,27 +384,51 @@
   notify:
       restart httpd
 
-#- name: create/update HAProxy service file in systemd directory
-#  copy:
-#    remote_src: yes
-#    src: "/opt/cloudscheduler/etc/systemd/system/{{ item }}.afile"
-#    dest: "/etc/systemd/system/{{ item }}"
-#    owner: root
-#    group: root
-#    mode: 0644
-#  with_items:
-#  - HAProxy.service
+- block:
+  - name: install HAProxy service wrapper
+    copy:
+      remote_src: yes
+      src: /opt/cloudscheduler/usr/local/sbin/haproxy_wrapper.afile
+      dest: /usr/local/sbin/haproxy_wrapper
+      owner: root
+      group: root
+      mode: 0744
+    notify:
+      restart httpd
+  - name: create/update HAProxy service file in systemd directory
+    copy:
+      remote_src: yes
+      src: "/opt/cloudscheduler/etc/systemd/system/{{ item }}.afile"
+      dest: "/etc/systemd/system/{{ item }}"
+      owner: root
+      group: root
+      mode: 0644
+    with_items:
+    - HAProxy.service
+  - name: ensure HAProxy service is enabled and running
+    systemd:
+      name: HAProxy.service
+      enabled: yes
+      state: restarted
+  when: ansible_facts['distribution_major_version'] in ("7", "8")
+
+- block:
+  - name: Add wrapper file that points to haproxy
+    copy:
+      src: /hepuser/fizz/Github/uvic-heprc-ansible-playbooks/roles/csv2/files/haproxy_wrapper_el9.afile
+      dest: /usr/local/sbin/haproxy_wrapper
+      owner: root
+      group: root
+      mode: 0744
+  - name: ensure haproxy service is enabled and running
+    systemd:
+      name: haproxy.service
+      enabled: yes
+      state: restarted
+  when: ansible_facts['distribution_major_version'] == "9"
 
 - name: reload daemons 
   command: systemctl daemon-reload
-
-# TODO we do not have the right configuration at this time
-- name: ensure HAProxy service is enabled and running
-  systemd:
-    #name: HAProxy.service
-    name: haproxy.service
-    enabled: yes
-    state: restarted
 
 ### container configuration ####################################################################################################################################
 
@@ -463,10 +478,9 @@
 
 
 # TODO: the problem likely is that this is always skipped
-- name: set default settings for cloudsheduler command
-  command: "cloudscheduler defaults set -s default -su csv2_default -spw {{ csv2_default_password }} -sa {{ csv2_web_address}}"
-  
-  
+# TODO csv2_web_address is not defined in time for this command to be used
+#- name: set default settings for cloudsheduler command
+#  command: "cloudscheduler defaults set -s default -su csv2_default -spw {{ csv2_default_password }} -sa {{ csv2_web_address}}"  
 #  when:
 #    - container is defined
 #    - container == True
@@ -523,9 +537,6 @@
 
 - import_tasks: configure_EL7_HTCondor.yaml
 
-#- name: create influx admin user
-#  command: influx -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
-
 - name: install influxDB ssl configuration file
   copy:
     src: etc_influxdb_influxdb.conf
@@ -548,28 +559,29 @@
   rescue:
   - name: Set influx user list as empty when not found
     set_fact:
-      user_list: "{{[]}}"
+      influx_user_list: "{{[]}}"
 
 # TODO: change these such that they match the earlier step probably best to create all users at once
-# TODO: add a check so this is idempotent because these tasks also can't be run twice
 # TODO fixup these user create commands by generalizing the organization, reducing the permissions
+# TODO add permissions for the influxdb2 versions
+# TODO add note saying these passowrds can't have spaces
 
 #- name: create influx admin user
 #  command: influx -ssl -unsafeSsl -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
 
 - name: setup initial influx user and bucket
   command: influx setup -f --username admin --password {{influx_admin_pass}} --org admin --bucket csv2_timeseries --retention 0
-  when: "'admin' not in {{influx_user_list}}"
+  when: "'admin' not in influx_user_list"
 
 - name: create influx reader user
   #command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -database 'csv2_timeseries' -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
   command: influx user create -n csv2_read -p csv2_public -o admin
-  when: "'csv2_read' not in {{influx_user_list}}"
+  when: "'csv2_read' not in influx_user_list"
 
 - name: create influx writer user
   #command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_writer WITH PASSWORD '{{ influx_writer_pass }}'"
   command: influx user create -n csv2_writer -p {{influx_writer_pass}} -o admin
-  when: "'csv2_writer' not in {{influx_user_list}}"
+  when: "'csv2_writer' not in influx_user_list"
 
 #- name: set permissions for influx read user
 #  command: influx -ssl -unsafeSsl -username admin -password {{ influx_admin_pass }} -execute "GRANT READ ON csv2_timeseries TO csv2_read"
@@ -702,10 +714,10 @@
       name: mariadb
       state: restarted
 
-# TODO this task fails if run twice
+# TODO this task fails if run twice (likely a bug with csv2 itself)
 - name: install csv2 database schema
   command: "/opt/cloudscheduler/utilities/db_upgrade {{ schema_model }} -i {{ db_upgrade_file }} -r live"
-  #ignore_errors: true  # Apparently we should just ignore when this fails
+  ignore_errors: true  # Apparently we should just ignore when this fails
 
 - name: retrieve privileges for remote users
   command: "/opt/cloudscheduler/utilities/mysql_privileges {{ item.0 }},{{ item.1 }} {{ item.2 }}"
