@@ -1,18 +1,22 @@
 ---
-# InfluxDb 
+# install_influxdb.yaml
 
-- name: Install python2 pip
-  yum:
-    name: python2-pip
+# TODO it is probably best to only have one major version of InfluxDB so we should try and get EL9 working with influxdb 1.8
+
+# TODO cut python 2 stuff for el9
+#- name: Install python2 pip
+#  yum:
+#    name: python2-pip
 
 - name: Install certifi python package
   pip:
-    name: certifi<=2020.4.5.1
+    #name: certifi<=2020.4.5.1
+    name: certifi
 
 - name: Install requests python package version for influx.
   pip:
     name: requests
-    version: 2.24.0
+    #version: 2.24.0
 
 - name: Install InfluxDB python package.
   pip:
@@ -23,11 +27,18 @@
     name: influxdb-repo
     description: InfluxDB YUM repo
     baseurl: https://repos.influxdata.com/rhel/$releasever/$basearch/stable
-    gpgcheck: no
+    gpgcheck: true
+    gpgkey: https://repos.influxdata.com/influxdata-archive_compat.key
+    enabled: true
 
-- name: install InfluxDB
-  yum:
-    name: ['influxdb']
+#- name: install InfluxDB
+#  yum:
+#    name: ['influxdb']
+#    state: latest
+
+- name: install InfluxDB2
+  package:
+    name: influxdb2, influxdb2-cli
     state: latest
 
 - name: Start service InfluxDB
@@ -44,3 +55,4 @@
       database_name: "csv2_timeseries"
       udp_port: 4444
   ignore_errors: true
+  when: ansible_facts['distribution_major_version'] == "7"
