@@ -2,6 +2,7 @@
 # file: install_CentOS_HAProxy.yaml
 
 - block:
+  # TODO see if all mod_wsgi installs are necessary
   - name: install the mod_wsgi python package
     pip:
       name: mod_wsgi-express

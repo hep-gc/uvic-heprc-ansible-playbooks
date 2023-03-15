@@ -1,5 +1,6 @@
 # install_HTCondor.yaml
 
+# New condor setup
 - name: configure HTCondor repository
   get_url:
     url: https://get.htcondor.org
@@ -8,6 +9,15 @@
 
 - name: setup HTCondor repo
   shell: /tmp/htcondor_repo_setup --no-dry-run
+
+# Old condor setup
+# install_EL7_HTCondor.yaml
+
+#- name: configure HTCondor repository
+#  get_url:
+#    url: http://research.cs.wisc.edu/htcondor/yum/repo.d/htcondor-stable-rhel7.repo
+#    dest: /etc/yum.repos.d/htcondor-stable-rhel7.repo
+#    mode: 0644
 
 #- name: install HTCondor repository GPG keys
 #  rpm_key:
@@ -18,4 +28,3 @@
 #  yum:
 #    name: ['condor-all']
 #    state: latest
-

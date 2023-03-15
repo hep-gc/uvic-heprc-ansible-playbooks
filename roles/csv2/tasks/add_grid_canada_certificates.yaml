@@ -1,5 +1,7 @@
 ---
 # file" add_grid_canada_certificates.yaml
+
+# TODO probably remove this from the public playbook
 - name: add grid canada to ca bundle
   script: bash-add_grid_canada_to_ca_bundle creates=/root/ansible_script_logs/bash-add_grid_canada_to_ca_bundle.log
 
