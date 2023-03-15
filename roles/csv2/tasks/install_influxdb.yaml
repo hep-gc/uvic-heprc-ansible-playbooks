@@ -3,10 +3,19 @@
 
 # TODO it is probably best to only have one major version of InfluxDB so we should try and get EL9 working with influxdb 1.8
 
-# TODO cut python 2 stuff for el9
-#- name: Install python2 pip
-#  yum:
-#    name: python2-pip
+- name: Install python2 pip
+  yum:
+    name: python2-pip
+  when: ansible_facts['distribution_major_version'] == "7"
+
+- name: Install certifi python package
+  pip:
+    name: certifi<=2020.4.5.1
+
+- name: Install requests python package version for influx.
+  pip:
+    name: requests
+    version: 2.24.0
 
 - name: Install certifi python package
   pip:

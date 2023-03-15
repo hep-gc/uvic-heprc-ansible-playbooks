@@ -1,13 +1,11 @@
 
-- name: set_fact
-  set_fact:
+- set_fact:
     csv2_host: '{{ i_virtualhosts.0.virtualhost }}'
     ssl_cert_file: "/etc/letsencrypt/live/{{ i_service_connection.0.ipv4fqdn }}/fullchain.pem"
     ssl_key_file: "/etc/letsencrypt/live/{{ i_service_connection.0.ipv4fqdn }}/privkey.pem"
   when: (local_web is undefined) or (local_web == False)
 
-- name: set_fact
-  set_fact:
+- set_fact:
     csv2_host: localhost
     ssl_cert_file: /local_ssl/localhost.crt
     ssl_key_file: /local_ssl/localhost.key
@@ -15,27 +13,23 @@
   - local_web is defined
   - local_web == True    
 
-- name: set_fact
-  set_fact:
+- set_fact:
     ssl_ca_cert_arg: 'SSLCACertificatePath /etc/grid-security/certificates/'
   when: (container is undefined) or (container == False)
 
-- name: set_fact
-  set_fact:
+- set_fact:
     ssl_ca_cert_arg: 'SSLCACertificateFile /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem'
   when: 
   - container is defined
   - container == True
 
-- name: set_fact
-  set_fact:
+- set_fact:
     db_hostname: "{{ i_service_connection.0.ipv4fqdn }}"
   when:
   - (db_on_localhost is undefined) or (db_on_localhost != true)
 
-- name: set_fact
-  set_fact:
-    public_mariadb: False
+#- set_fact:
+#    public_mariadb: False
 
 - name: set_fact
   set_fact:
@@ -46,20 +40,28 @@
 
 - name: set_fact
   set_fact:
-    htcondor_gsi_dn: "/CN=csv2-sa.heprc.uvic.ca"
-  when:
-  - htcondor_gsi_dn is undefined
+    hostname: "{{ i_service_connection.0.ipv4fqdn }}"
+
+- name: set active hostname
+  command: hostname {{ hostname }}
+
+- name: set hostname
+  command: echo {{hostname}} > /etc/hostname
+
 
 - name: set_fact
   set_fact:
-    htcondor_worker_gsi_dn: "/CN=csv2-sa-worker.heprc.uvic.ca"
-  when:
-  - htcondor_worker_gsi_dn is undefined
+    hostname: "{{ i_service_connection.0.ipv4fqdn }}"
+
+- name: set active hostname
+  command: hostname {{ hostname }}
+
+- name: set hostname
+  command: sed -i 's/.*/{{ hostname }}/g' /etc/hostname
 
 - name: create cloudscheduler user
   user:
     name: cloudscheduler
-# register: cloudscheduler_user
 
 - name: change the group ownership of the phpmyadmin directories
   file:
@@ -111,15 +113,8 @@
 
 
 - name: install ansible (still uses python 2.7) module prerequisites
-  yum:
-    name: python2-bcrypt
-  when: ansible_facts['distribution_major_version'] in ("7", "8")
-
-- name: install python bcrypt
   package:
-    name: python3-bcrypt
-  when: ansible_facts['distribution_major_version'] == "9"
-
+    name: python*-bcrypt
 
 - name: install qemu-img
   yum:
@@ -332,19 +327,19 @@
   notify:
     restart httpd
 
-- name: install firewalld 
-  yum:
-    name: firewalld
+#- name: install firewalld 
+#  yum:
+#    name: firewalld
 
 - name: install python firewalld for ansible
   yum:
     name: python-firewall
 
-- name: enable firewalld
-  systemd:
-    name: firewalld
-    enabled: yes
-    state: restarted
+#- name: enable firewalld
+#  systemd:
+#    name: firewalld
+#    enabled: yes
+#    state: restarted
 
 - name: open https port
   firewalld:
@@ -888,6 +883,12 @@
 - name: remove old setup group csv2_default
   command: "cloudscheduler group delete -su csv2_default -spw '{{ csv2_default_password }}' -sa {{ csv2_web_address }} -gn csv2-group -Y"
   ignore_errors: yes
+
+- name: TEST STEP DISABLE EC2
+  systemd:
+    name: csv2-ec2
+    state: stopped
+    enabled: yes
 
 - name: meta
   meta: flush_handlers
