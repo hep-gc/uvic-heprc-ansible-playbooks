@@ -101,40 +101,38 @@
   with_items:
   - "{{ certificate_users }}"
 
-- name: install bash script to update cert and key for certificate users
-  template:
-    src: usr_local_sbin_copy_certificates_to_users.j2
-    dest: /usr/local/sbin/copy_certificates_to_users.sh
-    owner: root
-    group: root
-    mode: 0700
-  when:
-  - certificate_users is defined
+# TODO certificate_users is probably always defined so I don't think we need the conditional
+- block:
+  - name: install bash script to update cert and key for certificate users
+    template:
+      src: usr_local_sbin_copy_certificates_to_users.j2
+      dest: /usr/local/sbin/copy_certificates_to_users.sh
+      owner: root
+      group: root
+      mode: 0700
 
-- name: copy certificates to users crontab entry
-  copy:
-    src: etc_cron.d_copy-certificates-to-users
-    dest: /etc/cron.d/copy-certificates-to-users
-    owner: root
-    group: root
-    mode: 0644
-  when:
-  - certificate_users is defined
+  - name: copy certificates to users crontab entry
+    copy:
+      src: etc_cron.d_copy-certificates-to-users
+      dest: /etc/cron.d/copy-certificates-to-users
+      owner: root
+      group: root
+      mode: 0644
 
-- name: copy certificates to users
-  command:
-    cmd: /usr/local/sbin/copy_certificates_to_users.sh
-  when:
-  - certificate_users is defined
+  - name: copy certificates to users
+    command:
+      cmd: /usr/local/sbin/copy_certificates_to_users.sh
+  when: certificate_users is defined
 
-- name: link hostcert for influxDB
-  file:
-    src: /etc/grid-security/hostcert.pem
-    dest: /etc/ssl/hostcert.pem
-    state: link
-
-- name: link hostkey for influxDB
-  file:
-    src: /etc/grid-security/hostkey.pem
-    dest: /etc/ssl/hostkey.pem
-    state: link
+# TODO: remove these as they break using letsencrypt certificates and probably aren't needed
+#- name: link hostcert for influxDB
+#  file:
+#    src: /etc/grid-security/hostcert.pem
+#    dest: /etc/ssl/hostcert.pem
+#    state: link
+#
+#- name: link hostkey for influxDB
+#  file:
+#    src: /etc/grid-security/hostkey.pem
+#    dest: /etc/ssl/hostkey.pem
+#    state: link
