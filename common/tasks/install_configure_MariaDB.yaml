@@ -96,6 +96,21 @@
   - container is defined
   - container == True
 
-- name: secure mariadb database
-  script: expect-mariadb_secure_database {{ database_user_passwords['root'] }} {{ database_user_passwords['change_from_old_root'] }} creates=/root/ansible_script_logs/expect-mariadb_secure_database.log
+# TODO replace this with a more idempotent setup
+#- name: secure mariadb database
+#  script: expect-mariadb_secure_database {{ database_user_passwords['root'] }} {{ database_user_passwords['change_from_old_root'] }} creates=/root/ansible_script_logs/expect-mariadb_secure_database.log
 
+# TODO these changes probably obsoletes the entry change_from_old_root, the expect package, and the expect-mariadb script
+- name: Change mysql root user's password
+  mysql_user:
+    name: root
+    password: "{{database_user_passwords['root']}}"
+    check_implicit_admin: true
+
+- name: Add MariaDB config file
+  template:
+    src: mariadb_credentials.j2
+    dest: /root/.my.cnf
+    owner: root
+    group: root
+    mode: 0600
