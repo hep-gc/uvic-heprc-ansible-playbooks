@@ -1,10 +1,41 @@
 
-- name: install and start the condor poller
-  shell: |
-    rm -rfv /tmp/cloudscheduler
-    cd /tmp
-    tar -xzf /opt/cloudscheduler/repository/condor_poller.tar.gz
-    rsync -av cloudscheduler /opt
-    /opt/cloudscheduler/utilities/service_disable_condor_poller
-    /opt/cloudscheduler/utilities/service_enable_condor_poller
-    rm -rfv /tmp/cloudscheduler
+# TODO break this up and use ansible modules so errors can be caught
+#- name: install and start the condor poller
+#  shell: |
+#    rm -rfv /tmp/cloudscheduler
+#    cd /tmp
+#    tar -xzf /opt/cloudscheduler/repository/condor_poller.tar.gz
+#    rsync -av cloudscheduler /opt
+#    /opt/cloudscheduler/utilities/service_disable_condor_poller
+#    /opt/cloudscheduler/utilities/service_enable_condor_poller
+#    rm -rfv /tmp/cloudscheduler
+
+# TODO do we really need to create a tarball just so we can immediately unpack it
+- name: Ensure /tmp/cloudscheduler exists
+  file:
+    path: /tmp/cloudscheduler
+    state: directory
+
+- name: Extract condor poller tarball
+  unarchive:
+    remote_src: true
+    src: /opt/cloudscheduler/repository/condor_poller.tar.gz
+    dest: /tmp/cloudscheduler
+
+- name: synchronize tarball contents and cloudscheduler directory
+  synchronize:
+    archive: true
+    src: /tmp/cloudscheduler
+    dest: /opt
+
+- name: Disable condor poller
+  command: /opt/cloudscheduler/utilities/service_disable_condor_poller
+
+- name: Enable condor poller
+  command: /opt/cloudscheduler/utilities/service_enable_condor_poller
+
+# TODO might need a check to make sure that condor poller is still running after a short while
+- name: Start condor poller
+  systemd:
+    name: csv2-condor-poller
+    state: restarted

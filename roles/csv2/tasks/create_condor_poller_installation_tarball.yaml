@@ -83,9 +83,9 @@
     mode: 0644
 
 - name: build the condor_poller tarball
-  command:
-    cmd: "tar -czvf /opt/cloudscheduler/repository/condor_poller.tar.gz cloudscheduler"
-    chdir: /tmp/gentgz
+  archive:
+    path: /tmp/gentgz/cloudscheduler
+    dest: /opt/cloudscheduler/repository/condor_poller.tar.gz
 
 - name: remove the temporary condor_poller gentgz directory
   file:
