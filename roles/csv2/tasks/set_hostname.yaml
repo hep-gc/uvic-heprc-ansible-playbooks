@@ -1,0 +1,21 @@
+- set_fact:
+    db_hostname: "{{ i_service_connection.0.ipv4fqdn }}"
+  when:
+  - (db_on_localhost is undefined) or (db_on_localhost != true)
+
+- name: set_fact
+  set_fact:
+    db_hostname: "localhost"
+  when:
+  - db_on_localhost is defined
+  - db_on_localhost == true
+
+- name: set_fact
+  set_fact:
+    hostname: "{{ i_service_connection.0.ipv4fqdn }}"
+
+- name: set active hostname
+  command: hostname {{ hostname }}
+
+- name: set hostname
+  command: echo {{hostname}} > /etc/hostname

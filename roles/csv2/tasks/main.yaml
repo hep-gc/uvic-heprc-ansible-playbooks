@@ -12,6 +12,8 @@
 - include_vars: "csv2-public-vars.yaml"
   when: internal_system_install is not defined
 
+- import_tasks: set_hostname.yaml
+
 - import_tasks: configure_root_mail_forwarding.yaml
 
 - import_tasks: create_installation_directories.yaml

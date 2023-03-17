@@ -23,32 +23,6 @@
   - container is defined
   - container == True
 
-- set_fact:
-    db_hostname: "{{ i_service_connection.0.ipv4fqdn }}"
-  when:
-  - (db_on_localhost is undefined) or (db_on_localhost != true)
-
-#- set_fact:
-#    public_mariadb: False
-
-- name: set_fact
-  set_fact:
-    db_hostname: "localhost"
-  when:
-  - db_on_localhost is defined
-  - db_on_localhost == true
-
-- name: set_fact
-  set_fact:
-    hostname: "{{ i_service_connection.0.ipv4fqdn }}"
-
-- name: set active hostname
-  command: hostname {{ hostname }}
-
-- name: set hostname
-  command: echo {{hostname}} > /etc/hostname
-
-
 - name: create cloudscheduler user
   user:
     name: cloudscheduler
@@ -398,6 +372,7 @@
   when: ansible_facts['distribution_major_version'] in ("7", "8")
 
 - block:
+  # TODO change this away from an absolute path
   - name: Add wrapper file that points to haproxy
     copy:
       src: /hepuser/fizz/Github/uvic-heprc-ansible-playbooks/roles/csv2/files/haproxy_wrapper_el9.afile
@@ -709,37 +684,35 @@
   register: "mysql_privileges"
   with_list: "{{ remote_database_users }}"
 
-- name: set_fact
-  set_fact:
-    stderr_lines: []
-  when: mysql_privileges is defined
+# TODO I'm pretty sure mysql_privileges will always be defined even if remote_database_users is empty
+- block:
+  - name: set_fact
+    set_fact:
+      stderr_lines: []
 
-- name: set_fact
-  set_fact:
-    stderr_lines: "{{ stderr_lines + item.stderr_lines }}"
-  with_items: "{{ mysql_privileges.results }}"
-  when: mysql_privileges is defined
+  - name: set_fact
+    set_fact:
+      stderr_lines: "{{ stderr_lines + item.stderr_lines }}"
+    with_items: "{{ mysql_privileges.results }}"
 
-- name: debug
-  debug:
-    msg: "{{ item }}"
-  with_nested: "{{ stderr_lines }}"
-  when: mysql_privileges is defined
+  - name: debug
+    debug:
+      msg: "{{ item }}"
+    with_nested: "{{ stderr_lines }}"
 
-- name: set_fact
-  set_fact:
-    stdout_lines: []
-  when: mysql_privileges is defined
+  - name: set_fact
+    set_fact:
+      stdout_lines: []
 
-- name: set_fact
-  set_fact:
-    stdout_lines: "{{ stdout_lines + item.stdout_lines }}"
-  with_items: "{{ mysql_privileges.results }}"
-  when: mysql_privileges is defined
+  - name: set_fact
+    set_fact:
+      stdout_lines: "{{ stdout_lines + item.stdout_lines }}"
+    with_items: "{{ mysql_privileges.results }}"
 
-- name: define csv2 database remote users and priveleges
-  command: "mysql -u root -p'{{ database_user_passwords['root'] }}' -e '{{ item }}' csv2"
-  with_items: "{{ stdout_lines }}"
+  # TODO this defines the host for the user 'condor_poller' as %
+  - name: define csv2 database remote users and priveleges
+    command: "mysql -u root -p'{{ database_user_passwords['root'] }}' -e '{{ item }}' csv2"
+    with_items: "{{ stdout_lines }}"
   when: mysql_privileges is defined
 
 - name: generate schema
