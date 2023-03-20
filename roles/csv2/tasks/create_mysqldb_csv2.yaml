@@ -20,3 +20,14 @@
     state: present
     login_user: csv2
     login_password: "{{ database_user_passwords['csv2'] }}"
+
+# TODO check if this was supposed to be done somewhere else. I'm not sure why it would have worked in the past since this file hasn't been changed in a long time
+# NOTE this is a temporary change to try and debug adding the user and should probably be taken out
+- name: create condor poller user
+  mysql_user:
+    name: condor_poller
+    host: "{{hostname}}"
+    password: "{{ database_user_passwords['condor_poller'] }}"
+    state: present
+    login_user: root
+    login_password: "{{ database_user_passwords['root'] }}"
