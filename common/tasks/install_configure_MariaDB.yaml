@@ -27,7 +27,7 @@
     mode: +x
     
 - name: Setup MariaDB repo
-  shell: "/tmp/mariadb_repo_setup"
+  command: /tmp/mariadb_repo_setup
 
 # Install Centos 7 and 8 dependencies
 - name: install mariadb (MySQL) packages for EL<9
@@ -40,16 +40,16 @@
   - restart mariadb
 
 # Install Almalinux 9 dependencies
-- name: install mariadb packages for EL9
-  package:
-    name: expect, MariaDB-server, MariaDB-client, MariaDB-devel, MariaDB-common, MariaDB-shared, zlib-devel, openssl-devel, gcc
-    state: latest
-  when: ansible_facts['distribution_major_version'] == "9"
-  notify: restart mariadb
+- block:
+  - name: install mariadb packages for EL9
+    package:
+      name: expect, MariaDB-server, MariaDB-client, MariaDB-devel, MariaDB-common, MariaDB-shared, zlib-devel, openssl-devel, gcc
+      state: latest
+    notify: restart mariadb
 
-- name: install python mySQL packages
-  pip:
-    name: mysqlclient
+  - name: install python mySQL packages
+    pip:
+      name: mysqlclient
   when: ansible_facts['distribution_major_version'] == "9"
 
 #- name: install pip3 mysqlclient

@@ -34,6 +34,7 @@
     path: /opt/letsencrypt/bin/certbot
   register: initial_certbot_status
 
+# TODO Is this meant as a check for if the server already has valid certificates?
 - name: stat letsencrypt status
   stat:
     path: /etc/letsencrypt
@@ -54,32 +55,25 @@
     name: ["virtualenv"]
   when: initial_python3_status.stat.exists == False
 
-- name: create python2 virtual environment for letsencrypt
-  command: virtualenv /opt/letsencrypt
-  when:
-  - initial_python3_status.stat.exists == False
-  - initial_optdir_status.stat.exists == False
+- block:
+  - name: create python2 virtual environment for letsencrypt
+    command: virtualenv /opt/letsencrypt
 
-- name: install certbot into the python2 virtual environment
-  command: /opt/letsencrypt/bin/pip install certbot
+  - name: install certbot into the python2 virtual environment
+    command: /opt/letsencrypt/bin/pip install certbot
   when:
   - initial_python3_status.stat.exists == False
   - initial_certbot_status.stat.exists == False
 
-- name: create python3 virtual environment for letsencrypt
-  command: python3 -m venv /opt/letsencrypt
-  when:
-  - initial_python3_status.stat.exists == True
-  - initial_optdir_status.stat.exists == False
+- block:
+  - name: create python3 virtual environment for letsencrypt
+    command: python3 -m venv /opt/letsencrypt
 
-- name: upgrade pip3 to latest version before install certbot
-  command: /opt/letsencrypt/bin/pip3 install --upgrade pip
-  when:
-  - initial_python3_status.stat.exists == True
-  - initial_certbot_status.stat.exists == False
+  - name: upgrade pip3 to latest version before install certbot
+    command: /opt/letsencrypt/bin/pip3 install --upgrade pip
 
-- name: install certbot into the python3 virtual environment
-  command: /opt/letsencrypt/bin/pip3 install certbot
+  - name: install certbot into the python3 virtual environment
+    command: /opt/letsencrypt/bin/pip3 install certbot
   when:
   - initial_python3_status.stat.exists == True
   - initial_certbot_status.stat.exists == False
@@ -116,11 +110,18 @@
     src: "{{ letsencrypt_archive }}/{{ i_service_connection.0.ipv4fqdn }}.tar.gz"
     dest: /etc/
   when: 
-  - initial_letsencrypt_status.stat.exists == False
-  - archive_status.stat.exists == True
+  - not initial_letsencrypt_status.stat.exists
+  - archive_status.stat.exists
 
-- name: run /usr/local/sbin/get_letsencrypt_cert
-  shell: /usr/local/sbin/get_letsencrypt_cert
+- block:
+  - name: run /usr/local/sbin/get_letsencrypt_cert
+    command: /usr/local/sbin/get_letsencrypt_cert
+  rescue:
+  - name: get_letsencrypt_cert script failed. Possibly requested too many certificates recently, attempting to use local archive
+    unarchive:
+      src: "{{ letsencrypt_archive }}/{{ i_service_connection.0.ipv4fqdn }}.tar.gz"
+      dest: /etc/
+
 
 
 - name: Fail if no virtual hosts were provided
