@@ -1,3 +1,5 @@
+# TODO maybe make use of the defaults directory to adjust precedence
+
 install_phpMyAdmin: True
 
 amqp_public_port: 15671
@@ -10,6 +12,7 @@ amqp_users:
 database_public_port: 3306
 database_local_port: 3306
 
+# TODO A change might be needed here to better add the host for the condor poller mysql user
 remote_database_users:
     - [condor_poller, "{{ database_user_passwords.condor_poller }}", "/opt/cloudscheduler/data_collectors/condor/condor_poller.py"]
 
@@ -21,6 +24,8 @@ certificate_users:
     - { host: "{{ ansible_fqdn }}",                                  owner: mysql,           group: mysql,           globus: '/var/lib/mysql/.globus',        pfx: 'user'}
     - { host: "{{ ansible_fqdn }}",                                  owner: influxdb,        group: influxdb,        globus: '/etc/ssl',                     pfx: 'host'}
 
+#htcondor_cert:
+#htcondor_worker_cert:
 
 htcondor_collector_port: 9618
 htcondor_low_port: 40000
@@ -38,4 +43,20 @@ default_grid_mapfile:
         - '"/CN={{ ansible_fqdn }}" condor'
 
 register_ELK: False
-ELK_server: <REPLACE ME>
+#ELK_server: "{{undef(hint='ELK Server not specified')}}"
+ELK_server: 
+
+ansible_ssh_port: 22
+
+
+letsencrypt_test: True
+
+letsencrypt_archive: /hepuser/fizz/letsencrypt/archive # TODO make the default for this somewhere that doesn't need admin permissions
+
+#htcondor_gsi_dn: /C=CA/O=Grid/CN=elephant136.heprc.uvic.ca
+#htcondor_cert: /hepuser/fizz/certificates/e103/hostcert.pem
+#htcondor_key: /hepuser/fizz/certificates/e103/hostkey.pem
+
+#htcondor_worker_gsi_dn: /C=CA/O=Grid/CN=elephant136.heprc.uvic.ca
+#htcondor_worker_cert: /hepuser/fizz/certificates/e103/hostcert.pem
+#htcondor_worker_key: /hepuser/fizz/certificates/e103/hostkey.pem
