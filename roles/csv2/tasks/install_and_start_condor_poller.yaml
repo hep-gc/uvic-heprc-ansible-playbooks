@@ -11,6 +11,7 @@
 #    rm -rfv /tmp/cloudscheduler
 
 # TODO do we really need to create a tarball just so we can immediately unpack it
+# TODO this doesnt create the file /opt/cloudscheduler/etc/cloudscheduler/condor_poller.yaml and more works need to be done to match the above shell commands
 - name: Ensure /tmp/cloudscheduler exists
   file:
     path: /tmp/cloudscheduler
