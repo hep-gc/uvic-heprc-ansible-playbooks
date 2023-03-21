@@ -21,7 +21,7 @@
 
 ### Steps to install csv2 on a pre-configured host
 
-- Ensure that you have an root access
+- Ensure that you have root access
 - Modify the vars (`csv2-public-vars.yaml`) and secrets (`csv2-public-secrets.yaml`) files in `vars/` with correct info
 - Modify the inventory file in the main uvic-heprc-ansible-playbooks/ directory with target information
 
