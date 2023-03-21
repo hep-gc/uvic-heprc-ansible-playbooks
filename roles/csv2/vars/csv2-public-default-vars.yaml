@@ -1,4 +1,3 @@
-install_phpMyAdmin: True
 
 amqp_public_port: 15671
 amqp_local_port: 5672
