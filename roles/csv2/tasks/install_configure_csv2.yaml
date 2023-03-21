@@ -42,23 +42,6 @@
   set_fact:
     hostname: "{{ i_service_connection.0.ipv4fqdn }}"
 
-- name: set active hostname
-  command: hostname {{ hostname }}
-
-- name: set hostname
-  command: echo {{hostname}} > /etc/hostname
-
-
-- name: set_fact
-  set_fact:
-    hostname: "{{ i_service_connection.0.ipv4fqdn }}"
-
-- name: set active hostname
-  command: hostname {{ hostname }}
-
-- name: set hostname
-  command: sed -i 's/.*/{{ hostname }}/g' /etc/hostname
-
 - name: create cloudscheduler user
   user:
     name: cloudscheduler
