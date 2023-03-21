@@ -95,8 +95,8 @@
   yum:
     name: libguestfs-tools-c
 
-- name: upgrade pip3 to latest version before install certbot
-  command: pip3 install --upgrade pip
+#- name: upgrade pip3 to latest version before install certbot
+#  command: pip3 install --upgrade pip
 
 - name: upgrade pip3 setuptools
   pip:
@@ -105,9 +105,7 @@
     - setuptools
     executable: pip3
     state: latest
-  when:
-  - openstack_vm is defined
-  - openstack_vm == True
+  
 
 - name: do csv2, web frontend and pollers pip3 installs
   pip:
@@ -749,13 +747,6 @@
   command: python3 /opt/cloudscheduler/web_frontend/cloudscheduler/csv2/gen_public_page.py
   become: yes
   become_user: cloudscheduler
-
-- name: disable selinux (openstack vm)
-  selinux:
-    state: disabled
-  when:
-  - openstack_vm is defined
-  - openstack_vm == True
 
 - name: copy csv2 crontab entries
   copy:
