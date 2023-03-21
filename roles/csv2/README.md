@@ -7,7 +7,7 @@
 ### Recommended Configuration
 
 
-- OS: CentOS 7
+- OS: CentOS 7 (Alma9 version in development)
 - Minimal machine  Requirements: 4+ cores, 8GB+ RAM, 100GB+ disk
 - Other requirements: machine needs to have hostname based on DNS for its IPv4
 - Open ports needed: 
