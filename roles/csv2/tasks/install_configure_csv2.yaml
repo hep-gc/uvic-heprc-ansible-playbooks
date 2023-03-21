@@ -793,8 +793,6 @@
     dest: /usr/bin/cloudscheduler
     state: link
 
-- name: create influx admin user
-  command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
 
 - name: create influx reader user
   command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
