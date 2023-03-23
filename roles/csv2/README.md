@@ -4,11 +4,12 @@
 
 - Ansible
 
-### Recommended Configuration
+### Recommended Configuration for the Cloudscheduler machine
 
 
 - OS: CentOS 7 (Alma9 version in development)
 - Minimal machine  Requirements: 4+ cores, 8GB+ RAM, 100GB+ disk
+  - more needed when using the HTCondor on the cloudscheduler machine instead of an external one
 - Other requirements: machine needs to have hostname based on DNS for its IPv4
 - Open ports needed: 
   - 80(http) 
