@@ -18,11 +18,10 @@
   - 3306 (mysql for external condor machines only; managed by csv2) 
   - 9618 and 40000-50000 (when HTCondor on the csv2 machine is used) 
   - 8086 (influxdb for timeseries)
-```
 
 ### Steps to install csv2 on a pre-configured host
 
 - Ensure that you have root access
 - Modify the vars (`csv2-public-vars.yaml`) and secrets (`csv2-public-secrets.yaml`) files in `vars/` with correct info
 - Modify the inventory file in the main uvic-heprc-ansible-playbooks/ directory with target information
-
+- Run the csv2 playbook- see the [uvic-heprc-ansible-playbooks readme](/README.md) for further details
