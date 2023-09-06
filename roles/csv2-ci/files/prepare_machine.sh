@@ -1,8 +1,6 @@
 #!/bin/bash
 
-yum install -y bind-utils
-ip=$(curl ipinfo.io/ip 2>/dev/null)
-host_name=$(nslookup $ip|grep name|cut -d= -f2|sed 's/.$//')
+host_name=$(curl ipinfo.io 2>/dev/null|grep hostname|cut -d'"' -f4)
 #echo "Host:$1"
 setenforce 0
 sed -i 's/enforcing/disabled/g;' /etc/sysconfig/selinux 
