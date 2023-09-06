@@ -1,7 +1,7 @@
 #!/bin/bash
 
-host_name=$1
-echo "Host:$1"
+host_name=$(curl ipinfo.io 2>/dev/null|grep hostname|cut -d'"' -f4)
+#echo "Host:$1"
 setenforce 0
 sed -i 's/enforcing/disabled/g;' /etc/sysconfig/selinux 
 sed -i 's/enforcing/disabled/g;' /etc/selinux/config
