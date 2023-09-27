@@ -58,14 +58,40 @@
 - name: add the ip to customize.sh
   shell: sed -i "s#XYZZYX#{{ip.stdout}}.0.0/16#g;" /etc/squid/customize.sh
 
+- name: get the number of cores
+  shell: grep -c 'processor' /proc/cpuinfo
+  register: cores
+
+- name: set the number of cores
+  shell: sed -i "s#VCORE#{{cores.stdout}}#g;" /etc/squid/customize.sh
+
+- name: get the total memory
+  shell: grep MemAvailable /proc/meminfo | awk '{print $2}' # cut -d":" -f 2
+  register: mem
+
+- name: save 25% of memory for os and convert to GB
+  set_fact:
+    cache_mem: "{{ ((mem.stdout | int * 0.75) / 1000000) | int }}"
+
+- name: set the available memory
+  shell: sed -i "s#CACHE_MEM#{{cache_mem}} GB#g;" /etc/squid/customize.sh
+
+- name: get the disk space 
+  shell: df -H | grep /dev/vda1 | awk '{print $2}' | cut -d"G" -f 1
+  register: ds
+
+- name: save 40 GB for disk space and convert to MB
+  set_fact: 
+    cache_dir: "{{ (((ds.stdout | int - 40) / (cores.stdout | int) * 1000) | int) }}"
+
+- name: set the disk space 
+  shell: sed -i "s#CACHE_DIR#{{cache_dir}}#g;" /etc/squid/customize.sh
+
 - name: update owner of customize.sh
   shell: chown squid:squid /etc/squid/customize.sh
 
 - name: enable frontier-squid
   shell: systemctl enable frontier-squid
-
-- name: restart frontier-squid
-  shell: systemctl restart frontier-squid
 
 - name: start frontier-squid
   shell: systemctl start frontier-squid
