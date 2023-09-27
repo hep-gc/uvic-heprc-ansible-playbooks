@@ -1,0 +1,74 @@
+- name: ensure squid directory exists
+  file:
+    path: /etc/squid
+    state: directory
+
+- name: copy customize.sh to the machine
+  copy:
+    src: customize.sh
+    dest: /etc/squid/customize.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: disable SELinux state
+  selinux:
+    state: disabled
+
+- name: change SELinux to permissive
+  shell: sed -i 's/^SELINUX=/SELINUX=permissive \#/g' /etc/sysconfig/selinux
+
+- name: download installer for frontier
+  get_url:
+    url: http://frontier.cern.ch/dist/rpms/RPMS/noarch/frontier-release-1.2-1.noarch.rpm
+    dest: /etc/squid/frontier-release-1.2-1.noarch.rpm
+
+- name: run installer for frontier
+  yum:
+    name: '/etc/squid/frontier-release-1.2-1.noarch.rpm'
+    state: present
+
+- name: install frontier packages
+  yum:
+    name: ['frontier-squid', 'epel-release']
+    state: present
+
+- name: install packages required for python3
+  yum:
+    name:
+    - python3
+    - python3-devel
+    - python3-pip
+    state: installed
+
+- name: install shoal-agent
+  command: python3 -m pip install shoal-agent
+
+- name: remove shoal-agent config file
+  shell: rm -f /etc/shoal/shoal_agent.conf
+
+- name: create pi
+  shell: /usr/sbin/ip -o route get 8.8.8.8 | sed "s/^.* dev \([[:alnum:]]*\) .*/\1/g"
+  register: pi
+
+- name: get the ip address
+  shell: ip addr show dev {{pi.stdout}} | grep -w inet  | gawk '{print $2}' |cut -d. -f 1,2
+  register: ip
+
+- name: add the ip to customize.sh
+  shell: sed -i "s#XYZZYX#{{ip.stdout}}.0.0/16#g;" /etc/squid/customize.sh
+
+- name: update owner of customize.sh
+  shell: chown squid:squid /etc/squid/customize.sh
+
+- name: enable frontier-squid
+  shell: systemctl enable frontier-squid
+
+- name: restart frontier-squid
+  shell: systemctl restart frontier-squid
+
+- name: start frontier-squid
+  shell: systemctl start frontier-squid
+
+- name: run shoal agent installer with default options
+  shell: (echo -e "\n") | shoal-agent-installation.sh
