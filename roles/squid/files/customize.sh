@@ -11,14 +11,16 @@
 #
 
 awk --file `dirname $0`/customhelps.awk --source '{
-setoption("acl NET_LOCAL src", "XYZZYX")
+setoption("acl NET_LOCAL src", "IP")
 uncomment("acl MAJOR_CVMFS")
 uncomment("acl ATLAS_FRONTIER")
 setoption("cache_mem", "CACHE_MEM")
-setoption("maxiumum_object_size_in_memory", "1 GB")
-setoption("cache_dir", "rock /var/cache/squid CACHE_DIR")
-setoption("memory_cache_shared", "on")
+setoption("cache_dir", 3, "CACHE_DIR")
 setoption("workers", VCORE)
+setoptionparameter("cache_dir", 2, "/var/cache/squid/squid${process_number}")
+setoption("cpu_affinity_map", "process_numbers=1,2,3,4,5,6,7 cores=1,2,3,4,5,6,7")
+insertline("^acl MAJOR_CVMFS", "acl BELLEII dstdom_regex ^(cvmfs-stratum-one.cc.kek.jp)$ ")
+insertline("^# http_access deny !RESTRICT_DEST", "http_access allow BELLEII")
 insertline("^# http_access deny !RESTRICT_DEST", "http_access allow ATLAS_FRONTIER")
 insertline("^# http_access deny !RESTRICT_DEST", "http_access deny !MAJOR_CVMFS")
 print

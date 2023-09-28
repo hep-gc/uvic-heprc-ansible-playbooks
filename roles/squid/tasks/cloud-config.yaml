@@ -47,45 +47,16 @@
 - name: remove shoal-agent config file
   shell: rm -f /etc/shoal/shoal_agent.conf
 
-- name: create pi
-  shell: /usr/sbin/ip -o route get 8.8.8.8 | sed "s/^.* dev \([[:alnum:]]*\) .*/\1/g"
-  register: pi
+- name: copy init_vars.sh to the machine
+  template:
+    src: init_vars.sh
+    dest: /etc/squid/init_vars.sh
+    owner: root
+    group: root
+    mode: u+x
 
-- name: get the ip address
-  shell: ip addr show dev {{pi.stdout}} | grep -w inet  | gawk '{print $2}' |cut -d. -f 1,2
-  register: ip
-
-- name: add the ip to customize.sh
-  shell: sed -i "s#XYZZYX#{{ip.stdout}}.0.0/16#g;" /etc/squid/customize.sh
-
-- name: get the number of cores
-  shell: grep -c 'processor' /proc/cpuinfo
-  register: cores
-
-- name: set the number of cores
-  shell: sed -i "s#VCORE#{{cores.stdout}}#g;" /etc/squid/customize.sh
-
-- name: get the available memory
-  shell: grep MemAvailable /proc/meminfo | awk '{print $2}'
-  register: mem
-
-- name: save 25% of memory for os and convert to GB
-  set_fact:
-    cache_mem: "{{ ((mem.stdout | int * 0.75) / 1000000) | int }}"
-
-- name: set the available memory
-  shell: sed -i "s#CACHE_MEM#{{cache_mem}} GB#g;" /etc/squid/customize.sh
-
-- name: get the disk space 
-  shell: df -H | grep /dev/vda1 | awk '{print $2}' | cut -d"G" -f 1
-  register: ds
-
-- name: save 40 GB for disk space and convert to MB
-  set_fact: 
-    cache_dir: "{{ ((ds.stdout | int - 40) / (cores.stdout | int) * 1000) | int }}"
-
-- name: set the disk space 
-  shell: sed -i "s#CACHE_DIR#{{cache_dir}}#g;" /etc/squid/customize.sh
+- name: run init_vars.sh
+  shell: /etc/squid/init_vars.sh
 
 - name: update owner of customize.sh
   shell: chown squid:squid /etc/squid/customize.sh
