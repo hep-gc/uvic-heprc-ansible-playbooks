@@ -55,13 +55,13 @@
   shell: seq -s, 1 {{VCORE.stdout}}
   register: SEQUENCE
 
-- name: get the available memory
-  shell: grep MemAvailable /proc/meminfo | awk '{print $2}'
+- name: get the total memory
+  shell: grep MemTotal /proc/meminfo | awk '{print $2}'
   register: MEM
 
-- name: save 10% of memory for os and convert to GB
+- name: save 10% of memory for os and convert to MB
   set_fact:
-    CACHE_MEM: "{{ ((MEM.stdout | int) / (VCORE.stdout | int) * 9 / 10000000) | int }}"
+    CACHE_MEM: "{{ ((MEM.stdout | int) / (VCORE.stdout | int) * 9 / 10000) | int }}"
 
 - name: get the disk space 
   shell: df -H --output=size /var/cache | sed 1d | tr -d "G"

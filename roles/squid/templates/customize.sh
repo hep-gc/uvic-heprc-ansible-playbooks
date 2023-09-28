@@ -14,7 +14,7 @@ awk --file `dirname $0`/customhelps.awk --source '{
 setoption("acl NET_LOCAL src", "{{IP.stdout}}")
 uncomment("acl MAJOR_CVMFS")
 uncomment("acl ATLAS_FRONTIER")
-setoption("cache_mem", "{{CACHE_MEM}}")
+setoption("cache_mem", "{{CACHE_MEM}} MB")
 setoption("cache_dir", 3, "{{CACHE_DIR}}")
 setoption("workers", {{VCORE.stdout}})
 setoptionparameter("cache_dir", 2, "/var/cache/squid/squid${process_number}")
