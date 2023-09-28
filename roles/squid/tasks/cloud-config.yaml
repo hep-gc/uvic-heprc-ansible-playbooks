@@ -44,12 +44,16 @@
   register: PI
 
 - name: get the ip address
-  shell: ip addr show dev {{PI.stdout}} | grep -w inet  | gawk '{print $2}' |cut -d. -f 1,2
+  shell: ip route | grep "{{PI.stdout}}.*link src" | awk '{print $1}' #ip addr show dev {{PI.stdout}} | grep -w inet  | gawk '{print $2}' |cut -d. -f 1,2
   register: IP
 
 - name: get the number of cores
   shell: grep -c 'processor' /proc/cpuinfo
   register: VCORE
+
+- name: create a list of cores
+  shell: seq -s, 1 {{VCORE.stdout}}
+  register: SEQUENCE
 
 - name: get the available memory
   shell: grep MemAvailable /proc/meminfo | awk '{print $2}'
@@ -64,7 +68,7 @@
   register: DS
 
 - name: save 20% for disk space and convert to MB
-  set_fact: 
+  set_fact:
     CACHE_DIR: "{{ ((DS.stdout | int) / (VCORE.stdout | int) / 5 * 4000) | int }}"
 
 - name: copy customize.sh to the machine
