@@ -3,14 +3,6 @@
     path: /etc/squid
     state: directory
 
-- name: copy customize.sh to the machine
-  copy:
-    src: customize.sh
-    dest: /etc/squid/customize.sh
-    owner: root
-    group: root
-    mode: 0755
-
 - name: disable SELinux state
   selinux:
     state: disabled
@@ -47,16 +39,41 @@
 - name: remove shoal-agent config file
   shell: rm -f /etc/shoal/shoal_agent.conf
 
-- name: copy init_vars.sh to the machine
+- name: create pi
+  shell: /usr/sbin/ip -o route get 8.8.8.8 | sed "s/^.* dev \([[:alnum:]]*\) .*/\1/g"
+  register: PI
+
+- name: get the ip address
+  shell: ip addr show dev {{PI.stdout}} | grep -w inet  | gawk '{print $2}' |cut -d. -f 1,2
+  register: IP
+
+- name: get the number of cores
+  shell: grep -c 'processor' /proc/cpuinfo
+  register: VCORE
+
+- name: get the available memory
+  shell: grep MemAvailable /proc/meminfo | awk '{print $2}'
+  register: MEM
+
+- name: save 10% of memory for os and convert to GB
+  set_fact:
+    CACHE_MEM: "{{ ((MEM.stdout | int) / (VCORE.stdout | int) * 9 / 10000000) | int }}"
+
+- name: get the disk space 
+  shell: df -H --output=size /var/cache | sed 1d | tr -d "G"
+  register: DS
+
+- name: save 20% for disk space and convert to MB
+  set_fact: 
+    CACHE_DIR: "{{ ((DS.stdout | int) / (VCORE.stdout | int) / 5 * 4000) | int }}"
+
+- name: copy customize.sh to the machine
   template:
-    src: init_vars.sh
-    dest: /etc/squid/init_vars.sh
+    src: customize.sh
+    dest: /etc/squid/customize.sh
     owner: root
     group: root
     mode: u+x
-
-- name: run init_vars.sh
-  shell: /etc/squid/init_vars.sh
 
 - name: update owner of customize.sh
   shell: chown squid:squid /etc/squid/customize.sh
