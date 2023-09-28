@@ -44,7 +44,7 @@
   register: PI
 
 - name: get the ip address
-  shell: ip route | grep "{{PI.stdout}}.*link src" | awk '{print $1}' #ip addr show dev {{PI.stdout}} | grep -w inet  | gawk '{print $2}' |cut -d. -f 1,2
+  shell: ip route | grep "{{PI.stdout}}.*link src" | awk '{print $1}'
   register: IP
 
 - name: get the number of cores
