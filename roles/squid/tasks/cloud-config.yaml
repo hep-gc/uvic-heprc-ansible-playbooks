@@ -92,21 +92,15 @@
   template:
     src: customize.sh
     dest: /etc/squid/customize.sh
-    owner: root
-    group: root
+    owner: squid
+    group: squid
     mode: u+x
-
-- name: update owner of customize.sh
-  shell: chown squid:squid /etc/squid/customize.sh
 
 - name: enable frontier-squid
   shell: systemctl enable frontier-squid
 
 - name: restart frontier-squid 
   shell: systemctl restart frontier-squid 
-  
-- name: start frontier-squid
-  shell: systemctl start frontier-squid
 
 - name: run shoal agent installer with default options
   shell: (echo -e "\n") | shoal-agent-installation.sh
