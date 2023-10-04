@@ -30,8 +30,8 @@
 
 - name: install mariadb (MySQL) packages
   yum:
-    name: ['expect', 'MariaDB-server', 'MariaDB-client', 'MariaDB-devel', 'MariaDB-compat', 'MariaDB-common',
-           'MariaDB-shared', 'zlib-devel', 'openssl-devel', 'MySQL-python','python2-PyMySQL']
+    name: ['expect', 'MariaDB-server', 'MariaDB-client', 'MariaDB-devel', 'MariaDB-common',
+           'MariaDB-shared', 'zlib-devel', 'openssl-devel', 'python3-PyMySQL']
     state: latest
   notify:
   - restart mariadb

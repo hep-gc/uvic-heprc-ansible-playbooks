@@ -42,6 +42,10 @@
   set_fact:
     hostname: "{{ i_service_connection.0.ipv4fqdn }}"
 
+- name: disable SELinux
+  selinux: 
+    state: disabled
+
 - name: create cloudscheduler user
   user:
     name: cloudscheduler
@@ -72,6 +76,23 @@
 
 - name: import_tasks
   import_tasks: install_python3_mod_wsgi.yaml
+
+- name: install wget
+  yum: 
+    name: wget
+    state: latest
+
+- name: get the script for rabbitmq
+  shell: wget https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh -O rabbitmq_script.rpm.sh
+
+- name: execute the script
+  shell: chmod +x rabbitmq_script.rpm.sh | sudo os=el dist=8 ./rabbitmq_script.rpm.sh
+
+- name: get the erlang script
+  shell: wget https://packagecloud.io/install/repositories/rabbitmq/erlang/script.rpm.sh -O erlang_script.rpm.sh
+
+- name: execute the script
+  shell: chmod +x erlang_script.rpm.sh | sudo os=el dist=8 ./erlang_script.rpm.sh
 
 - name: install other prerequisite packages for cloudscheduler
   yum:
@@ -296,19 +317,19 @@
   notify:
     restart httpd
 
-#- name: install firewalld 
-#  yum:
-#    name: firewalld
+- name: install firewalld 
+  yum:
+    name: firewalld
 
 - name: install python firewalld for ansible
   yum:
     name: python-firewall
 
-#- name: enable firewalld
-#  systemd:
-#    name: firewalld
-#    enabled: yes
-#    state: restarted
+- name: enable firewalld
+  systemd:
+    name: firewalld
+    enabled: yes
+    state: restarted
 
 - name: open https port
   firewalld:
@@ -377,7 +398,7 @@
     enabled: yes
     state: restarted
   with_items:
-  - HAProxy.service
+  - haproxy.service
 
 ### container configuration ####################################################################################################################################
 
@@ -487,6 +508,7 @@
 
 - name: create influx admin user
   command: influx -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
+  ignore_errors: yes
 
 - name: install influxDB ssl configuration file
   copy:
