@@ -77,22 +77,23 @@
 - name: import_tasks
   import_tasks: install_python3_mod_wsgi.yaml
 
-- name: install wget
-  yum: 
-    name: wget
-    state: latest
-
 - name: get the script for rabbitmq
-  shell: wget https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh -O rabbitmq_script.rpm.sh
-
+  get_url:
+    url: https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh
+    dest: /tmp/rabbitmq_script.rpm.sh
+    mode: a+x
+  
 - name: execute the script
-  shell: chmod +x rabbitmq_script.rpm.sh | sudo os=el dist=8 ./rabbitmq_script.rpm.sh
+  shell: sudo os=el dist=8 /tmp/rabbitmq_script.rpm.sh
 
 - name: get the erlang script
-  shell: wget https://packagecloud.io/install/repositories/rabbitmq/erlang/script.rpm.sh -O erlang_script.rpm.sh
+  get_url:
+    url: https://packagecloud.io/install/repositories/rabbitmq/erlang/script.rpm.sh
+    dest: /tmp/erlang_script.rpm.sh
+    mode: a+x
 
 - name: execute the script
-  shell: chmod +x erlang_script.rpm.sh | sudo os=el dist=8 ./erlang_script.rpm.sh
+  shell: sudo os=el dist=8 /tmp/erlang_script.rpm.sh
 
 - name: install other prerequisite packages for cloudscheduler
   yum:

@@ -20,6 +20,5 @@
     state: started
   ignore_errors: yes
   with_items:
-  - fetch-crl-boot
-  - fetch-crl-cron
+  - fetch-crl
 

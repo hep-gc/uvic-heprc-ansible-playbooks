@@ -1,13 +1,22 @@
 # install_EL7_HTCondor.yaml
 
-- name: check status of htcondor install # need to fix!!!
-  shell: yum list installed | grep htcondor-release | wc -l
-  register: condor_install
+- name: check status of htcondor install
+  yum:
+    name: htcondor-release
+    state: installed
+  register: htcondor_installed
   ignore_errors: yes
 
-- name: install htcondor
-  shell: curl -fsSL https://get.htcondor.org | sudo /bin/bash -s -- --no-dry-run
-  when: condor_install.stdout == "0"
+- name: download htcondor script
+  get_url: 
+    url: https://get.htcondor.org
+    dest: /tmp/install_htcondor.sh
+    validate_certs: yes
+  when: htcondor_installed.msg != "Nothing to do"
+
+- name: run the script
+  shell: /bin/bash /tmp/install_htcondor.sh --no-dry-run
+  when: htcondor_installed.msg != "Nothing to do"
 
 - name: allow SHA1 Hashing
   shell: update-crypto-policies --set DEFAULT:SHA1
