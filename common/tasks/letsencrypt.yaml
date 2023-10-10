@@ -85,6 +85,12 @@
   - initial_python3_status.stat.exists == True
   - initial_certbot_status.stat.exists == False
 
+- name: install non-broken ssl version for certbot
+  command: /opt/letsencrypt/bin/pip3 install pyOpenSSL==23.1.1
+  when:
+  - initial_python3_status.stat.exists == True
+  - initial_certbot_status.stat.exists == False
+
 - name: install certbot into the python3 virtual environment
   command: /opt/letsencrypt/bin/pip3 install certbot
   when:
