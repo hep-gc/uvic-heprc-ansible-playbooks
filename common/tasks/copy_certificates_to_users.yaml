@@ -100,8 +100,8 @@
 
 - name: install bash script to update cert and key for certificate users
   template:
-    src: usr_local_sbin_copy_certificates_to_users.j2
-    dest: /usr/local/sbin/copy_certificates_to_users.sh
+    src: etc_letsencrypt_renewal-hooks_post_copy_certificates_to_users.j2
+    dest: /etc/letsencrypt/renewal-hooks/post/copy_certificates_to_users.sh
     owner: root
     group: root
     mode: 0700
