@@ -3,7 +3,7 @@
 
 - name: install packages required by ntpd
   yum:
-    name: ['ntp']
+    name: ['ntpsec']
     state: latest
   ignore_errors: yes
   notify:

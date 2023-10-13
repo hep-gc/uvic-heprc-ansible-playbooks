@@ -8,21 +8,11 @@
 
 - name: Install certifi python package
   pip:
-    name: certifi<=2020.4.5.1
+    name: certifi
 
 - name: Install requests python package version for influx.
   pip:
     name: requests
-    version: 2.24.0
-
-- name: Install certifi python package
-  pip:
-    name: certifi<=2020.4.5.1
-
-- name: Install requests python package version for influx.
-  pip:
-    name: requests
-    version: 2.24.0
 
 - name: Install InfluxDB python package.
   pip:
