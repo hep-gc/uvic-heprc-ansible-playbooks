@@ -108,19 +108,19 @@
   when:
   - certificate_users is defined
 
-- name: copy certificates to users crontab entry
-  copy:
-    src: etc_cron.d_copy-certificates-to-users
-    dest: /etc/cron.d/copy-certificates-to-users
-    owner: root
-    group: root
-    mode: 0644
-  when:
-  - certificate_users is defined
+#- name: copy certificates to users crontab entry
+#  copy:
+#    src: etc_cron.d_copy-certificates-to-users
+#    dest: /etc/cron.d/copy-certificates-to-users
+#    owner: root
+#    group: root
+#    mode: 0644
+#  when:
+#  - certificate_users is defined
 
 - name: copy certificates to users
   command:
-    cmd: /usr/local/sbin/copy_certificates_to_users.sh
+    cmd: /etc/letsencrypt/renewal-hooks/post/copy_certificates_to_users.sh
   when:
   - certificate_users is defined
 
