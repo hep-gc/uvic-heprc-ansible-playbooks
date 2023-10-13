@@ -13,12 +13,21 @@
     group: root
     mode: 0644
 
+- name: determine fetch-crl package names
+  set_fact:
+    fetch_items: "{{ alma_list if ansible_facts['distribution_major_version'] == '9' else centos_list }}"
+  vars:
+    alma_list: 
+      - fetch-crl
+    centos_list:
+      - fetch-boot
+      - fetch-cron
+
 - name: ensure fetch-crl services are enabled and started
   service:
     name: "{{ item }}"
     enabled: yes
     state: started
   ignore_errors: yes
-  with_items:
-  - fetch-crl
+  with_items: fetch-crl
 

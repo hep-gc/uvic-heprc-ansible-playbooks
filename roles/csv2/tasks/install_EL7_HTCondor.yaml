@@ -1,25 +1,34 @@
 # install_EL7_HTCondor.yaml
 
+- name: configure HTCondor repository
+  get_url:
+    url: http://research.cs.wisc.edu/htcondor/yum/repo.d/htcondor-stable-rhel{{ ansible_facts['distribution_major_version'] }}.repo
+    dest: /etc/yum.repos.d/htcondor-stable.repo
+    mode: 0644
+  when: ansible_facts['distribution_major_version'] == '7'
+
 - name: check status of htcondor install
   yum:
     name: htcondor-release
     state: installed
   register: htcondor_installed
   ignore_errors: yes
+  when: ansible_facts['distribution_major_version'] == '9'
 
 - name: download htcondor script
   get_url: 
     url: https://get.htcondor.org
     dest: /tmp/install_htcondor.sh
     validate_certs: yes
-  when: htcondor_installed.msg != "Nothing to do"
+  when: ansible_facts['distribution_major_version'] == '9' and htcondor_installed.msg != "Nothing to do"
 
 - name: run the script
   shell: /bin/bash /tmp/install_htcondor.sh --no-dry-run
-  when: htcondor_installed.msg != "Nothing to do"
+  when: ansible_facts['distribution_major_version'] == '9' and htcondor_installed.msg != "Nothing to do"
 
 - name: allow SHA1 Hashing
   shell: update-crypto-policies --set DEFAULT:SHA1
+  when: ansible_facts['distribution_major_version'] == '9'
 
 - name: install HTCondor repository GPG keys
   rpm_key:

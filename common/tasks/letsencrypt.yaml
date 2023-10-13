@@ -6,6 +6,13 @@
 
 - set_fact:
     homedir: "{{ lookup('ansible.builtin.env', 'HOME') }}"
+  when:
+    ansible_version.major >= 3
+
+- set_fact:
+    homedir: "{{ lookup('env','HOME') }}"
+  when:
+    ansible_version.major < 3
 
 - name: set_fact letsencrypt_archive if undefined
   set_fact:

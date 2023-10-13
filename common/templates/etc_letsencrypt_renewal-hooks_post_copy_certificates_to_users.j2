@@ -28,3 +28,4 @@ if [ $R -eq 1 ]; then
     /usr/bin/mail -s "user key/cert problem on $(hostname)" "{{ admin_email }}"
 fi
 
+systemctl restart influxdb csv2-timeseries
