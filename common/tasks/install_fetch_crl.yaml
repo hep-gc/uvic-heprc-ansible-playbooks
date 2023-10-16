@@ -20,8 +20,8 @@
     alma_list: 
       - fetch-crl
     centos_list:
-      - fetch-boot
-      - fetch-cron
+      - fetch-crl-boot
+      - fetch-crl-cron
 
 - name: ensure fetch-crl services are enabled and started
   service:
@@ -29,5 +29,5 @@
     enabled: yes
     state: started
   ignore_errors: yes
-  with_items: fetch-crl
+  with_items: "{{ fetch_items }}"
 
