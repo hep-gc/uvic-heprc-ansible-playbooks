@@ -19,6 +19,7 @@
   yum:
     name: '/etc/squid/frontier-release-1.2-1.noarch.rpm'
     state: present
+    disable_gpg_check: True
 
 - name: install frontier packages
   yum:
