@@ -1,0 +1,28 @@
+- name: get the installer for the condor poller
+  get_url:
+    url: "https://{{ csv2_fqdn }}/repo/install_condor_poller.sh"
+    dest: /tmp/install_condor_poller.sh
+    mode: a+x
+    owner: root
+    group: root
+
+- name: install wget
+  yum:
+    name: wget
+
+- name: run the install script
+  shell: /tmp/install_condor_poller.sh
+
+- name: make the directory
+  file:
+    path: /etc/cloudscheduler
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: disable the poller
+  shell: /opt/cloudscheduler/utilities/service_disable_condor_poller
+
+- name: enable the poller
+  shell: /opt/cloudscheduler/utilities/service_enable_condor_poller

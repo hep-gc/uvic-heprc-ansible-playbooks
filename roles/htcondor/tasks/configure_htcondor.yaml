@@ -1,0 +1,124 @@
+# configure_htcondor.yaml
+
+- name: install required python packages
+  yum:
+    name: firewalld
+
+- name: install python firewalld for ansible
+  yum:
+    name: python-firewall
+
+- name: enable firewalld
+  systemd:
+    name: firewalld
+    enabled: yes
+    state: restarted
+
+- name: remove minicondor file
+  file:
+    dest: /etc/condor/config.d/00-minicondor
+    state: absent
+
+- name: open HTCondor service port
+  firewalld: zone=public port="{{ htcondor_collector_port }}/tcp"  state=enabled immediate=yes permanent=yes
+  when: (container is undefined) or (container == False)
+  ignore_errors: yes
+
+- name: open HTCondor ephemeral ports
+  firewalld: zone=public port="{{ htcondor_low_port }}-{{ htcondor_high_port }}/tcp"  state=enabled immediate=yes permanent=yes
+  when: (container is undefined) or (container == False)
+  ignore_errors: yes
+
+- name: HTCondor local configuration
+  copy:
+    src: etc_condor_condor_config.local
+    dest: /etc/condor/condor_config.local
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+  - reconfigure condor
+  when: (container is undefined) or (container == False)
+
+- name: HTCondor local container configuration
+  copy:
+    src: etc_condor_condor_config.local.container
+    dest: /etc/condor/condor_config.local
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+  - reconfigure condor
+  when: (container is defined) and (container == True)
+
+- name: HTCondor configure
+  template:
+    src: "etc_condor_config.d_{{ item }}.j2"
+    dest: "/etc/condor/config.d/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+  - ports
+  notify:
+  - reconfigure condor
+
+- name: HTCondor configure
+  copy:
+    src: "etc_condor_config.d_{{ item }}"
+    dest: "/etc/condor/config.d/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+  - default_request
+  - defrag
+  - scaling
+  - system_hold
+  notify:
+  - reconfigure condor
+
+- name: enable HTCondor IDTokens configuration
+  template:
+    src: etc_condor_config.d_idtokens.j2
+    dest: /etc/condor/config.d/idtokens
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+  - reconfigure condor
+  when:
+  - (htcondor_token_auth is defined) and (htcondor_token_auth == True)
+
+- name: disable HTCondor IDTokens if it is not required
+  file:
+    dest: /etc/condor/config.d/idtokens
+    state: absent
+  notify:
+  - reconfigure condor
+  when:
+  - (htcondor_token_auth is undefined) or (htcondor_token_auth == False)
+
+- name: get the new value for allow daemon
+  shell: echo "{{ admin_email }}" | cut -d@ -f 1
+  register: allow_daemon
+
+- name: update HTCondor allow daemon configuration
+  lineinfile:
+    path: /etc/condor/condor_config.local
+    regexp: "^ALLOW_DAEMON = *."
+    line: "ALLOW_DAEMON = {{ allow_daemon.stdout }}@*"
+
+- name: create and save a condor token (saved in /etc/condor/tokens.d)
+  command: condor_token_create -identity "{{ admin_email }}" -token "{{ htcondor_fqdn }}"
+
+- name: restart HTCondor
+  service:
+    name: condor
+    enabled: yes
+    state: restarted
+  ignore_errors: yes
+
+- name: wait for condor
+  wait_for:
+    timeout: 5

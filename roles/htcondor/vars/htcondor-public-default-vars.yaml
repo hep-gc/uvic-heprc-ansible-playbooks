@@ -1,0 +1,13 @@
+certificate_users:
+    - { host: "{{ ansible_fqdn }}",                                  owner: root,            group: root,            globus: '/root/.globus',                 pfx: 'user'}
+    - { host: "{{ ansible_fqdn }}",                                  owner: condor,          group: condor,          globus: '/var/lib/condor/.globus',       pfx: 'user'}
+
+htcondor_collector_port: 9618
+htcondor_low_port: 40000
+htcondor_high_port: 50000
+
+# Set the default for token authentication.
+htcondor_token_auth: False
+
+register_ELK: False
+ELK_server: <REPLACE ME>

@@ -3,3 +3,4 @@
 - import_playbook: csv2.yaml
 - import_playbook: csv2-ci.yaml
 - import_playbook: xrootd.yaml
+- import_playbook: htcondor.yaml
