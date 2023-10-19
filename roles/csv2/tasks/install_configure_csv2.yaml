@@ -487,6 +487,7 @@
 
 - name: create influx admin user
   command: influx -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
+  ignore_errors: yes
 
 - name: install influxDB ssl configuration file
   copy:
@@ -770,15 +771,19 @@
 
 - name: create influx reader user
   command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
+  ignore_errors: yes
 
 - name: create influx writer user
   command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_writer WITH PASSWORD '{{ influx_writer_pass }}'"
+  ignore_errors: yes
 
 - name: set permissions for influx read user
   command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute "GRANT READ ON csv2_timeseries TO csv2_read"
+  ignore_errors: yes
 
 - name: set permissions for influx write user
   command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute "GRANT WRITE on csv2_timeseries TO csv2_writer"
+  ignore_errors: yes
 
 - name: restart influxdb on ssl
   service:
