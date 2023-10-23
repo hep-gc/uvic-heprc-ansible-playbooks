@@ -1,0 +1,6 @@
+# install_development_tools.yaml
+
+- name: Install the 'Development tools' package group
+  yum:
+    name: "@Development tools"
+    state: present

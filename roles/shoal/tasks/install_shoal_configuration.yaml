@@ -1,0 +1,123 @@
+# install required pacakges
+- import_tasks: install_configure_rabbitmq.yaml
+# for apache to run on python3
+- import_tasks: install_httpd24-httpd.yaml
+# from '/.common/lib/tasks/'
+- import_tasks: install_python3_mod_wsgi.yaml
+# for gcc python3
+- import_tasks: install_development_tools.yaml
+# for dig command
+- import_tasks: install_bind_utils.yaml
+# for geoip database
+- import_tasks: install_database_server.yaml
+
+- name: Disable SELinux
+  selinux:
+    state: disabled
+
+- name: open http port
+  firewalld:
+    service: http
+    permanent: true
+    state: enabled 
+    immediate: true
+  ignore_errors: yes
+
+- name: open amqp port
+  firewalld:
+    service: amqp
+    permanent: true
+    state: enabled
+    immediate: true
+  ignore_errors: yes
+
+- name: Git clone shoal master branch
+  git:
+    repo: "https://github.com/hep-gc/shoal.git"
+    dest: /opt/shoal/
+    force: yes
+    update: yes
+
+- name: upgrade pip3 to the latest version
+  pip: 
+    name: pip
+    executable: pip3
+    extra_args: --upgrade
+
+- name: Install required packages with specified version for python3
+  pip:
+    name:
+      [
+        "web.py>=0.61",
+        "pika>=0.9.11",
+        "requests>=2.3.0",
+        "pygeoip>=0.2.5",
+        "geoip2>=0.6.0",
+        "ipaddr>=2.1.9",
+        "maxminddb>=1.1.1",
+        "urllib3>=1.25.11",
+        "pandas>=1.1.5",
+        "mysql-connector>=2.2.9",
+      ]
+    executable: pip3
+
+- name: run script for database setup
+  shell: /opt/shoal/shoal-server/shoal_server/setup-db/setup_db.sh
+
+- name: Run install script to install shoal server
+  shell: |
+    cd /opt/shoal/shoal-server/
+    python3 /opt/shoal/shoal-server/setup.py install
+
+# create /etc/shoal/ directory for configuration
+- file:
+    path: /etc/shoal
+    state: directory
+
+# copy files to proper locations
+- name: Add shoal configuration template file to correct position
+  template:
+    src: etc_shoal_server_configuration.j2
+    dest: /etc/shoal/shoal_server.conf
+
+- name: Copy shoal server configuration file to correct position
+  command: cp /opt/shoal/shoal-server/conf/shoal_server.conf /etc/shoal/
+
+- name: Copy shoal server logrotate file to correct position
+  command: cp /opt/shoal/shoal-server/conf/shoal-server.logrotate /etc/logrotate.d/
+
+- name: Copy shoal server scripts folder to correct position
+  command: rsync -avr /opt/shoal/shoal-server/conf/scripts /var/www/shoal
+
+- name: Copy shoal server static folder to correct position
+  command: cp -R /opt/shoal/shoal-server/static/ /var/www/shoal/
+
+- name: Copy shoal server templates folder to correct position
+  command: cp -R /opt/shoal/shoal-server/templates/ /var/www/shoal/
+
+- name: Copy shoal configuration for apache to correct position
+  command: cp /opt/shoal/shoal-server/conf/shoal.conf /etc/httpd/conf.d/
+
+# update ownership of /var/www
+- file:
+    path: /var/www
+    state: directory
+    owner: apache
+    group: apache
+
+# add log file
+- file:
+    path: /var/log/shoal_server.log
+    state: touch
+    owner: apache
+    group: apache
+
+- name: Start service rabbitmq, if not started
+  service:
+    name: rabbitmq-server
+    state: started
+
+- name: Start service httpd, if not started
+  service:
+    name: httpd
+    state: started
