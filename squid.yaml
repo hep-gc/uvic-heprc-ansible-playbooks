@@ -1,0 +1,5 @@
+---
+# file: squid.yaml
+- hosts: squid
+  roles:
+  - squid
