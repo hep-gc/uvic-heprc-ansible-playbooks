@@ -1,0 +1,6 @@
+# install_bind_utils.yaml
+
+- name: Install the bind-utils package
+  yum:
+    name: bind-utils
+    state: present
