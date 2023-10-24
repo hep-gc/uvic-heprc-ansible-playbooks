@@ -2,7 +2,7 @@
 
 - name: configure HTCondor repository
   get_url:
-    url: http://research.cs.wisc.edu/htcondor/yum/repo.d/htcondor-stable-rhel{{ ansible_facts['distribution_major_version'] }}.repo
+    url: http://research.cs.wisc.edu/htcondor/yum/repo.d/htcondor-stable-rhel7.repo
     dest: /etc/yum.repos.d/htcondor-stable.repo
     mode: 0644
   when: ansible_facts['distribution_major_version'] == '7'
