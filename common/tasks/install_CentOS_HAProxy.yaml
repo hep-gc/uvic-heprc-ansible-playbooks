@@ -1,15 +1,16 @@
 ---
 # file: install_CentOS_HAProxy.yaml
 
-- name: install the python3 mod_wsgi repository
+- name: install HAProxy on centos 7
   yum:
-    name:
-      - centos-release-scl-rh
+    name: rh-haproxy18
     state: latest
+  when: ansible_facts['distribution_major_version'] == '7'
 
-- name: install the python3 mod_wsgi module (rpm places it in /opt)
+- name: install HAProxy on almalinux 9
   yum:
-    name:
-      - rh-haproxy18
+    name: haproxy
     state: latest
+  when: ansible_facts['distribution_major_version'] == '9'
+
 

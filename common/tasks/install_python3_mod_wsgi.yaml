@@ -8,22 +8,34 @@
     name:
       - centos-release-scl-rh
     state: latest
+  when: ansible_facts['distribution_major_version'] == '7'
 
-- name: install the python3 mod_wsgi module (rpm places it in /opt)
+- name: install the python3 mod_wsgi module (rpm places it in /opt) on centos 7
   yum:
     name:
       - rh-python36-mod_wsgi
     state: latest
+  when: ansible_facts['distribution_major_version'] == '7'
 
-- name: create symbolik link for mod_wsgi path
+- name: install the python3 mod_wsgi module (rpm places it in /opt) on almalinux 9
+  yum:
+    name:
+      - python3-mod_wsgi
+    state: latest
+  when: ansible_facts['distribution_major_version'] == '9'
+
+- name: create symbolik link for mod_wsgi path for centos 7
   file:
-      src: /opt/rh/httpd24/root/usr/lib64/httpd/modules/mod_rh-python36-wsgi.so
-      dest: /lib64/httpd/modules/mod_rh-python36-wsgi.so
-      state: link
+    src: /opt/rh/httpd24/root/usr/lib64/httpd/modules/mod_rh-python36-wsgi.so
+    dest: /lib64/httpd/modules/mod_rh-python36-wsgi.so
+    state: link
+  when: ansible_facts['distribution_major_version'] == '7'
+    
 
-- name: create symbolik link for mod_wsgi apache configuration
+- name: create symbolik link for mod_wsgi apache configuration for centos 7
   file:
-      src: /opt/rh/httpd24/root/etc/httpd/conf.modules.d/10-rh-python36-wsgi.conf
-      dest: /etc/httpd/conf.modules.d/10-rh-python36-wsgi.conf
-      state: link
-
+    src: /opt/rh/httpd24/root/etc/httpd/conf.modules.d/10-rh-python36-wsgi.conf
+    dest: /etc/httpd/conf.modules.d/10-rh-python36-wsgi.conf
+    state: link
+  when: ansible_facts['distribution_major_version'] == '7'
+  

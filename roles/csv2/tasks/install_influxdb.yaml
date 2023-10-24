@@ -6,23 +6,20 @@
     name: python2-pip
   when: ansible_facts['distribution_major_version'] == "7"
 
+- name: determine package versions
+  set_fact:
+    certifi_version: "{{ 'certifi' if ansible_facts['distribution_major_version'] == '9' else 'certifi<=2020.4.5.1' }}"
+    requests_version: "{{ 'latest' if ansible_facts['distribution_major_version'] == '9' else '2.24.0' }}"
+
 - name: Install certifi python package
   pip:
-    name: certifi<=2020.4.5.1
+    name: "{{ certifi_version }}"
 
 - name: Install requests python package version for influx.
   pip:
     name: requests
-    version: 2.24.0
+    version: "{{ requests_version }}"
 
-- name: Install certifi python package
-  pip:
-    name: certifi<=2020.4.5.1
-
-- name: Install requests python package version for influx.
-  pip:
-    name: requests
-    version: 2.24.0
 - name: install msgpack depdenancy for influxdb
   pip:
     name: msgpack

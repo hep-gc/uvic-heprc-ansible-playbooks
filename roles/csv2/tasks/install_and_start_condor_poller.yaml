@@ -8,3 +8,5 @@
     /opt/cloudscheduler/utilities/service_disable_condor_poller
     /opt/cloudscheduler/utilities/service_enable_condor_poller
     rm -rfv /tmp/cloudscheduler
+    rm -f /etc/condor/config.d/00-minicondor
+    systemctl restart condor
