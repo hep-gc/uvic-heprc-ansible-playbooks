@@ -1,0 +1,50 @@
+# update_customize_sh.yaml
+
+- name: create pi
+  shell: /usr/sbin/ip -o route get 8.8.8.8 | sed "s/^.* dev \([[:alnum:]]*\) .*/\1/g"
+  register: PI
+
+- name: get the ip address
+  shell: ip route | grep "{{PI.stdout}}.*link src" | awk '{print $1}'
+  register: IP
+
+- name: get the number of cores
+  shell: grep -c 'processor' /proc/cpuinfo
+  register: VCORE
+
+- name: create a list of cores
+  shell: seq -s, 1 {{VCORE.stdout}}
+  register: SEQUENCE
+
+- name: get the total memory
+  shell: grep MemTotal /proc/meminfo | awk '{print $2}'
+  register: MEM
+
+- name: save 10% of memory for os and convert to MB
+  set_fact:
+    CACHE_MEM: "{{ ((MEM.stdout | int) / (VCORE.stdout | int) * 9 / 10000) | int }}"
+
+- name: get the disk space 
+  shell: df -H --output=avail /var/cache | sed 1d | tr -d "G"
+  register: DS
+
+- name: save 20% for disk space and convert to MB
+  set_fact:
+    CACHE_DIR: "{{ ((DS.stdout | int) / (VCORE.stdout | int) / 5 * 4000) | int }}"
+
+- name: copy customize.sh to the machine
+  template:
+    src: customize.sh
+    dest: /etc/squid/customize.sh
+    owner: squid
+    group: squid
+    mode: u+x
+
+- name: enable frontier-squid
+  shell: systemctl enable frontier-squid
+
+- name: restart frontier-squid 
+  shell: systemctl restart frontier-squid 
+
+- name: run shoal agent installer with default options
+  shell: (echo -e "\n") | shoal-agent-installation.sh
