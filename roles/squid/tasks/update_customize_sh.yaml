@@ -47,4 +47,4 @@
   shell: systemctl restart frontier-squid 
 
 - name: run shoal agent installer with default options
-  shell: (echo -e "\n") | shoal-agent-installation.sh
+  shell: shoal-agent-installation.sh -b

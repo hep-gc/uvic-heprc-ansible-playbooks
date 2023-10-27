@@ -1,1 +1,5 @@
 admin_email: alyssablair@uvic.ca
+
+amqp_users: shoal
+amqp_user_passwords:
+  shoal: shoal
