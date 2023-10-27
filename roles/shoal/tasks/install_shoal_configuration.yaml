@@ -31,13 +31,12 @@
     immediate: true
   ignore_errors: yes
 
-# - name: Git clone shoal master branch
-#   git:
-#     repo: "https://github.com/hep-gc/shoal.git"
-#     dest: /opt/shoal/
-#     force: yes
-#     update: yes
-#     version: "alyssa-shoal-server"
+- name: Git clone shoal master branch
+  git:
+    repo: "https://github.com/hep-gc/shoal.git"
+    dest: /opt/shoal/
+    force: yes
+    update: yes
 
 - name: upgrade pip3 to the latest version
   pip: 
@@ -62,8 +61,8 @@
       ]
     executable: pip3
 
-# - name: run script for database setup
-#   shell: /opt/shoal/shoal-server/shoal_server/setup-db/setup_db.sh
+- name: run script for database setup
+  shell: /opt/shoal/shoal-server/shoal_server/setup-db/setup_db.sh
 
 - name: Run install script to install shoal server
   shell: |
