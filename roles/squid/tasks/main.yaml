@@ -1,4 +1,5 @@
 # squid server setup yaml
+- include_vars: squid-default-vars.yaml
 - import_tasks: install_packages.yaml
 - import_tasks: configure_swap.yaml
 - import_tasks: update_customize_sh.yaml
