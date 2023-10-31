@@ -1,0 +1,46 @@
+# install_packages.yaml
+
+- name: ensure squid directory exists
+  file:
+    path: /etc/squid
+    state: directory
+
+- name: disable SELinux state
+  selinux:
+    state: disabled
+
+- name: change SELinux to permissive
+  shell: sed -i 's/^SELINUX=/SELINUX=permissive \#/g' /etc/sysconfig/selinux
+
+- name: download installer for frontier
+  get_url:
+    url: http://frontier.cern.ch/dist/rpms/RPMS/noarch/frontier-release-1.2-1.noarch.rpm
+    dest: /etc/squid/frontier-release-1.2-1.noarch.rpm
+
+- name: run installer for frontier
+  yum:
+    name: '/etc/squid/frontier-release-1.2-1.noarch.rpm'
+    state: present
+
+- name: install frontier packages
+  yum:
+    name: ['frontier-squid', 'epel-release']
+    state: present
+
+- name: install packages required for python3
+  yum:
+    name:
+    - python3
+    - python3-devel
+    - python3-pip
+    state: installed
+
+- name: install shoal-agent
+  pip:
+    name: shoal-agent
+    executable: pip3
+
+- name: remove shoal-agent config file
+  file:
+    path: /etc/shoal/shoal_agent.conf
+    state: absent

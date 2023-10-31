@@ -1,0 +1,15 @@
+# install_httpd24-httpd.yaml
+
+- name: install the python3 httpd24-httpd repository
+  yum:
+    name:
+      - centos-release-scl-rh
+    state: latest
+  when: ansible_facts['distribution_major_version'] == '7'
+
+- name: install the python3 httpd24-httpd module
+  yum:
+    name:
+      - httpd24-httpd
+    state: latest
+  when: ansible_facts['distribution_major_version'] == '7'

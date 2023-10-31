@@ -1,13 +1,24 @@
 ---
 # file: configure_ntpd.yaml - add local times server time.uvic.ca.
 
-- name: install packages required by ntpd
+
+- name: install packages required by ntpd on centos 7
   yum:
     name: ['ntp']
     state: latest
   ignore_errors: yes
   notify:
     - restart ntpd
+  when: ansible_facts['distribution_major_version'] == '7'
+
+- name: install on almalinux 9
+  yum:
+    name: ['ntpsec']
+    state: latest
+  ignore_errors: yes
+  notify:
+    - restart ntpd
+  when: ansible_facts['distribution_major_version'] == '9'
 
 - name: meta
   meta: flush_handlers

@@ -1,0 +1,22 @@
+# configure_swap_file.yaml
+
+- name: check for swap file
+  stat:
+    path: /swapfile
+  register: swap
+
+- name: create swap file
+  shell: dd if=/dev/zero of=/swapfile bs=1M count=$((5*1024))
+  when: not swap.stat.exists
+
+- name: make the swap file
+  shell: mkswap /swapfile
+  when: not swap.stat.exists
+
+- name: update swapfile permissions
+  shell: sudo chmod 0600 /swapfile
+  when: not swap.stat.exists
+
+- name: mount swap
+  shell: swapon /swapfile
+  when: not swap.stat.exists

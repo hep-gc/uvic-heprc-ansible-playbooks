@@ -4,3 +4,5 @@
 - import_playbook: csv2-ci.yaml
 - import_playbook: xrootd.yaml
 - import_playbook: htcondor.yaml
+- import_playbook: shoal.yaml
+- import_playbook: squid.yaml

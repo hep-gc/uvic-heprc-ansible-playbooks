@@ -42,6 +42,10 @@
   set_fact:
     hostname: "{{ i_service_connection.0.ipv4fqdn }}"
 
+- name: disable SELinux
+  selinux: 
+    state: disabled
+
 - name: create cloudscheduler user
   user:
     name: cloudscheduler
@@ -72,6 +76,28 @@
 
 - name: import_tasks
   import_tasks: install_python3_mod_wsgi.yaml
+
+- name: get the script for rabbitmq
+  get_url:
+    url: https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh
+    dest: /tmp/rabbitmq_script.rpm.sh
+    mode: a+x
+  when: ansible_facts['distribution_major_version'] == '9'
+  
+- name: execute the script
+  shell: sudo os=el dist=8 /tmp/rabbitmq_script.rpm.sh
+  when: ansible_facts['distribution_major_version'] == '9'
+
+- name: get the erlang script
+  get_url:
+    url: https://packagecloud.io/install/repositories/rabbitmq/erlang/script.rpm.sh
+    dest: /tmp/erlang_script.rpm.sh
+    mode: a+x
+  when: ansible_facts['distribution_major_version'] == '9'
+
+- name: execute the script
+  shell: sudo os=el dist=8 /tmp/erlang_script.rpm.sh
+  when: ansible_facts['distribution_major_version'] == '9'
 
 - name: install other prerequisite packages for cloudscheduler
   yum:
@@ -106,13 +132,16 @@
     executable: pip3
     state: latest
   
+- name: determine django package version
+  set_fact:
+    django_package: "{{ 'django' if ansible_facts['distribution_major_version'] == '9' else 'django==2.0.5'}}"
 
 - name: do csv2, web frontend and pollers pip3 installs
   pip:
     name: ["bcrypt==3.1.4", "boto3>=1.9.130", "pika", "python-keystoneclient",
            "openstacksdk==0.57.0", "python-dateutil",
            "pyyaml", "jinja2", "libvirt-python", "py-dateutil", "urllib3", "django-mathfilters",
-           "htcondor", "PyMySQL", "psutil", "celery==4.4.6", "django==2.0.5",
+           "htcondor", "PyMySQL", "psutil", "celery==4.4.6", "{{ django_package }}",
            "django-debug-toolbar", "python-magic"]
     executable: pip3
 #### Removed mqsqlclient and mqsql-connector and sqlparse "mysqlclient==1.3.1", "mysql-connector==2.2.9", "sqlparse==0.2.4"
@@ -296,19 +325,19 @@
   notify:
     restart httpd
 
-#- name: install firewalld 
-#  yum:
-#    name: firewalld
+- name: install firewalld 
+  yum:
+    name: firewalld
 
 - name: install python firewalld for ansible
   yum:
     name: python-firewall
 
-#- name: enable firewalld
-#  systemd:
-#    name: firewalld
-#    enabled: yes
-#    state: restarted
+- name: enable firewalld
+  systemd:
+    name: firewalld
+    enabled: yes
+    state: restarted
 
 - name: open https port
   firewalld:
@@ -371,13 +400,17 @@
 - name: reload daemons 
   command: systemctl daemon-reload
 
+- name: determine name of HAProxy service
+  set_fact:
+    haproxy_name: "{{ 'haproxy.service' if ansible_facts['distribution_major_version'] == '9' else 'HAProxy.service'}}"
+
 - name: ensure HAProxy service is enabled and running
   systemd:
     name: "{{ item }}"
     enabled: yes
     state: restarted
   with_items:
-  - HAProxy.service
+  - "{{ haproxy_name }}"
 
 ### container configuration ####################################################################################################################################
 
@@ -708,20 +741,24 @@
   blowfish:
     password: "{{ csv2_default_password }}"
 
+- name: determine mysql command 
+  set_fact:
+    mysql_command: "{{ 'mariadb' if ansible_facts['distribution_major_version'] == '9' else 'mysql' }}"
+
 - name: create csv2_default user for csv2
-  command: mysql -u root --password="{{ database_user_passwords['root'] }}" -D csv2 -e 'INSERT INTO csv2_user (username, password, is_superuser, join_date) VALUES ("csv2_default", "{{ blowfish.hash }}", 1, "2018-04-01")'
+  command: "{{ mysql_command }} -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 -e 'INSERT INTO csv2_user (username, password, is_superuser, join_date) VALUES (\"csv2_default\", \"{{ blowfish.hash }}\", 1, \"2018-04-01\")'"
   ignore_errors: yes
 
 - name: create csv2-group for the default csv2 user
-  command: mysql -u root --password="{{ database_user_passwords['root'] }}" -D csv2 -e 'INSERT INTO csv2_groups (group_name, htcondor_fqdn, job_cpus, job_ram, job_disk, job_scratch, job_swap, vm_keep_alive) VALUES ("csv2-group", "{{ condor_manager }}", "1", "1000", "5", "0", "0", "0")'
+  command: "{{ mysql_command }} -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 -e 'INSERT INTO csv2_groups (group_name, htcondor_fqdn, job_cpus, job_ram, job_disk, job_scratch, job_swap, vm_keep_alive) VALUES (\"csv2-group\", \"{{ condor_manager }}\", \"1\", \"1000\", \"5\", \"0\", \"0\", \"0\")'"
   ignore_errors: yes
 
 - name: add default csv2 user to csv2-group
-  command: mysql -u root --password="{{ database_user_passwords['root'] }}" -D csv2 -e 'INSERT INTO csv2_user_groups (username, group_name) VALUES ("csv2_default", "csv2-group")'
+  command: "{{ mysql_command }} -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 -e 'INSERT INTO csv2_user_groups (username, group_name) VALUES (\"csv2_default\", \"csv2-group\")'"
   ignore_errors: yes
 
 - name: add metadata files for csv2-group
-  command: mysql -u root --password="{{ database_user_passwords['root'] }}" -D csv2 -e 'INSERT INTO csv2_group_metadata (group_name, metadata_name, enabled, priority, metadata, mime_type) VALUES ("csv2-group", "{{ item }}", "1", "0", LOAD_FILE("/opt/cloudscheduler/metadata/{{ item }}"), "cloud-config")'
+  command: "{{ mysql_command }} -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 -e 'INSERT INTO csv2_group_metadata (group_name, metadata_name, enabled, priority, metadata, mime_type) VALUES (\"csv2-group\", \"{{ item }}\", \"1\", \"0\", LOAD_FILE(\"/opt/cloudscheduler/metadata/{{ item }}\"), \"cloud-config\")'"
   ignore_errors: yes
   with_items:
   - default.yaml.j2
