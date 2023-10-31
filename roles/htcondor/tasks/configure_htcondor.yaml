@@ -1,19 +1,5 @@
 # configure_htcondor.yaml
 
-- name: install required python packages
-  yum:
-    name: firewalld
-
-- name: install python firewalld for ansible
-  yum:
-    name: python-firewall
-
-- name: enable firewalld
-  systemd:
-    name: firewalld
-    enabled: yes
-    state: restarted
-
 - name: remove minicondor file
   file:
     dest: /etc/condor/config.d/00-minicondor

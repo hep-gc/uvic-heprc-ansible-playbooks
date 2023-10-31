@@ -1,3 +1,4 @@
 ---
 
 - include: reconfigure_condor.yaml
+- include: restart_httpd.yaml

@@ -7,7 +7,7 @@ htcondor_token_auth: True
 admin_email: <REPLACE ME> # Email address you'd like to recieve admin mail to and generate token with, usually the root on the csv2 host
 
 i_service_connection: 
-- ipv4: <REPLACE ME> # IPV4 address of your target csv2 host
+- ipv4: <REPLACE ME> # IPV4 address of your target htcondor host
   ipv4fqdn: '{{ htcondor_fqdn }}'
 
 i_virtualhosts:
