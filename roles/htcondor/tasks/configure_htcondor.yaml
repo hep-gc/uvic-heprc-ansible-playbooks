@@ -96,7 +96,7 @@
     line: "ALLOW_DAEMON = {{ allow_daemon.stdout }}@*"
 
 - name: create and save a condor token (saved in /etc/condor/tokens.d)
-  command: condor_token_create -identity "{{ admin_email }}" -token "{{ htcondor_fqdn }}"
+  shell: "condor_token_create -identity {{ admin_email }} -token {{ htcondor_fqdn }}"
 
 - name: restart HTCondor
   service:

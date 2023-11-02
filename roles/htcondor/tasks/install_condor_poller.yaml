@@ -11,7 +11,7 @@
     name: wget
 
 - name: run the install script
-  shell: /tmp/install_condor_poller.sh
+  shell: yes | /tmp/install_condor_poller.sh
 
 - name: make the directory
   file:
@@ -26,3 +26,16 @@
 
 - name: enable the poller
   shell: /opt/cloudscheduler/utilities/service_enable_condor_poller
+
+- name: copy htcondor python packages to cloudscheduler folder
+  shell: cp -r /usr/lib64/python3.6/site-packages/htcondor /opt/cloudscheduler/python3/lib/python3.6/site-packages/
+  when: ansible_facts['distribution_major_version'] == '7'
+
+- name: copy htcondor python packages to cloudscheduler folder
+  shell: cp -r /usr/lib64/python3.6/site-packages/classad /opt/cloudscheduler/python3/lib/python3.6/site-packages/
+  when: ansible_facts['distribution_major_version'] == '7'
+
+- name: restart the condor poller
+  service:
+    name: csv2-condor-poller
+    state: restarted

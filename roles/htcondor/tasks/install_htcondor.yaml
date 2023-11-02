@@ -1,3 +1,5 @@
+# install_htcondor.yaml
+
 - name: check status of htcondor install
   yum:
     name: htcondor-release
@@ -10,11 +12,10 @@
     url: https://get.htcondor.org
     dest: /tmp/install_htcondor.sh
     validate_certs: yes
-  when: htcondor_installed.msg != "Nothing to do"
 
 - name: run the script
-  shell: /bin/bash /tmp/install_htcondor.sh --no-dry-run
-  when: htcondor_installed.msg != "Nothing to do"
+  shell: /bin/bash /tmp/install_htcondor.sh --no-dry-run --channel stable
+  ignore_errors: yes
 
 - name: allow SHA1 Hashing
   shell: update-crypto-policies --set DEFAULT:SHA1

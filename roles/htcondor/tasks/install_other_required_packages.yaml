@@ -20,4 +20,10 @@
   package:
     name: ['@development', 's-nail', 'xauth', 'xorg-x11-fonts-Type1']
     state: latest
+  when: ansible_facts['distribution_major_version'] == '9'
 
+- name: install other required packages
+  package:
+    name: ['@development', 'mailx', 'xauth', 'xorg-x11-apps', 'xorg-x11-fonts-Type1']
+    state: latest
+  when: ansible_facts['distribution_major_version'] == '7'

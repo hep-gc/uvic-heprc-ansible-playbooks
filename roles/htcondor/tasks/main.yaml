@@ -2,12 +2,22 @@
 - include_vars: htcondor-public-default-vars.yaml
 - include_vars: htcondor-public-vars.yaml
 
+- import_tasks: configure_root_mail_forwarding.yaml
 - import_tasks: create_installation_directories.yaml
 - import_tasks: install_other_required_packages.yaml
+- import_tasks: install_python_pip.yaml
+- import_tasks: install_python3.yaml
+
 - import_tasks: letsencrypt.yaml
+  when: (local_web is undefined) or (local_web == False)
+- import_tasks: create_localhost_cert.yaml
+  when: (local_web is defined) and (local_web == True)
+- import_tasks: configure_swap.yaml
+
+- include: install_configure_httpd.yaml
+- import_tasks: install_EGI_trust_anchors.yaml
 
 - import_tasks: install_htcondor.yaml
-- import_tasks: copy_certificates_to_users.yaml
 - import_tasks: configure_htcondor.yaml
 - import_tasks: install_condor_poller.yaml
   when: csv2_fqdn is defined
