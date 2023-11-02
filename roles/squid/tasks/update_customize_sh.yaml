@@ -47,4 +47,42 @@
   shell: systemctl restart frontier-squid 
 
 - name: run shoal agent installer with default options
-  shell: (echo -e "\n") | shoal-agent-installation.sh
+  shell: shoal-agent-installation.sh -b
+
+- name: update the server name if specified
+  replace:
+    path: /etc/shoal/shoal_agent.conf
+    regexp: "^amqp_server_url=.*"
+    replace: "amqp_server_url={{ amqp_server_url }}"
+  when: amqp_server_url is defined
+
+- name: add use credentials configuration if using credentials
+  lineinfile:
+    path: /etc/shoal/shoal_agent.conf
+    regexp: "^use_credentials=.*"
+    line: "use_credentials=True"
+    insertafter: "^amqp_exchange=.*"
+  when: (amqp_use_credentials is defined) and (amqp_use_credentials == True)
+
+- name: add the username configuration if using credentials
+  lineinfile:
+    path: /etc/shoal/shoal_agent.conf
+    regexp: "^amqp_username=.*"
+    line: "amqp_username={{ amqp_users }}"
+    insertafter: "^use_credentials=.*"
+  when: (amqp_use_credentials is defined) and (amqp_use_credentials == True)
+
+- name: add the password configuration if using credentials
+  lineinfile:
+    path: /etc/shoal/shoal_agent.conf
+    regexp: "^amqp_password=.*"
+    line: "amqp_password={{ amqp_user_passwords[item] }}"
+    insertafter: "^amqp_username=.*"
+  with_items: 
+  - "{{ amqp_users }}"
+  when: (amqp_use_credentials is defined) and (amqp_use_credentials == True)
+
+- name: restart the shoal-agent
+  service:
+    name: shoal-agent
+    state: restarted

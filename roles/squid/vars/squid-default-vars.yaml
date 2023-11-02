@@ -1,7 +1,3 @@
-admin_email: CHANGE_ME
-
-amqp_server_url: shoal.heprc.uvic.ca
-
 amqp_use_credentials: False
 
 amqp_users: shoal

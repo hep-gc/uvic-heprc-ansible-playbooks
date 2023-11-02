@@ -82,7 +82,7 @@ squid_distloadweight = 0.5
 
 # RabbitMQ Server URL & Port
 # The default is the test server running at UVic
-amqp_server_url = shoal.heprc.uvic.ca
+amqp_server_url = {{ amqp_server_url }}
 amqp_port       = 5672
 
 # RabbitMQ virtual host. Can leave this as default most of the time.
@@ -106,6 +106,13 @@ amqp_exchange = shoal
 # RabbitMQ Exchange type (topic, direct, fanout, etc.)
 #
 amqp_exchange_type = topic
+
+# Use Credentials Options specifies whether or not to use the options and if so,
+# the username and password to use
+#
+use_credentials = {{ amqp_use_credentials }}
+amqp_username = {{ amqp_users }}
+amqp_password = {{ amqp_user_passwords[amqp_users] }}
 
 [webpy]
 # Configurations specific to webpy server
