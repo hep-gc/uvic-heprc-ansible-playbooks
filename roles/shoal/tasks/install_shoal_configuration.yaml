@@ -98,6 +98,13 @@
 - name: Copy shoal configuration for apache to correct position
   command: cp /opt/shoal/shoal-server/conf/shoal.conf /etc/httpd/conf.d/
 
+- name: allow guest users if not using credentials
+  replace:
+    path: /etc/rabbitmq/rabbitmq.conf
+    regexp: "^# loopback_users.guest = false"
+    replace: "loopback_users.guest = false"
+  when: (amqp_use_credentials is undefined) or (amqp_use_credentials == False)
+
 # update ownership of /var/www
 - file:
     path: /var/www
@@ -112,12 +119,43 @@
     owner: apache
     group: apache
 
-- name: Start service rabbitmq, if not started
+- name: prerequisite services are enabled and running
   service:
     name: rabbitmq-server
-    state: started
+    enabled: yes
+    state: restarted
 
-- name: Start service httpd, if not started
+- name: wait for prerequisite services
+  wait_for:
+  args:
+    timeout: 5
+
+- name: define shoal amqp (rabbitmq) users
+  rabbitmq_user:
+    user: "{{ item }}"
+    password: "new user temporary password"
+    vhost: /
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    state: present
+    tags: administrator
+  with_items:
+  - "{{ amqp_users }}"
+  when: (amqp_use_credentials is defined) and (amqp_use_credentials == True)
+
+- name: update shoal amqp (rabbitmq) user passwords 
+  command: "rabbitmqctl change_password {{ item }} {{ amqp_user_passwords[item] }}"
+  with_items:
+  - "{{ amqp_users }}"
+  when: (amqp_use_credentials is defined) and (amqp_use_credentials == True)
+
+- name: restart rabbitmq service
+  service:
+    name: rabbitmq-server
+    state: restarted
+
+- name: restart httpd service
   service:
     name: httpd
-    state: started
+    state: restarted

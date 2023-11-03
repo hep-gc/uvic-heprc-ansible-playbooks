@@ -32,3 +32,8 @@
     state: installed
     update_cache: true
   register: rabbitmqinstalled
+
+- name: create the RabbitMQ config file
+  copy:
+    src: etc_rabbitmq_rabbitmq.conf
+    dest: /etc/rabbitmq/rabbitmq.conf
