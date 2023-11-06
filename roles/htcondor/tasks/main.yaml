@@ -23,6 +23,8 @@
   when: (htcondor_token_auth is defined) and (htcondor_token_auth == True)
 - import_tasks: install_htcondor_8.yaml
   when: (htcondor_token_auth is undefined) or (htcondor_token_auth == False)
+- import_tasks: copy_certificates_to_users.yaml
+  when: (htcondor_gsi is defined) and (htcondor_gsi == True)
 - import_tasks: configure_htcondor.yaml
 - import_tasks: install_condor_poller.yaml
   when: csv2_fqdn is defined

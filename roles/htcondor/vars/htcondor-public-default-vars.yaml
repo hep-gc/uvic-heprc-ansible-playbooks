@@ -6,6 +6,11 @@ htcondor_high_port: 50000
 htcondor_token_auth: False
 htcondor_gsi: False
 
+certificate_users:
+    - { host: "{{ ansible_fqdn }}",                                  owner: root,            group: root,            globus: '/etc/grid-security',            pfx: 'host'}
+    - { host: "{{ ansible_fqdn }}",                                  owner: root,            group: root,            globus: '/root/.globus',                 pfx: 'user'}
+    - { host: "{{ ansible_fqdn }}",                                  owner: condor,          group: condor,          globus: '/var/lib/condor/.globus',       pfx: 'user'}
+
 # The following default systems and users create the default /etc/grid-security/grid-mapfile.
 # Additional systems and users can be defined in the csv2 host specific "vars" file.
 default_grid_mapfile:
