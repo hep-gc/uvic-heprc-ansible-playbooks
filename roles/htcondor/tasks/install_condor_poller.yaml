@@ -27,13 +27,13 @@
 - name: enable the poller
   shell: /opt/cloudscheduler/utilities/service_enable_condor_poller
 
-- name: copy htcondor python packages to cloudscheduler folder
+- name: copy htcondor python packages for token auth to cloudscheduler folder
   shell: cp -r /usr/lib64/python3.6/site-packages/htcondor /opt/cloudscheduler/python3/lib/python3.6/site-packages/
-  when: ansible_facts['distribution_major_version'] == '7'
+  when: ansible_facts['distribution_major_version'] == '7' and (htcondor_token_auth is defined) and (htcondor_token_auth == True)
 
-- name: copy htcondor python packages to cloudscheduler folder
+- name: copy htcondor python packages for token auth to cloudscheduler folder
   shell: cp -r /usr/lib64/python3.6/site-packages/classad /opt/cloudscheduler/python3/lib/python3.6/site-packages/
-  when: ansible_facts['distribution_major_version'] == '7'
+  when: ansible_facts['distribution_major_version'] == '7' and (htcondor_token_auth is defined) and (htcondor_token_auth == True)
 
 - name: restart the condor poller
   service:

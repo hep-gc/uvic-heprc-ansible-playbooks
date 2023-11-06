@@ -16,8 +16,13 @@
 
 - include: install_configure_httpd.yaml
 - import_tasks: install_EGI_trust_anchors.yaml
+- import_tasks: install_fetch_crl.yaml
+  when: (htcondor_gsi is defined) and (htcondor_gsi == True)
 
-- import_tasks: install_htcondor.yaml
+- import_tasks: install_htcondor_23.yaml
+  when: (htcondor_token_auth is defined) and (htcondor_token_auth == True)
+- import_tasks: install_htcondor_8.yaml
+  when: (htcondor_token_auth is undefined) or (htcondor_token_auth == False)
 - import_tasks: configure_htcondor.yaml
 - import_tasks: install_condor_poller.yaml
   when: csv2_fqdn is defined

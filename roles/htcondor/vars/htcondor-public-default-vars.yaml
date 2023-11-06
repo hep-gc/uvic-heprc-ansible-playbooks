@@ -1,13 +1,18 @@
-certificate_users:
-    - { host: "{{ ansible_fqdn }}",                                  owner: root,            group: root,            globus: '/root/.globus',                 pfx: 'user'}
-    - { host: "{{ ansible_fqdn }}",                                  owner: condor,          group: condor,          globus: '/var/lib/condor/.globus',       pfx: 'user'}
-
 htcondor_collector_port: 9618
 htcondor_low_port: 40000
 htcondor_high_port: 50000
 
-# Set the default for token authentication.
+# Set the default for token authentication and GSI authentication.
 htcondor_token_auth: False
+htcondor_gsi: False
+
+# The following default systems and users create the default /etc/grid-security/grid-mapfile.
+# Additional systems and users can be defined in the csv2 host specific "vars" file.
+default_grid_mapfile:
+    systems:
+        - '"{{ htcondor_gsi_dn }}" condor'
+        - '"{{ htcondor_worker_gsi_dn }}" condor'
+        - '"/CN={{ ansible_fqdn }}" condor'
 
 register_ELK: False
 ELK_server: <REPLACE ME>

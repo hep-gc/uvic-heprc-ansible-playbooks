@@ -27,3 +27,9 @@
     name: ['@development', 'mailx', 'xauth', 'xorg-x11-apps', 'xorg-x11-fonts-Type1']
     state: latest
   when: ansible_facts['distribution_major_version'] == '7'
+
+- name: install epel release
+  yum:
+    name: epel-release
+    state: latest
+

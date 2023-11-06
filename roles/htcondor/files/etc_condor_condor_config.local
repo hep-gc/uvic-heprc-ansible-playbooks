@@ -20,6 +20,7 @@ TRUST_UID_DOMAIN = TRUE
 
 #SPOOL		= /storage/condor/spool
 #EXECUTE		= /storage/condor/execute
+# DELEGATE_JOB_GSI_CREDENTIALS_LIFETIME = 0
 
 ALLOW_READ = *
 ALLOW_WRITE = *

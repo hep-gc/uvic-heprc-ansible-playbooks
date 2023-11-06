@@ -1,4 +1,4 @@
-# install_htcondor.yaml
+# install_htcondor_23.yaml
 
 - name: download htcondor script
   get_url:
@@ -12,7 +12,7 @@
   when: ansible_facts['distribution_major_version'] == '9'
 
 - name: run the script for centos 7
-  shell: /bin/bash /tmp/install_htcondor.sh --no-dry-dun --channel stable
+  shell: /bin/bash /tmp/install_htcondor.sh --no-dry-run --channel stable
   ignore_errors: yes
   when: ansible_facts['distribution_major_version'] == '7'
 

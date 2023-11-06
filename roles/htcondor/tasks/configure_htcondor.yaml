@@ -15,6 +15,10 @@
   when: (container is undefined) or (container == False)
   ignore_errors: yes
 
+- name: get the authentication method
+  set_fact:
+    auth_method: "{{ 'idtokens' if htcondor_token_auth is defined and htcondor_token_auth == True else 'gsi' }}"
+
 - name: HTCondor local configuration
   copy:
     src: etc_condor_condor_config.local
@@ -28,7 +32,7 @@
 
 - name: HTCondor local container configuration
   copy:
-    src: etc_condor_condor_config.local.container
+    src: etc_condor_condor_config_{{auth_method}}.local.container
     dest: /etc/condor/condor_config.local
     owner: root
     group: root
@@ -64,39 +68,58 @@
   notify:
   - reconfigure condor
 
-- name: enable HTCondor IDTokens configuration
+- name: enable HTCondor authentication method configuration
   template:
-    src: etc_condor_config.d_idtokens.j2
-    dest: /etc/condor/config.d/idtokens
+    src: "etc_condor_config.d_{{ auth_method }}.j2"
+    dest: "/etc/condor/config.d/{{ auth_method }}"
     owner: root
     group: root
     mode: 0644
   notify:
   - reconfigure condor
-  when:
-  - (htcondor_token_auth is defined) and (htcondor_token_auth == True)
+  when: ((htcondor_token_auth is defined) and (htcondor_token_auth == True)) or ((htcondor_gsi is defined) and (htcondor_gsi == True))
 
 - name: disable HTCondor IDTokens if it is not required
   file:
-    dest: /etc/condor/config.d/idtokens
+    dest: "/etc/condor/config.d/idtokens"
     state: absent
   notify:
   - reconfigure condor
+  when: (htcondor_token_auth is undefined) or (htcondor_token_auth == False)
+
+- name: disable HTCondor GSI if it is not required
+  file: 
+    dest: "/etc/condor/config.d/gsi"
+    state: absent
+  notify:
+  - reconfigure condor
+  when: (htcondor_gsi is undefined) or (htcondor_gsi == False)
+
+- name: install the grid-mapfile if GSI is required
+  template:
+    src: etc_grid-security_grid-mapfile.j2
+    dest: /etc/grid-security/grid-mapfile
+    owner: root
+    group: root
+    mode: 0644
   when:
-  - (htcondor_token_auth is undefined) or (htcondor_token_auth == False)
+  - (htcondor_gsi is defined) and (htcondor_gsi == True)
 
 - name: get the new value for allow daemon
   shell: echo "{{ admin_email }}" | cut -d@ -f 1
   register: allow_daemon
+  when: (htcondor_token_auth is defined) and (htcondor_token_auth == True)
 
 - name: update HTCondor allow daemon configuration
   lineinfile:
     path: /etc/condor/condor_config.local
     regexp: "^ALLOW_DAEMON = *."
     line: "ALLOW_DAEMON = {{ allow_daemon.stdout }}@*"
+  when: (htcondor_token_auth is defined) and (htcondor_token_auth == True)
 
 - name: create and save a condor token (saved in /etc/condor/tokens.d)
   shell: "condor_token_create -identity {{ admin_email }} -token {{ htcondor_fqdn }}"
+  when: (htcondor_token_auth is defined) and (htcondor_token_auth == True)
 
 - name: restart HTCondor
   service:
