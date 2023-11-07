@@ -15,7 +15,7 @@
 - Configuration with GSI authentication will install HTCondor Version 8.*
 - GSI authentication is not available for Alma 9 due to its incompatability with HTCondor Version 8.*
 
-### Steps to install csv2 on a pre-configured host
+### Steps to install htcondor on a pre-configured host
 
 - Ensure that you have root access
 - Modify the vars (`htcondor-public-vars.yaml`) with correct info
