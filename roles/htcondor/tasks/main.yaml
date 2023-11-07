@@ -9,9 +9,13 @@
 - import_tasks: install_python3.yaml
 
 - import_tasks: letsencrypt.yaml
-  when: (local_web is undefined) or (local_web == False)
+  when: 
+  - (local_web is undefined) or (local_web == False)
+  - (htcondor_gsi is undefined) or (htcondor_gsi == False)
 - import_tasks: create_localhost_cert.yaml
-  when: (local_web is defined) and (local_web == True)
+  when: 
+  - local_web is defined
+  - local_web == True
 - import_tasks: configure_swap.yaml
 
 - include: install_configure_httpd.yaml
