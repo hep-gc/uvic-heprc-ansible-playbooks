@@ -818,7 +818,7 @@
   ignore_errors: yes
 
 - name: check if the writer user exists
-  shell: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute 'SHOW USERS' | grep -q csv2_writer | wc -l
+  shell: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute 'SHOW USERS' | grep csv2_writer | wc -l
   register: csv2_writer_user
 
 - name: create influx writer user
