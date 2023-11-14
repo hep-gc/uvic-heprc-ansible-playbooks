@@ -546,6 +546,13 @@
       owner=root
       group=cloudscheduler
 
+- name: make a copy of the cloudscheduler.yaml file if it exists
+  copy:
+    remote_src: yes
+    src: /etc/cloudscheduler/cloudscheduler.yaml
+    dest: "/etc/cloudscheduler/cloudscheduler.yaml.old-{{ ansible_date_time.date }}"
+  ignore_errors: yes
+
 - name: install cloudscheduler.yaml config file
   template:
     src: "/tmp/cloudscheduler/{{ inventory_hostname }}/opt/cloudscheduler/etc/cloudscheduler/cloudscheduler.yaml.j2"
@@ -810,9 +817,14 @@
   command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
   ignore_errors: yes
 
+- name: check if the writer user exists
+  shell: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute 'SHOW USERS' | grep csv2_writer | wc -l
+  register: csv2_writer_user
+
 - name: create influx writer user
   command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_writer WITH PASSWORD '{{ influx_writer_pass }}'"
   ignore_errors: yes
+  when: csv2_writer_user.stdout == '0'
 
 - name: set permissions for influx read user
   command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute "GRANT READ ON csv2_timeseries TO csv2_read"
