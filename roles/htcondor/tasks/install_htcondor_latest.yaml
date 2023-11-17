@@ -1,4 +1,4 @@
-# install_htcondor_23.yaml
+# install_htcondor_latest.yaml
 
 - name: download htcondor script
   get_url:

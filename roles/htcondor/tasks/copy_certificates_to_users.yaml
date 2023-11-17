@@ -26,6 +26,7 @@
     owner: condor
     group: condor
     mode: 0400
+    remote_src: True
   with_items:
   - {src: "{{ htcondor_cert }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/cert.pem"}
   - {src: "{{ htcondor_cert }}", dest: "/etc/grid-security/hostcert.pem"}
@@ -45,6 +46,7 @@
     owner: condor
     group: condor
     mode: 0400
+    remote_src: True
   with_items:
   - {src: "{{ htcondor_key }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/privkey.pem"}
   - {src: "{{ htcondor_key }}", dest: "/etc/grid-security/hostkey.pem"}
