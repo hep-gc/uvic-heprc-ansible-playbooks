@@ -8,9 +8,6 @@
     group: condor
     mode: 0700
   with_items:
-  - "/usr/local/etc/certificates"
-  - "/usr/local/etc/certificates/{{ ansible_fqdn }}"
-  - "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}"
   - "/etc/grid-security/condor-worker"
   - "/var/lib/condor/.globus"
   when:
@@ -28,9 +25,7 @@
     mode: 0400
     remote_src: True
   with_items:
-  - {src: "{{ htcondor_cert }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/cert.pem"}
   - {src: "{{ htcondor_cert }}", dest: "/etc/grid-security/hostcert.pem"}
-  - {src: "{{ htcondor_worker_cert }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/cert.pem"}
   - {src: "{{ htcondor_worker_cert }}", dest: "/var/lib/condor/.globus/usercert.pem"}
   - {src: "{{ htcondor_worker_cert }}", dest: "/etc/grid-security/condor-worker/hostcert.pem"}
   when:
@@ -48,9 +43,7 @@
     mode: 0400
     remote_src: True
   with_items:
-  - {src: "{{ htcondor_key }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/privkey.pem"}
   - {src: "{{ htcondor_key }}", dest: "/etc/grid-security/hostkey.pem"}
-  - {src: "{{ htcondor_worker_key }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/privkey.pem"}
   - {src: "{{ htcondor_worker_key }}", dest: "/var/lib/condor/.globus/userkey.pem"}
   - {src: "{{ htcondor_worker_key }}", dest: "/etc/grid-security/condor-worker/hostkey.pem"}
   when:
