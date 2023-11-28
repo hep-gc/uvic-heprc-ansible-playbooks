@@ -47,41 +47,12 @@ class S3StorageShare:
                 'status_code': '005',
                 'type': 'int',
             },
-            'storagestats.api': {
-                'default': 'generic',
-                'required': False,
-                'status_code': '070',
-                'valid': ['generic'],
-            },
-            'storagestats.frequency': {
-                'default': '600',
-                'required': False,
-                'status_code': '072'
-            },
-            'storagestats.quota': {
-                'default': 'api',
-                'required': False,
-                'status_code': '071',
-            },
             'ssl_check': {
                 'boolean': True,
                 'default': True,
                 'required': False,
                 'status_code': '006',
-                'valid': ['true', 'false', 'yes', 'no']
-            },
-            's3.alternate': {
-                'default': 'false',
-                'required': False,
-                'status_code': '020',
-                'valid': ['true', 'false', 'yes', 'no']
-            },
-            'storagestats.api': {
-                'default': 'generic',
-                'required': False,
-                'status_code': '070',
-                'valid': ['ceph-admin', 'cloudwatch', 'generic', 'list-objects',
-                            'minio_prometheus', 'minio_prometheus_v2'],
+                'valid': ['True', 'False', 'yes', 'no']
             },
             's3.priv_key': {
                 'required': True,
@@ -122,38 +93,34 @@ class S3StorageShare:
                     if self.validators[_setting]['required']:
                         raise Exception
                     else:
-                        print("warning: missing setting")
+                        # print(f"warning: missing setting {_setting}, using default value {self.validators[_setting]['default']}")
                         self.plugin_settings.update({_setting: self.validators[_setting]['default']})
                 except Exception:
                     self.stats['check'] = "MissingRequiredSetting"
                     print("an error occurred")
 
-            
+
     def get_object_checksum(self, hash_type, object_url):
         _metadata = self.get_object_metadata(object_url)
         
         try:
             return _metadata[hash_type]
         except KeyError:
-            return {}
-        
+            return None
+
+
     def get_object_metadata(self, object_url):
-        _object_path = urlsplit(object_url).path
-
-        _object_key = _object_path.split('/')[1::]
-        if self.uri["bucket"] in _object_key:
-            _object_key.remove(self.uri["bucket"])
-
-        _object_key = '/'.join(_object_key)
 
         _connection = self.get_s3_boto_client()
         _kwargs = {
             "Bucket": self.uri["bucket"],
-            "Key": _object_key,
-
+            "Key": object_url,
         }
         
-        return run_boto_client(_connection, 'head_object', _kwargs)
+        _result = run_boto_client(_connection, 'head_object', _kwargs)
+        _metadata = {k.lower(): v for k, v in _result['Metadata'].items()}
+        
+        return _metadata
 
 
     def put_object_checksum(self, checksum, hash_type, object_url, force):
@@ -169,34 +136,27 @@ class S3StorageShare:
 
         else:
             print("no new metadata")
+            exit(0)
 
 
     def put_object_metadata(self, metadata, object_url):
-        
-        _object_path = urlsplit(object_url).path
-
-        _object_key = _object_path.split('/')[1::]
-        if self.uri['bucket'] in _object_key:
-            _object_key.remove(self.uri['bucket'])
-        _object_key = '/'.join(_object_key)
-
         _connection = self.get_s3_boto_client()
 
         _kwargs = {
             'Bucket': self.uri['bucket'],
             'CopySource': {
                 'Bucket': self.uri['bucket'],
-                'Key': _object_key,
+                'Key': object_url,
             },
-            'Key': _object_key,
+            'Key': object_url,
             'Metadata': metadata,
             'MetadataDirective': 'REPLACE',
         }
 
         try:
             assert len(metadata) != 0
-            _result = run_boto_client(_connection, 'copy_object', _kwargs)
-
+            run_boto_client(_connection, 'copy_object', _kwargs)
+        
         except Exception as e:
             print("an error occurred: ", e)
             exit(1)
@@ -205,6 +165,7 @@ class S3StorageShare:
     def get_s3_boto_client(self):
         _api_url = f"{self.uri['scheme']}://{self.uri['netloc']}"
         _session = boto3.session.Session()
+        
         _connection = _session.client(
             "s3",
             region_name=self.plugin_settings['s3.region'],
@@ -223,9 +184,43 @@ class S3StorageShare:
         return _connection
 
 
+    def list_objects(self, delta=1, prefix='', report_file='/tmp/filelist_report'):
+        _connection = self.get_s3_boto_client()
+        
+        _total_bytes = 0
+        _total_files = 0
+        
+        _kwargs = {
+            'Bucket': self.uri['bucket'],
+            'Prefix': prefix,
+            # 'Delimiter': '/',
+        }
+        
+        while True:
+            _response = run_boto_client(_connection, 'list_objects', _kwargs)
+            
+            try:
+                _response['Contents']
+            except KeyError:
+                self.stats['bytesused'] = 0
+                break
+            else:
+                for _file in _response['Contents']:
+                    _total_bytes += int(_file['Size'])
+                    _total_files += 1
+                    
+            try:
+                _kwargs['Marker'] = _response['NextMarker']
+            except KeyError:
+                break
+            
+        self.stats['endtime'] = int(datetime.datetime.now().timestamp())
+        
+        return int(_total_bytes), _total_files
+
+
 def run_boto_client(_connection, method, _kwargs):
+    
     _function = getattr(_connection, method)
     _result = _function(**_kwargs)
-
-    _metadata = {k.lower(): v for k, v in _result['Metadata'].items()}
-    return _metadata
+    return _result

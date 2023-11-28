@@ -1,56 +1,59 @@
-i#!/bin/bash
+#!/bin/bash
 
-URL="$1"
+PATH="$1"
 METHOD=$2
 endpoint=$3
+bucket=$4
 chksum="0"
 
 calculate_checksum()
 {
-    local url=$1
+    local path=$1
     local method=$2
     local endpoint=$3
+    local bucket=$4
     local chksumarray=( 0 0 )
     local chksum=0
 
     case "$method" in
-        adler32) chksumarray=($(aws s3 cp s3://"${url}" - --endpoint-url="${endpoint}"| xrdadler32))
+        adler32) chksumarray=($(aws s3 cp s3://"${path}" - --endpoint-url="${endpoint}"| xrdadler32))
                  ;;
-        md5) chksumarray=($(aws s3 cp s3://"${url}" - --endpoint-url="${endpoint}" | md5sum))
+        md5) chksumarray=($(aws s3 cp s3://"${path}" - --endpoint-url="${endpoint}" | md5sum))
              ;;
     esac
-
     chksum=${chksumarray[0]}
     echo $chksum
+    put_checksum $method $path $endpoint $chksum
 }
 
-getchecksum()
+get_checksum()
 {
-    local method=$1
-    local url=$2
+    local path=$1
+    local method=$2
     local endpoint=$3
-    local chksum=$(xxx checksums get -c /path/to-config -e $endpoint -u $url -t $method)
-
+    local bucket=$4
+    
+    local chksum=$(python3 /tmp/checksum.py checksums get -f $url -t $method)
     if [ "$chksum" == "None" ];
     then
-        chksum=$(calculate_checksum $url $method $endpoint)
+        chksum=$(calculate_checksum $path $method $endpoint $bucket)
     fi
-    echo $chksum
 
-    # command: python3 checksum.py put --checksum=92fae96b4910fb18871b94ab4b04e5b4 -e http://206.12.154.92:9000 -u http://206.12.154.92:9000/tpc/cksum8 -t md5
+    echo $chksum
 
 }
 
-putchecksum()
+put_checksum()
 {
     local method=$1
-    local url=$2
+    local path=$2
     local endpoint=$3
     local chksum=$4
 
-    # TODO: finish this function
-    # command: python3 checksum.py put --checksum=${checksum} -e ${endpoint} -u ${url} -t md5
+    python3 /tmp/checksum.py checksums put --checksum=$chksum -f $path -t $method
+
 }
-chksum=$(getchecksum $METHOD $URL $endpoint)
+
+chksum=$(get_checksum $PATH $METHOD $endpoint $bucket)
 echo -e ">>>>> HASH $chksum\n"
 exit
