@@ -2,41 +2,38 @@
 
 FILEPATH="$1"
 METHOD=$2
-endpoint=$3
-bucket=$4
+bucket=$3
 chksum="0"
 
 calculate_checksum()
 {
     local filepath=$1
     local method=$2
-    local endpoint=$3
-    local bucket=$4
+    local bucket=$3
     local chksumarray=( 0 0 )
     local chksum=0
 
     case "$method" in
-        adler32) chksumarray=($(aws s3 cp s3://"${bucket}/${filepath}" - --endpoint-url="${endpoint}"| xrdadler32))
+        adler32) chksumarray=($(s3cmd get s3://"${bucket}/${filepath}" - --config="/etc/xrootd/s3cfg" | xrdadler32))
                  ;;
-        md5) chksumarray=($(aws s3 cp s3://"${bucket}/${filepath}" - --endpoint-url="${endpoint}" | md5sum))
+        md5) chksumarray=($(s3cmd get s3://"${bucket}/${filepath}" - --config="/etc/xrootd/s3cfg" | md5sum))
              ;;
     esac
     chksum=${chksumarray[0]}
     echo $chksum
-    put_checksum $method $filepath $endpoint $chksum
+    put_checksum $method $filepath $chksum
 }
 
 get_checksum()
 {
     local filepath=$1
     local method=$2
-    local endpoint=$3
-    local bucket=$4
+    local bucket=$3
     
-    local chksum=$(python3 /tmp/storage_stats.py checksums get -f $filepath -t $method)
+    local chksum=$(storage_stats checksums get -f $filepath -t $method)
     if [ "$chksum" == "None" ];
     then
-        chksum=$(calculate_checksum $filepath $method $endpoint $bucket)
+        chksum=$(calculate_checksum $filepath $method $bucket)
     fi
 
     echo $chksum
@@ -47,13 +44,12 @@ put_checksum()
 {
     local method=$1
     local filepath=$2
-    local endpoint=$3
-    local chksum=$4
+    local chksum=$3
 
-    python3 /tmp/storage_stats.py checksums put --checksum=$chksum -f $filepath -t $method
+    storage_stats checksums put --checksum=$chksum -f $filepath -t $method
 
 }
 
-chksum=$(get_checksum $FILEPATH $METHOD $endpoint $bucket)
+chksum=$(get_checksum $FILEPATH $METHOD $bucket)
 echo -e "$chksum\n"
 exit
