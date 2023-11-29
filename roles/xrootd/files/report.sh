@@ -1,7 +1,7 @@
 #!/bin/bash
 get_report()
 {
-    local values=$(python3 /tmp/checksum.py reports storage)
+    local values=$(python3 /tmp/storage_stats.py reports)
 
     echo $values
 }

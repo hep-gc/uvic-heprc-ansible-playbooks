@@ -1,6 +1,9 @@
 import argparse
 
 def parse_args(args):
+    """
+    create the argument parser
+    """
     parser = argparse.ArgumentParser()
     subparser = parser.add_subparsers()
     
@@ -11,6 +14,9 @@ def parse_args(args):
 
 
 def add_checksums_subparser(subparser):
+    """
+    create the checksums subparser
+    """
     parser = subparser.add_parser(
         'checksums',
         help="obtain and output object/file checksums"
@@ -23,6 +29,9 @@ def add_checksums_subparser(subparser):
 
     
 def add_checksums_get_subparser(subparser):
+    """
+    create the checksums get subparser
+    """
     parser = subparser.add_parser(
         'get', 
         help="Get object/file checksums"
@@ -33,6 +42,9 @@ def add_checksums_get_subparser(subparser):
 
     
 def add_checksums_put_subparser(subparser):
+    """
+    create the checksums put subparser
+    """
     parser = subparser.add_parser(
         'put',
         help="Set object/file checksums.."
@@ -46,6 +58,7 @@ def add_checksums_put_subparser(subparser):
         '--checksum',
         action='store',
         default=False,
+        required=True,
         dest='checksum',
         type=str.lower,
         help="String with checksum to set. ['adler32', md5] "
@@ -54,27 +67,23 @@ def add_checksums_put_subparser(subparser):
 
 
 def add_reports_subparser(subparser):
+    """
+    create the reports subparser
+    """
     parser = subparser.add_parser(
         'reports',
         help="obtain and output storage reports"
     )
     subparser = parser.add_subparsers()
     parser.set_defaults(cmd='reports')
-    
-    add_reports_storage_subparser(subparser)
-    
-def add_reports_storage_subparser(subparser):
-    parser = subparser.add_parser(
-        'storage', 
-        help="Generate storage related report."
-    )
-    parser.set_defaults(sub_cmd='storage')
 
     add_general_options(parser)
 
     
 def add_checksum_options(parser):
-    
+    """
+    create the common checksum options
+    """
     add_general_options(parser)
     
     group_checksum = parser.add_argument_group("Checksum required options")
@@ -83,8 +92,8 @@ def add_checksum_options(parser):
         '-t', '--hash_type',
         action='store',
         default=False,
-        dest='hash_type',
         required=True,
+        dest='hash_type',
         type=str.lower,
         help="Type of checksum hash. ['adler32', md5] "
                 "Required."
@@ -104,6 +113,10 @@ def add_checksum_options(parser):
 
     
 def add_general_options(parser):
+    """
+    create the common options for both
+    checksums and reports
+    """
     parser.add_argument(
         '-c', '--config',
         action='store',

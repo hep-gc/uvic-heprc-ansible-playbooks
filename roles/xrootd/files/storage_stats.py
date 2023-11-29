@@ -8,11 +8,15 @@ def main():
 
     if ARGS.cmd == 'checksums':
         checksums(ARGS)
+    
     elif ARGS.cmd == 'reports':
         reports(ARGS)
         
 
 def checksums(ARGS):
+    """
+    get the checksum of the file specified
+    """
     # TODO: check for required args
     _storage_share = parse_conf_file(ARGS.config_path)
     _storage_share = S3StorageShare(_storage_share)
@@ -33,6 +37,9 @@ def checksums(ARGS):
         )
 
 def reports(ARGS):
+    """
+    get the number of files and bytes used in the bucket
+    """
     #TODO: check for required args
     
     _storage_share = parse_conf_file(ARGS.config_path)
@@ -42,6 +49,9 @@ def reports(ARGS):
     print(_total_bytes, _total_files)
 
 def parse_conf_file(config_path):
+    """
+    Parse the s3 configuration file
+    """
     _storage_share = {}
 
     _keys = {

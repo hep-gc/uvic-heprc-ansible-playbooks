@@ -6,7 +6,6 @@ from botocore.client import Config
 class S3StorageShare:
     def __init__(self, storage_share):
 
-        # self.id = storage_share['id']
         self.plugin_settings = storage_share['plugin_settings']
 
         self.plugin_settings.update(
@@ -24,8 +23,6 @@ class S3StorageShare:
             'scheme':   _url.scheme,
             'url':      storage_share['url'],
         }
-
-        #self.plugin = storage_share['plugin']
 
         self.debug = []
         self.status = []
@@ -84,6 +81,10 @@ class S3StorageShare:
 
 
     def validate_plugin_settings(self):
+        """ 
+        checks for required plugin settings
+        """
+        
         for _setting in self.validators:
             try:
                 self.plugin_settings[_setting]
@@ -101,6 +102,10 @@ class S3StorageShare:
 
 
     def get_object_checksum(self, hash_type, object_url):
+        """
+        return the metadata of the specified hash type.
+        returns None if the metadata does not exist
+        """
         _metadata = self.get_object_metadata(object_url)
         
         try:
@@ -110,6 +115,10 @@ class S3StorageShare:
 
 
     def get_object_metadata(self, object_url):
+        """
+        get and return the metadata from the file
+        in s3 storage
+        """
 
         _connection = self.get_s3_boto_client()
         _kwargs = {
@@ -124,22 +133,33 @@ class S3StorageShare:
 
 
     def put_object_checksum(self, checksum, hash_type, object_url, force):
+        """
+        check if there is existing metadata in the s3 file metadata
+        if metadata exists, exit unless force is true
+        """
         _metadata = self.get_object_metadata(object_url)
 
         if hash_type not in _metadata:
+            # no metadata exists of this hash type, add metadata
             _metadata.setdefault(hash_type, checksum)
             self.put_object_metadata(_metadata, object_url)
 
         elif force:
+            # metadata already exists, replace metadata
             _metadata[hash_type] = checksum
             self.put_object_metadata(_metadata, object_url)
 
         else:
+            # metadata already exists
             print("no new metadata")
             exit(0)
 
 
     def put_object_metadata(self, metadata, object_url):
+        """
+        put the new data in the metadata of the
+        specified file in s3 storage
+        """
         _connection = self.get_s3_boto_client()
 
         _kwargs = {
@@ -154,6 +174,7 @@ class S3StorageShare:
         }
 
         try:
+            # ensure there is new metadata to enter
             assert len(metadata) != 0
             run_boto_client(_connection, 'copy_object', _kwargs)
         
@@ -163,9 +184,12 @@ class S3StorageShare:
 
 
     def get_s3_boto_client(self):
+        """
+        create and return a connection to s3 storage
+        """
         _api_url = f"{self.uri['scheme']}://{self.uri['netloc']}"
         _session = boto3.session.Session()
-        
+
         _connection = _session.client(
             "s3",
             region_name=self.plugin_settings['s3.region'],
@@ -184,7 +208,11 @@ class S3StorageShare:
         return _connection
 
 
-    def list_objects(self, delta=1, prefix='', report_file='/tmp/filelist_report'):
+    def list_objects(self):
+        """
+        get the files in s3 storage, calculate, and 
+        return the number of files and bytes used
+        """
         _connection = self.get_s3_boto_client()
         
         _total_bytes = 0
@@ -192,13 +220,14 @@ class S3StorageShare:
         
         _kwargs = {
             'Bucket': self.uri['bucket'],
-            'Prefix': prefix,
+            'Prefix': '',
             # 'Delimiter': '/',
         }
         
         while True:
             _response = run_boto_client(_connection, 'list_objects', _kwargs)
             
+            # check for files in the response
             try:
                 _response['Contents']
             except KeyError:
@@ -208,19 +237,21 @@ class S3StorageShare:
                 for _file in _response['Contents']:
                     _total_bytes += int(_file['Size'])
                     _total_files += 1
-                    
+            
+            # marker indicating the location of the last file read        
             try:
                 _kwargs['Marker'] = _response['NextMarker']
             except KeyError:
                 break
-            
-        self.stats['endtime'] = int(datetime.datetime.now().timestamp())
-        
+                
         return int(_total_bytes), _total_files
 
 
 def run_boto_client(_connection, method, _kwargs):
-    
+    """
+    runs the specified function with the 
+    given arguments and returns the result
+    """
     _function = getattr(_connection, method)
     _result = _function(**_kwargs)
     return _result
