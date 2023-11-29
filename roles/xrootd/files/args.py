@@ -78,6 +78,7 @@ def add_reports_subparser(subparser):
     parser.set_defaults(cmd='reports')
 
     add_general_options(parser)
+    add_logging_options(parser)
 
     
 def add_checksum_options(parser):
@@ -85,6 +86,7 @@ def add_checksum_options(parser):
     create the common checksum options
     """
     add_general_options(parser)
+    add_logging_options(parser)
     
     group_checksum = parser.add_argument_group("Checksum required options")
 
@@ -142,4 +144,38 @@ def add_general_options(parser):
         default=False,
         dest='verbose',
         help="Show on stderr events according to loglevel."
+    )
+    
+def add_logging_options(parser):
+    """Add logging optional arguments.
+
+    Arguments:
+    parser -- Object form argparse.ArgumentParser()
+
+    """
+
+    group_logging = parser.add_argument_group("Logging options")
+    group_logging.add_argument(
+        '--logfile',
+        action='store',
+        default='/var/log/xrootd/s3_proxy/storage_stats.log',
+        dest='logfile',
+        help="Set logfiles path. "
+             "Default: /var/log/xrootd/s3_proxy/storage_stats.log"
+    )
+    group_logging.add_argument(
+        '--logid',
+        action='store',
+        default=False,
+        dest='logid',
+        help='Add this log id to every log line.'
+    )
+    group_logging.add_argument(
+        '--loglevel',
+        action='store',
+        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'],
+        default='WARNING',
+        dest='loglevel',
+        help="Set log output level. "
+        "Default: WARNING."
     )

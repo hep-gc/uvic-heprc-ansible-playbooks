@@ -1,6 +1,6 @@
 # Setup endpoint
 host_base = {{s3_host}}
-host_bucket = {{s3_host}}/%(bucket)
+host_bucket = {{s3_host}}/{{bucket_name}}
 bucket_location = uvic
 use_https = False
 

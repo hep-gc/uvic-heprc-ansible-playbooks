@@ -1,7 +1,13 @@
+import sys
 from urllib.parse import urlsplit
 import boto3
 import datetime
 from botocore.client import Config
+import logging
+import botocore.vendored.requests.exceptions as botoRequestsExceptions
+import botocore.exceptions as botoExceptions
+
+_logger = logging.getLogger('storage_stats')
 
 class S3StorageShare:
     def __init__(self, storage_share):
@@ -49,7 +55,7 @@ class S3StorageShare:
                 'default': True,
                 'required': False,
                 'status_code': '006',
-                'valid': ['True', 'False', 'yes', 'no']
+                'valid': ['true', 'false', 'yes', 'no']
             },
             's3.priv_key': {
                 'required': True,
@@ -85,21 +91,43 @@ class S3StorageShare:
         checks for required plugin settings
         """
         
+        _logger.info("Validating configured setitngs.")
+        
         for _setting in self.validators:
+            _logger.debug(f"Validating setting {_setting}")
+            
             try:
                 self.plugin_settings[_setting]
 
             except KeyError:
+                if self.validators[_setting]['required']:
+                    _logger.error(f"Missing required setting: {_setting}")
+                    self.status.append(f"[ERROR] {self.validators[_setting]['status_code']}")
+                    
+                else:
+                    _logger.warn(f"Missing setting: {_setting}, using default value: {self.validators[_setting]['default']}")
+                    self.status.append(f"[WARN] {self.validators[_setting]['status_code']}")
+                    self.plugin_settings.update({_setting: self.validators[_setting]['default']})
+            
+            else:
                 try:
-                    if self.validators[_setting]['required']:
-                        raise Exception
+                    if self.plugin_settings[_setting].lower() not in self.validators[_setting]['valid']:
+                        _logger.error(f"Invalid setting {self.plugin_settings[_setting]} for {_setting}. \
+                            Valid settings: {self.validators[_setting]['valid']}")
+                        exit(self.validators[_setting]['status_code'])
+                    
                     else:
-                        # print(f"warning: missing setting {_setting}, using default value {self.validators[_setting]['default']}")
-                        self.plugin_settings.update({_setting: self.validators[_setting]['default']})
-                except Exception:
-                    self.stats['check'] = "MissingRequiredSetting"
-                    print("an error occurred")
-
+                        try:
+                            self.validators[_setting]['boolean']
+                        except KeyError:
+                            pass
+                        else:
+                            self.plugin_settings[_setting] = self.plugin_settings[_setting].lower() == 'true' \
+                                or self.plugin_settings[_setting].lower() == 'yes'
+                                
+                except KeyError:
+                    pass
+    
 
     def get_object_checksum(self, hash_type, object_url):
         """
@@ -109,8 +137,12 @@ class S3StorageShare:
         _metadata = self.get_object_metadata(object_url)
         
         try:
+            _logger.info(f"Checking if metadata contains checksum of hash type {hash_type}")
+            _logger.debug(f"Metadata being checked: {_metadata}")
             return _metadata[hash_type]
+        
         except KeyError:
+            _logger.warning(f"No checksum found for hash type {hash_type}")
             return None
 
 
@@ -127,9 +159,14 @@ class S3StorageShare:
         }
         
         _result = run_boto_client(_connection, 'head_object', _kwargs)
-        _metadata = {k.lower(): v for k, v in _result['Metadata'].items()}
         
-        return _metadata
+        try:
+            _metadata = {k.lower(): v for k, v in _result['Metadata'].items()}
+            return _metadata
+
+        except KeyError:
+            _logger.warning("No key Metadata in _result")
+            return {}
 
 
     def put_object_checksum(self, checksum, hash_type, object_url, force):
@@ -142,16 +179,21 @@ class S3StorageShare:
         if hash_type not in _metadata:
             # no metadata exists of this hash type, add metadata
             _metadata.setdefault(hash_type, checksum)
+            _logger.info(f"New metadata detected, calling API to upload: {_metadata}")
+            
             self.put_object_metadata(_metadata, object_url)
 
         elif force:
             # metadata already exists, replace metadata
             _metadata[hash_type] = checksum
+            _logger.info(f"Force flag detected, calling API to update: {_metadata}")
+            
             self.put_object_metadata(_metadata, object_url)
 
         else:
             # metadata already exists
-            print("no new metadata")
+            _logger.info("No new metadata detected, no need to call API.")
+            _logger.debug(f"Metadata: {_metadata}")
             exit(0)
 
 
@@ -176,11 +218,15 @@ class S3StorageShare:
         try:
             # ensure there is new metadata to enter
             assert len(metadata) != 0
+            
+            _logger.info(f"Updating metdata of object '{object_url}'")
+            _logger.debug(f"Metadata being uploaded: '{metadata}'")
+            
             run_boto_client(_connection, 'copy_object', _kwargs)
         
-        except Exception as e:
-            print("an error occurred: ", e)
-            exit(1)
+        except AssertionError as INFO:
+            _logger.info(f"Empty metadata. Skipping API request. {INFO}")
+            sys.exit(1)
 
 
     def get_s3_boto_client(self):
@@ -221,7 +267,7 @@ class S3StorageShare:
         _kwargs = {
             'Bucket': self.uri['bucket'],
             'Prefix': '',
-            # 'Delimiter': '/',
+            # 'Delimiter': '*',
         }
         
         while True:
@@ -231,7 +277,6 @@ class S3StorageShare:
             try:
                 _response['Contents']
             except KeyError:
-                self.stats['bytesused'] = 0
                 break
             else:
                 for _file in _response['Contents']:
@@ -253,5 +298,28 @@ def run_boto_client(_connection, method, _kwargs):
     given arguments and returns the result
     """
     _function = getattr(_connection, method)
-    _result = _function(**_kwargs)
+    _result = {}
+    try:
+        _result = _function(**_kwargs)
+    
+    except botoExceptions.ClientError as ERR:
+        _logger.error(f"[{ERR.__class__.__name__}][{ERR.response['ResponseMetadata']['HTTPStatusCode']}] Failed to establish a connection")
+        _logger.debug(f"{str(ERR)}")
+    
+    except botoRequestsExceptions.SSLError as ERR:
+        _logger.error(f"[{ERR.__class__.__name__}][092] Failed to establish a connection")
+        _logger.debug(f"{str(ERR)}")
+
+    except botoRequestsExceptions.RequestException as ERR:
+        _logger.error(f"[{ERR.__class__.__name__}][400] Failed to establish a connection")
+        _logger.debug(f"{str(ERR)}")
+    
+    except botoExceptions.ParamValidationError as ERR:
+        _logger.error(f"[{ERR.__class__.__name__}][095] Failed to establish a connection")
+        _logger.debug(f"{str(ERR)}")
+            
+    except botoExceptions.BotoCoreError as ERR:
+        _logger.error(f"[{ERR.__class__.__name__}][400] Failed to establish a connection")
+        _logger.debug(f"{str(ERR)}")
+            
     return _result
