@@ -7,14 +7,8 @@
     validate_certs: yes
 
 - name: run the script
-  shell: /bin/bash /tmp/install_htcondor.sh --no-dry-run
-  ignore_errors: yes
-  when: ansible_facts['distribution_major_version'] == '9'
-
-- name: run the script for centos 7
   shell: /bin/bash /tmp/install_htcondor.sh --no-dry-run --channel stable
   ignore_errors: yes
-  when: ansible_facts['distribution_major_version'] == '7'
 
 - name: allow SHA1 Hashing
   shell: update-crypto-policies --set DEFAULT:SHA1

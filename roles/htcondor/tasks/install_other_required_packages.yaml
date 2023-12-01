@@ -15,7 +15,6 @@
     warn: false
   when: ansible_facts['distribution_major_version'] == "9"
 
-# TODO see if xorg-x11-apps is really needed
 - name: install other required packages
   package:
     name: ['gcc', 'git', 's-nail']
@@ -27,6 +26,23 @@
     name: ['gcc', 'git', 'mailx']
     state: latest
   when: ansible_facts['distribution_major_version'] == '7'
+
+- name: install x11 packages 
+  package: 
+    name: ['xauth', 'xorg-x11-fonts-Type1']
+    state: latest
+  when: 
+  - x11_forwarding is defined
+  - x11_forwarding == True
+
+- name: install x11 package for centos 7
+  package:
+    name: xorg-x11-apps
+    state: latest
+  when:
+  - ansible_facts['distribution_major_version'] == '7'
+  - x11_forwarding is defined
+  - x11_forwarding == True
 
 - name: install epel release
   yum:

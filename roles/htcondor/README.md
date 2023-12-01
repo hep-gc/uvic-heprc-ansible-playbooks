@@ -11,7 +11,7 @@
 ### Configuration Specifications
 
 - Token and GSI authentication flags both default to False unless otherwise specified
-- Configuration without GSI authentication will install the latest HTCondor version
+- Configuration without GSI authentication will install the latest stable HTCondor version
 - Configuration with GSI authentication will install HTCondor Version 8.*
 - GSI authentication is not available for Alma 9 due to its incompatability with HTCondor Version 8.*
 

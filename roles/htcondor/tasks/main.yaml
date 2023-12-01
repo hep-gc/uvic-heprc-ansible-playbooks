@@ -5,7 +5,6 @@
 - import_tasks: configure_root_mail_forwarding.yaml
 - import_tasks: create_installation_directories.yaml
 - import_tasks: install_other_required_packages.yaml
-- import_tasks: install_python_pip.yaml
 - import_tasks: install_python3.yaml
 
 - import_tasks: create_localhost_cert.yaml
