@@ -22,25 +22,9 @@ class S3StorageShare:
 
         _url = urlsplit(storage_share['url'])
         self.uri = {
-            'hostname': _url.hostname,
             'netloc':   _url.netloc,
             'path':     _url.path,
-            'port':     _url.port,
             'scheme':   _url.scheme,
-            'url':      storage_share['url'],
-        }
-
-        self.debug = []
-        self.status = []
-
-        self.stats = {
-            'bytesused': -1,
-            'bytesfree': -1,
-            'endtime': 0,
-            'filecount': -1,
-            'quota': 1000 ** 4,
-            'starttime': int(datetime.datetime.now().timestamp()),
-            'check': True,
         }
 
         self.validators = {
@@ -80,10 +64,7 @@ class S3StorageShare:
 
         self.validate_plugin_settings()
 
-        self.uri['bucket'] = self.uri['path'].rpartition("/")[-1]
-        self.star_fields = {
-            'storage_share': self.uri['bucket'],
-        }
+        self.uri['bucket'] = self.uri['path'].rpartition('/')[-1]
 
 
     def validate_plugin_settings(self):
@@ -102,11 +83,9 @@ class S3StorageShare:
             except KeyError:
                 if self.validators[_setting]['required']:
                     _logger.error(f"Missing required setting: {_setting}")
-                    self.status.append(f"[ERROR] {self.validators[_setting]['status_code']}")
                     
                 else:
                     _logger.warn(f"Missing setting: {_setting}, using default value: {self.validators[_setting]['default']}")
-                    self.status.append(f"[WARN] {self.validators[_setting]['status_code']}")
                     self.plugin_settings.update({_setting: self.validators[_setting]['default']})
             
             else:
@@ -151,11 +130,10 @@ class S3StorageShare:
         get and return the metadata from the file
         in s3 storage
         """
-
         _connection = self.get_s3_boto_client()
         _kwargs = {
-            "Bucket": self.uri["bucket"],
-            "Key": object_url,
+            'Bucket': self.uri['bucket'],
+            'Key': object_url,
         }
         
         _result = run_boto_client(_connection, 'head_object', _kwargs)
@@ -192,7 +170,7 @@ class S3StorageShare:
 
         else:
             # metadata already exists
-            _logger.info("No new metadata detected, no need to call API.")
+            _logger.info("No new metadata detected, no need to call API. To update the existing data, use --force")
             _logger.debug(f"Metadata: {_metadata}")
             exit(0)
 
@@ -305,6 +283,8 @@ def run_boto_client(_connection, method, _kwargs):
     except botoExceptions.ClientError as ERR:
         _logger.error(f"[{ERR.__class__.__name__}][{ERR.response['ResponseMetadata']['HTTPStatusCode']}] Failed to establish a connection")
         _logger.debug(f"{str(ERR)}")
+        print("An error occurred (404). File not found")
+        sys.exit(1)
     
     except botoRequestsExceptions.SSLError as ERR:
         _logger.error(f"[{ERR.__class__.__name__}][092] Failed to establish a connection")

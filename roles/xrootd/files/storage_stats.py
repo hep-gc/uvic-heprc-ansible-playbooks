@@ -30,7 +30,6 @@ def checksums(ARGS):
     """
     get the checksum of the file specified
     """
-    # TODO: check for required args
     _storage_share = parse_conf_file(ARGS.config_path)
     _storage_share = S3StorageShare(_storage_share)
     
@@ -51,12 +50,9 @@ def checksums(ARGS):
 
 def reports(ARGS):
     """
-    get the number of files and bytes used in the bucket
+    get the number of bytes and files used in the bucket
     """
-    #TODO: check for required args
-    
     _storage_share = parse_conf_file(ARGS.config_path)
-    print(_storage_share)
     _storage_share = S3StorageShare(_storage_share)
     
     _total_bytes, _total_files = _storage_share.list_objects()
@@ -72,22 +68,22 @@ def parse_conf_file(config_path):
     _storage_share = {}
 
     _keys = {
-        "access_key": "s3.pub_key",
-        "secret_key": "s3.priv_key",
-        "region": "s3.region",
-        "use_https": "ssl_check",
-        "signature_v2": "s3.signature_ver",
+        'access_key': 's3.pub_key',
+        'secret_key': 's3.priv_key',
+        'region': 's3.region',
+        'use_https': 'ssl_check',
+        'signature_v2': 's3.signature_ver',
     }
 
     try:
         _logger.info(f"Reading file '{os.path.realpath(config_path)}'")
         
-        with open(config_path, "r") as _file:
+        with open(config_path, 'r') as _file:
             for _line in _file:
                 _line = _line.strip()
                 
-                if not _line.startswith("#"):
-                    _key, _value = _line.partition("=")[::2]
+                if not _line.startswith('#'):
+                    _key, _value = _line.partition('=')[::2]
                     _key = _key.strip()
                     
                     if _key in _keys:
@@ -95,13 +91,13 @@ def parse_conf_file(config_path):
                         _value = _value.strip()
                         _storage_share.setdefault('plugin_settings', {})
                         
-                        if _key == "signature_v2":
-                            _value = "s3v4" if _value.lower() == "true" else "s3"
+                        if _key == 'signature_v2':
+                            _value = 's3v4' if _value.lower() == 'true' else 's3'
                         
                         _storage_share['plugin_settings'][_setting] = _value
                         _logger.info(f"Setting plugin setting {_setting} to {_value}")
                         
-                    elif _key == "host_bucket":
+                    elif _key == 'host_bucket':
                         _storage_share['url'] = _value.strip()
                         _logger.info(f"Setting url to {_value}")
                     

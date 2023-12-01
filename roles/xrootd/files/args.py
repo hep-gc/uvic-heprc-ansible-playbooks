@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 def parse_args(args):
     """
@@ -9,6 +10,10 @@ def parse_args(args):
     
     add_checksums_subparser(subparser)
     add_reports_subparser(subparser)
+    
+    if len(args) == 0:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
     
     return parser.parse_args(args)
 
