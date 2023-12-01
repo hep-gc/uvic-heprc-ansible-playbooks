@@ -107,11 +107,11 @@
   lineinfile:
     path: /etc/condor/condor_config.local
     regexp: "^ALLOW_DAEMON = *."
-    line: "ALLOW_DAEMON = {{ allow_daemon.stdout }}@*"
+    line: "ALLOW_DAEMON = condor_pool@*"
   when: (htcondor_token_auth is defined) and (htcondor_token_auth == True)
 
 - name: create and save a condor token (saved in /etc/condor/tokens.d)
-  shell: "condor_token_create -identity {{ admin_email }} -token {{ htcondor_fqdn }}"
+  shell: "condor_token_create -identity condor@{{ htcondor_fqdn }} -token {{ htcondor_fqdn }}"
   when: (htcondor_token_auth is defined) and (htcondor_token_auth == True)
 
 - name: restart HTCondor

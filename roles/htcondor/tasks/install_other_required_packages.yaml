@@ -18,13 +18,13 @@
 # TODO see if xorg-x11-apps is really needed
 - name: install other required packages
   package:
-    name: ['@development', 's-nail', 'xauth', 'xorg-x11-fonts-Type1']
+    name: ['gcc', 'git', 's-nail']
     state: latest
   when: ansible_facts['distribution_major_version'] == '9'
 
 - name: install other required packages
   package:
-    name: ['@development', 'mailx', 'xauth', 'xorg-x11-apps', 'xorg-x11-fonts-Type1']
+    name: ['gcc', 'git', 'mailx']
     state: latest
   when: ansible_facts['distribution_major_version'] == '7'
 
@@ -32,4 +32,3 @@
   yum:
     name: epel-release
     state: latest
-
