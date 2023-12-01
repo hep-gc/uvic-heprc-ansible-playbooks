@@ -17,6 +17,9 @@
 - import_tasks: add_s3_credentials.yaml
   when: server_type == "s3_proxy"
 
+- import_tasks: install_s3_storage_stats.yaml
+  when: server_type == "s3_proxy"
+
 - import_tasks: configure_grid_security.yaml
 - import_tasks: configure_xrootd.yaml
 - import_tasks: configure_cmsd.yaml
