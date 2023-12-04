@@ -35,23 +35,21 @@
     replace: 'baseurl = http://mirror.mariadb.org/yum/11.2.1/rhel9-amd64/'
   when: ansible_facts['distribution_major_version'] == '9'
 
-- name: install mariadb (MySQL) packages on centos 7
-  yum:
-    name: ['expect', 'MariaDB-server', 'MariaDB-client', 'MariaDB-devel', 'MariaDB-compat', 'MariaDB-common',
-          'MariaDB-shared', 'zlib-devel', 'openssl-devel', 'MySQL-python', 'python2-PyMySQL']
-    state: latest
-  notify:
-  - restart mariadb
-  when: ansible_facts['distribution_major_version'] == '7'
-
-- name: install mariadb (MySQL) packages on almalinux 9
+- name: install mariadb (MySQL) packages
   yum:
     name: ['expect', 'MariaDB-server', 'MariaDB-client', 'MariaDB-devel', 'MariaDB-common',
           'MariaDB-shared', 'zlib-devel', 'openssl-devel', 'python3-PyMySQL']
     state: latest
   notify:
   - restart mariadb
-  when: ansible_facts['distribution_major_version'] == '9'
+
+- name: install mariadb (MySQL) packages on centos 7
+  yum:
+    name: ['MariaDB-compat', 'MySQL-python', 'python2-PyMySQL']
+    state: latest
+  notify:
+  - restart mariadb
+  when: ansible_facts['distribution_major_version'] == '7'
 
 - name: ensure mariadb is running and enabled with service
   service: name=mariadb state=restarted enabled=yes
@@ -80,7 +78,7 @@
   when:
   - container is defined
   - container == True
-
+  
 - name: secure mariadb database
   script: expect-mariadb_secure_database "{{ database_user_passwords['root'] }}" "{{ database_user_passwords['change_from_old_root'] }}" "{{ ansible_facts['distribution_major_version'] }}" creates=/root/ansible_script_logs/expect-mariadb_secure_database.log
 
