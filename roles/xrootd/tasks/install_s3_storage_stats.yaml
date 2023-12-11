@@ -1,54 +1,23 @@
-# s3_storage_stats.yaml
----
+# # s3_storage_stats.yaml
+# ---
 
-- name: install boto packages
-  shell: python3 -m pip install boto3
+- name: install python3
+  yum:
+    name: python3
 
-- name: copy base file
-  copy:
-    src: base.py
-    dest: /usr/local/bin/base.py
+- name: create s3 proxy log directory
+  file:
+    state: directory
+    path: /var/log/xrootd/s3_proxy
     owner: root
     group: root
-    mode: 0700
 
-- name: copy args file
-  copy:
-    src: args.py
-    dest: /usr/local/bin/args.py
+- name: create log file for storage-stats
+  file:
+    state: touch
+    path: /var/log/xrootd/s3_proxy/storage_stats.log
     owner: root
     group: root
-    mode: 0700
 
-- name: copy storage_stats file
-  copy:
-    src: storage_stats.py
-    dest: /usr/local/bin/storage_stats
-    owner: root
-    group: root
-    mode: 0700
-
-- name: copy logger file
-  copy:
-    src: logger.py
-    dest: /usr/local/bin/logger.py
-    owner: root
-    group: root
-    mode: 0700
-
-- name: copy checksum file
-  copy:
-    src: checksum.sh
-    dest: /usr/local/bin/checksum.sh
-    owner: root
-    group: root
-    mode: 0700
-
-
-- name: copy report file
-  copy:
-    src: report.sh
-    dest: /usr/local/bin/report.sh
-    owner: root
-    group: root
-    mode: 0700
+- name: install s3-storage-stats
+  command: python3 -m pip install s3-storage-stats==1.0.3
