@@ -1,0 +1,38 @@
+SEC_DEFAULT_AUTHENTICATION = REQUIRED
+SEC_DEFAULT_AUTHENTICATION_METHODS = FS, IDTOKENS
+SEC_CLIENT_AUTHENTICATION = REQUIRED
+SEC_CLIENT_AUTHENTICATION_METHODS = FS, IDTOKENS
+
+SEC_DEFAULT_ENCRYPTION = REQUIRED
+SEC_DEFAULT_CRYPTO_METHODS = 3DES
+SEC_DEFAULT_INTEGRITY = REQUIRED
+
+SEC_DAEMON_INTEGRITY = REQUIRED
+SEC_DAEMON_AUTHENTICATION = REQUIRED
+SEC_DAEMON_AUTHENTICATION_METHODS = IDTOKENS
+
+SEC_NEGOTIATOR_INTEGRITY = REQUIRED
+SEC_NEGOTIATOR_AUTHENTICATION = REQUIRED
+SEC_NEGOTIATOR_AUTHENTICATION_METHODS = IDTOKENS
+
+# default: /etc/condor/tokens.d for daemons
+SEC_TOKEN_SYSTEM_DIRECTORY = /etc/condor/tokens.d
+SEC_PASSWORD_DIRECTORY = /etc/condor/passwords.d
+
+# pool signing key and password
+SEC_TOKEN_POOL_SIGNING_KEY_FILE = /etc/condor/passwords.d/POOL
+SEC_PASSWORD_FILE = /etc/condor/passwords.d/password_pool
+
+# keys distributed through a fetch
+# SEC_TOKEN_FETCH_ALLOWED_SIGNING_KEYS = /etc/condor/tokens.d
+
+# clear out any host-based authorizations
+# (unnecessary if you leave authentication REQUIRED,
+#  but useful if you make it optional and want to
+#  allow some unauthenticated operations, such as
+#  ALLOW_READ = */*.cs.wisc.edu)
+ALLOW_READ = *
+ALLOW_WRITE = *
+ALLOW_NEGOTIATOR = 
+ALLOW_ADMINISTRATOR = 
+ALLOW_DAEMON = @*

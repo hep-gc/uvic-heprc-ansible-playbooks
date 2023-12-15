@@ -1,0 +1,5 @@
+---
+# file: htcondor.yaml
+- hosts: htcondor
+  roles:
+  - htcondor
