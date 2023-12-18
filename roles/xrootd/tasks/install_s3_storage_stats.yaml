@@ -20,4 +20,4 @@
     group: root
 
 - name: install s3-storage-stats
-  command: python3 -m pip install s3-storage-stats==1.0.3
+  command: python3 -m pip install s3-storage-stats>=1.0.4
