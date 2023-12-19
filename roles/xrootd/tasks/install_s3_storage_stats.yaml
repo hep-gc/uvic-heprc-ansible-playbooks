@@ -5,19 +5,19 @@
   yum:
     name: python3
 
-- name: create s3 proxy log directory
+- name: create s3 log directory
   file:
     state: directory
-    path: /var/log/xrootd/s3_proxy
+    path: "/var/log/xrootd/{{server_type}}"
     owner: root
     group: root
 
-- name: create log file for storage-stats
+- name: create log file for s3-storage-stats
   file:
     state: touch
-    path: /var/log/xrootd/s3_proxy/storage_stats.log
+    path: "/var/log/xrootd/{{server_type}}/s3_storage_stats.log"
     owner: root
     group: root
 
 - name: install s3-storage-stats
-  command: python3 -m pip install s3-storage-stats>=1.0.4
+  command: python3 -m pip install s3-storage-stats>=1.0.8

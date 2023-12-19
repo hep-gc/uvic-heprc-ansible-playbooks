@@ -14,17 +14,17 @@ def main():
 
     logger.setup_logger(
         logfile=ARGS.logfile,
-        logid=ARGS.logid,
         loglevel=ARGS.loglevel,
+        s3_name=ARGS.s3_name,
         verbose=ARGS.verbose,
     )
 
     if ARGS.cmd == 'checksums':
         checksums(ARGS)
-    
+
     elif ARGS.cmd == 'reports':
         reports(ARGS)
-        
+
 
 def checksums(ARGS):
     """
@@ -32,7 +32,7 @@ def checksums(ARGS):
     """
     _storage_share = parse_conf_file(ARGS.config_path)
     _storage_share = S3StorageShare(_storage_share)
-    
+
     if ARGS.sub_cmd == 'get':
         _checksum = _storage_share.get_object_checksum(
             ARGS.hash_type,
@@ -48,14 +48,15 @@ def checksums(ARGS):
             force=ARGS.force
         )
 
+
 def reports(ARGS):
     """
     get the number of bytes and files used in the bucket
     """
     _storage_share = parse_conf_file(ARGS.config_path)
     _storage_share = S3StorageShare(_storage_share)
-    
-    _total_bytes, _total_files = _storage_share.list_objects()
+
+    _total_bytes, _total_files = _storage_share.list_objects(ARGS.prefix)
     print(_total_bytes, _total_files)
 
 
@@ -77,33 +78,33 @@ def parse_conf_file(config_path):
 
     try:
         _logger.info(f"Reading file '{os.path.realpath(config_path)}'")
-        
+
         with open(config_path, 'r') as _file:
             for _line in _file:
                 _line = _line.strip()
-                
+
                 if not _line.startswith('#'):
                     _key, _value = _line.partition('=')[::2]
                     _key = _key.strip()
-                    
+
                     if _key in _keys:
                         _setting = _keys[_key]
                         _value = _value.strip()
                         _storage_share.setdefault('plugin_settings', {})
-                        
+
                         if _key == 'signature_v2':
                             _value = 's3v4' if _value.lower() == 'true' else 's3'
-                        
+
                         _storage_share['plugin_settings'][_setting] = _value
                         _logger.info(f"Setting plugin setting {_setting} to {_value}")
-                        
+
                     elif _key == 'host_bucket':
                         _storage_share['url'] = _value.strip()
                         _logger.info(f"Setting url to {_value}")
-                    
+
     except UnicodeDecodeError:
         _logger.warning(f"Cannot parse configuration file {config_path}")
-        
+
     return _storage_share
 
 

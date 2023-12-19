@@ -71,30 +71,30 @@ class S3StorageShare:
         """ 
         checks for required plugin settings
         """
-        
+
         _logger.info("Validating configured setitngs.")
-        
+
         for _setting in self.validators:
             _logger.debug(f"Validating setting {_setting}")
-            
+
             try:
                 self.plugin_settings[_setting]
 
             except KeyError:
                 if self.validators[_setting]['required']:
                     _logger.error(f"Missing required setting: {_setting}")
-                    
+
                 else:
                     _logger.warn(f"Missing setting: {_setting}, using default value: {self.validators[_setting]['default']}")
                     self.plugin_settings.update({_setting: self.validators[_setting]['default']})
-            
+
             else:
                 try:
                     if self.plugin_settings[_setting].lower() not in self.validators[_setting]['valid']:
                         _logger.error(f"Invalid setting {self.plugin_settings[_setting]} for {_setting}. \
                             Valid settings: {self.validators[_setting]['valid']}")
                         exit(self.validators[_setting]['status_code'])
-                    
+
                     else:
                         try:
                             self.validators[_setting]['boolean']
@@ -103,10 +103,10 @@ class S3StorageShare:
                         else:
                             self.plugin_settings[_setting] = self.plugin_settings[_setting].lower() == 'true' \
                                 or self.plugin_settings[_setting].lower() == 'yes'
-                                
+
                 except KeyError:
                     pass
-    
+
 
     def get_object_checksum(self, hash_type, object_url):
         """
@@ -135,9 +135,9 @@ class S3StorageShare:
             'Bucket': self.uri['bucket'],
             'Key': object_url,
         }
-        
+
         _result = run_boto_client(_connection, 'head_object', _kwargs)
-        
+
         try:
             _metadata = {k.lower(): v for k, v in _result['Metadata'].items()}
             return _metadata
@@ -196,12 +196,12 @@ class S3StorageShare:
         try:
             # ensure there is new metadata to enter
             assert len(metadata) != 0
-            
+
             _logger.info(f"Updating metdata of object '{object_url}'")
             _logger.debug(f"Metadata being uploaded: '{metadata}'")
-            
+
             run_boto_client(_connection, 'copy_object', _kwargs)
-        
+
         except AssertionError as INFO:
             _logger.info(f"Empty metadata. Skipping API request. {INFO}")
             sys.exit(1)
@@ -228,29 +228,28 @@ class S3StorageShare:
                 retries=dict(max_attempts=0)
             )
         )
-        
+
         return _connection
 
 
-    def list_objects(self):
+    def list_objects(self, prefix):
         """
         get the files in s3 storage, calculate, and 
         return the number of files and bytes used
         """
         _connection = self.get_s3_boto_client()
-        
+
         _total_bytes = 0
         _total_files = 0
-        
+
         _kwargs = {
             'Bucket': self.uri['bucket'],
-            'Prefix': '',
-            # 'Delimiter': '*',
+            'Prefix': prefix,
         }
-        
+
         while True:
             _response = run_boto_client(_connection, 'list_objects', _kwargs)
-            
+
             # check for files in the response
             try:
                 _response['Contents']
@@ -260,13 +259,13 @@ class S3StorageShare:
                 for _file in _response['Contents']:
                     _total_bytes += int(_file['Size'])
                     _total_files += 1
-            
+
             # marker indicating the location of the last file read        
             try:
                 _kwargs['Marker'] = _response['NextMarker']
             except KeyError:
                 break
-                
+
         return int(_total_bytes), _total_files
 
 
@@ -279,13 +278,13 @@ def run_boto_client(_connection, method, _kwargs):
     _result = {}
     try:
         _result = _function(**_kwargs)
-    
+
     except botoExceptions.ClientError as ERR:
         _logger.error(f"[{ERR.__class__.__name__}][{ERR.response['ResponseMetadata']['HTTPStatusCode']}] Failed to establish a connection")
         _logger.debug(f"{str(ERR)}")
         print("An error occurred (404). File not found")
         sys.exit(1)
-    
+
     except botoRequestsExceptions.SSLError as ERR:
         _logger.error(f"[{ERR.__class__.__name__}][092] Failed to establish a connection")
         _logger.debug(f"{str(ERR)}")
@@ -293,13 +292,13 @@ def run_boto_client(_connection, method, _kwargs):
     except botoRequestsExceptions.RequestException as ERR:
         _logger.error(f"[{ERR.__class__.__name__}][400] Failed to establish a connection")
         _logger.debug(f"{str(ERR)}")
-    
+
     except botoExceptions.ParamValidationError as ERR:
         _logger.error(f"[{ERR.__class__.__name__}][095] Failed to establish a connection")
         _logger.debug(f"{str(ERR)}")
-            
+
     except botoExceptions.BotoCoreError as ERR:
         _logger.error(f"[{ERR.__class__.__name__}][400] Failed to establish a connection")
         _logger.debug(f"{str(ERR)}")
-            
+
     return _result

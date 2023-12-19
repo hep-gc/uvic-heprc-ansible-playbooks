@@ -43,6 +43,14 @@ In its simplest form it requires two positional arguments:
 s3-storage-stats checksums get -f [FILE] -t [HASH_TYPE]
 ```
 
+The name option specifies the name of the s3 service. It is used to
+create the logfile path if not otherwise specified. The example below
+will create the logfile at /var/log/xrootd/s3_proxy/s3_storage_stats.log:
+
+```bash
+s3-storage-stats checksums get -f [FILE] -t [HASH_TYPE] -n s3_proxy
+```
+
 A more complex example specifying configuration file, logging file, 
 logging level and verbosity:
 
@@ -55,9 +63,9 @@ Help:
 ```bash
 s3-storage-stats checksums get -h
 usage: s3-storage-stats checksums get [-h] [-c CONFIG_PATH] [--force] [-v]
-                                      [--logfile LOGFILE] [--logid LOGID]
-                                      [--loglevel {DEBUG,INFO,WARNING,ERROR}]
-                                      -t HASH_TYPE -f FILE
+                                         [-n S3_NAME] [--logfile LOGFILE]
+                                         [--loglevel {DEBUG,INFO,WARNING,ERROR}]
+                                         -t HASH_TYPE -f FILE
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -66,11 +74,12 @@ optional arguments:
                         one argument. Default: '/etc/xrootd/s3cfg'.
   --force               Force command execution.
   -v, --verbose         Show on stderr events according to loglevel.
+  -n S3_NAME, --name S3_NAME
+                        Set the name of the s3 service. Default: ''
 
 Logging options:
   --logfile LOGFILE     Set logfiles path. Default:
-                        /var/log/xrootd/s3_proxy/storage_stats.log
-  --logid LOGID         Add this log id to every log line.
+                        /var/log/xrootd/[S3_NAME]/s3_storage_stats.log
   --loglevel {DEBUG,INFO,WARNING,ERROR}
                         Set log output level. Default: WARNING.
 
@@ -89,7 +98,15 @@ to the file's metadata. Nothing is returned unless the process encounters errors
 In its simplest form it requires three positional arguments:
 
 ```bash
-s3-storage-stats checksums get -f [FILE] -t [HASH_TYPE] --checksum [CHECKSUM]
+s3-storage-stats checksums put -f [FILE] -t [HASH_TYPE] --checksum [CHECKSUM]
+```
+
+The name option specifies the name of the s3 service. It is used to
+create the logfile path if not otherwise specified. The example below
+will create the logfile at /var/log/xrootd/s3_proxy/s3_storage_stats.log:
+
+```bash
+s3-storage-stats checksums put -f [FILE] -t [HASH_TYPE] --checksum [CHECKSUM] -n s3_proxy
 ```
 
 A more complex example specifying configuration file path, logging file and level,
@@ -104,9 +121,10 @@ Help:
 ```bash
 s3-storage-stats checksums put -h
 usage: s3-storage-stats checksums put [-h] [-c CONFIG_PATH] [--force] [-v]
-                                      [--logfile LOGFILE] [--logid LOGID]
-                                      [--loglevel {DEBUG,INFO,WARNING,ERROR}]
-                                      -t HASH_TYPE -f FILE --checksum CHECKSUM
+                                         [-n S3_NAME] [--logfile LOGFILE]
+                                         [--loglevel {DEBUG,INFO,WARNING,ERROR}]
+                                         -t HASH_TYPE -f FILE --checksum
+                                         CHECKSUM
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -115,11 +133,12 @@ optional arguments:
                         one argument. Default: '/etc/xrootd/s3cfg'.
   --force               Force command execution.
   -v, --verbose         Show on stderr events according to loglevel.
+  -n S3_NAME, --name S3_NAME
+                        Set the name of the s3 service. Default: ''
 
 Logging options:
   --logfile LOGFILE     Set logfiles path. Default:
-                        /var/log/xrootd/s3_proxy/storage_stats.log
-  --logid LOGID         Add this log id to every log line.
+                        /var/log/xrootd/[S3_NAME]/s3_storage_stats.log
   --loglevel {DEBUG,INFO,WARNING,ERROR}
                         Set log output level. Default: WARNING.
 
@@ -127,7 +146,7 @@ Checksum required options:
   -t HASH_TYPE, --hash_type HASH_TYPE
                         Type of checksum hash. ['adler32', md5] Required.
   -f FILE, --file FILE  URL of object/file to request checksum of. Required.
-  --checksum CHECKSUM   String with checksum to set. ['adler32', md5] Required
+  --checksum CHECKSUM   String with checksum to set. Required.
 ```
 
 ---
@@ -142,6 +161,21 @@ In its simplest form, the reports command requires no addition arguments:
 s3-storage-stats reports
 ```
 
+The name option specifies the name of the s3 service. It is used to
+create the logfile path if not otherwise specified. The example below
+will create the logfile at /var/log/xrootd/s3_proxy/s3_storage_stats.log:
+
+```bash
+s3-storage-stats reports -n s3_proxy
+```
+
+The prefix option allows the user to specify a path prefix for the file and byte counts.
+This can be used to count only the files in a specific directory:
+
+```bash
+s3-storage-stats reports --prefix='/directory_name'
+```
+
 A more complex example specifying configuration file path, logging file and level,
 and verbosity:
 
@@ -152,10 +186,12 @@ s3-storage-stats reports -c /etc/xrootd/s3_config --loglevel=WARNING --logfile='
 Help:
 
 ```bash
+s3-storage-stats reports -h
 usage: s3-storage-stats reports [-h] [-c CONFIG_PATH] [--force] [-v]
-                                [--logfile LOGFILE] [--logid LOGID]
-                                [--loglevel {DEBUG,INFO,WARNING,ERROR}]
-                                {} ...
+                                   [-n S3_NAME] [--logfile LOGFILE]
+                                   [--loglevel {DEBUG,INFO,WARNING,ERROR}]
+                                   [-p PREFIX]
+                                   {} ...
 
 positional arguments:
   {}
@@ -167,11 +203,41 @@ optional arguments:
                         one argument. Default: '/etc/xrootd/s3cfg'.
   --force               Force command execution.
   -v, --verbose         Show on stderr events according to loglevel.
+  -n S3_NAME, --name S3_NAME
+                        Set the name of the s3 service. Default: ''
 
 Logging options:
   --logfile LOGFILE     Set logfiles path. Default:
-                        /var/log/xrootd/s3_proxy/storage_stats.log
-  --logid LOGID         Add this log id to every log line.
+                        /var/log/xrootd/[S3_NAME]/s3_storage_stats.log
   --loglevel {DEBUG,INFO,WARNING,ERROR}
                         Set log output level. Default: WARNING.
+
+Report options:
+  -p PREFIX, --prefix PREFIX
+                        Prefix for directory path. Default: ''
 ```
+
+## Configuration
+The configuration file should be in the following format:
+
+```bash
+# Setup endpoint
+host_base = [ENDPOINT_URL]
+host_bucket = [ENDPOINT_URL]/[BUCKET]
+region = [REGION]
+use_https = boolean
+
+# Setup access keys
+access_key = [ACCESS_KEY]
+secret_key = [SECRET_KEY]
+
+# Enable S3 v4 signature API
+signature_v2 = boolean
+
+```
+
+
+## References
+Based on: https://pypi.org/project/dynafed-storagestats/
+
+[Source Code] https://github.com/hep-gc/dynafed_storagestats

@@ -1,7 +1,7 @@
 #!/bin/bash
 get_report()
 {
-    local values=$(python3 /tmp/storage_stats.py reports)
+    local values=$(s3-storage-stats reports)
 
     echo $values
 }
