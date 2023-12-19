@@ -2,9 +2,9 @@
 
 import os
 import sys
-from base import S3StorageShare
-from args import parse_args
-import logger
+from s3_storage_stats.base import S3StorageShare
+from s3_storage_stats.args import parse_args
+import s3_storage_stats.logger as logger
 import logging
 
 
