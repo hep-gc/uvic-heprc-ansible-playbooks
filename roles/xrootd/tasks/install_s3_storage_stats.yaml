@@ -20,4 +20,20 @@
     group: root
 
 - name: install s3-storage-stats
-  command: python3 -m pip install s3-storage-stats>=1.0.8
+  command: python3 -m pip install s3-storage-stats>=1.0.9
+
+- name: copy checksum script to the machine
+  template:
+    src: checksum.sh
+    dest: /usr/local/bin/checksum.sh
+    owner: root
+    group: root
+    mode: 0700
+
+- name: copy the reports script to the machine
+  template:
+    src: report.sh
+    dest: /usr/local/bin/report.sh
+    owner: root
+    group: root
+    mode: 0700

@@ -30,7 +30,7 @@ get_checksum()
     local method=$2
     local bucket=$3
     
-    local chksum=$(s3-storage-stats checksums get -f $filepath -t $method)
+    local chksum=$(s3-storage-stats checksums get -f $filepath -t $method -n "{{ server_type }}")
     if [ "$chksum" == "None" ];
     then
         chksum=$(calculate_checksum $filepath $method $bucket)
@@ -46,7 +46,7 @@ put_checksum()
     local filepath=$2
     local chksum=$3
 
-    s3-storage-stats checksums put --checksum=$chksum -f $filepath -t $method
+    s3-storage-stats checksums put --checksum=$chksum -f $filepath -t $method -n "{{ server_type }}"
 
 }
 
