@@ -1,0 +1,126 @@
+# configure_htcondor.yaml
+
+- name: remove minicondor file
+  file:
+    dest: /etc/condor/config.d/00-minicondor
+    state: absent
+
+- name: open HTCondor service port
+  firewalld: zone=public port="{{ htcondor_collector_port }}/tcp"  state=enabled immediate=yes permanent=yes
+  ignore_errors: yes
+
+- name: open HTCondor ephemeral ports
+  firewalld: zone=public port="{{ htcondor_low_port }}-{{ htcondor_high_port }}/tcp"  state=enabled immediate=yes permanent=yes
+  ignore_errors: yes
+
+- name: HTCondor local configuration
+  template:
+    src: etc_condor_condor_config.local.j2
+    dest: /etc/condor/condor_config.local
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+  - reconfigure condor
+
+- name: HTCondor configure
+  template:
+    src: "etc_condor_config.d_{{ item }}.j2"
+    dest: "/etc/condor/config.d/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+  - ports
+  notify:
+  - reconfigure condor
+
+- name: HTCondor configure
+  copy:
+    src: "etc_condor_config.d_{{ item }}"
+    dest: "/etc/condor/config.d/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+  - default_request
+  - defrag
+  - scaling
+  - system_hold
+  notify:
+  - reconfigure condor
+
+- name: enable HTCondor gsi configuration
+  template:
+    src: "etc_condor_config.d_gsi.j2"
+    dest: "/etc/condor/config.d/gsi"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+  - reconfigure condor
+  when: (htcondor_gsi is defined) and (htcondor_gsi == True)
+
+- name: enable HTCondor IDTokens configuration
+  template:
+    src: "etc_condor_config.d_idtokens.j2"
+    dest: "/etc/condor/config.d/idtokens"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+  - reconfigure condor
+  when: (htcondor_token_auth is defined) and (htcondor_token_auth == True)
+
+- name: disable HTCondor IDTokens if it is not required
+  file:
+    dest: "/etc/condor/config.d/idtokens"
+    state: absent
+  notify:
+  - reconfigure condor
+  when: (htcondor_token_auth is undefined) or (htcondor_token_auth == False)
+
+- name: disable HTCondor GSI if it is not required
+  file: 
+    dest: "/etc/condor/config.d/gsi"
+    state: absent
+  notify:
+  - reconfigure condor
+  when: (htcondor_gsi is undefined) or (htcondor_gsi == False)
+
+- name: install the grid-mapfile if GSI is required
+  template:
+    src: etc_grid-security_grid-mapfile.j2
+    dest: /etc/grid-security/grid-mapfile
+    owner: root
+    group: root
+    mode: 0644
+  when:
+  - (htcondor_gsi is defined) and (htcondor_gsi == True)
+
+- name: get the new value for allow daemon
+  shell: echo "{{ admin_email }}" | cut -d@ -f 1
+  register: allow_daemon
+  when: (htcondor_token_auth is defined) and (htcondor_token_auth == True)
+
+- name: update HTCondor allow daemon configuration
+  lineinfile:
+    path: /etc/condor/condor_config.local
+    regexp: "^ALLOW_DAEMON = *."
+    line: "ALLOW_DAEMON = condor_pool@*"
+  when: (htcondor_token_auth is defined) and (htcondor_token_auth == True)
+
+- name: create and save a condor token (saved in /etc/condor/tokens.d)
+  shell: "condor_token_create -identity condor@{{ htcondor_fqdn }} -token {{ htcondor_fqdn }}"
+  when: (htcondor_token_auth is defined) and (htcondor_token_auth == True)
+
+- name: restart HTCondor
+  service:
+    name: condor
+    enabled: yes
+    state: restarted
+  ignore_errors: yes
+
+- name: wait for condor
+  wait_for:
+    timeout: 5

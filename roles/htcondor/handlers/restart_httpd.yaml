@@ -1,0 +1,5 @@
+---
+# restart_httpd.yaml
+- name: restart httpd with service
+  service: name=httpd enabled=yes state=restarted
+  listen: restart httpd

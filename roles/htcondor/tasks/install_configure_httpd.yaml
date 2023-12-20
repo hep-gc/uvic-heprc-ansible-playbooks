@@ -1,0 +1,15 @@
+---
+# install_configure_httpd.yaml
+
+- name: install packages required by httpd
+  yum:
+    name: ['httpd']
+    state: latest
+  notify:
+  - restart httpd
+
+- name: enable and start httpd
+  service:
+    name: httpd
+    enabled: yes
+    state: restarted

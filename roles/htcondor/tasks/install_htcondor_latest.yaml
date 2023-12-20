@@ -1,0 +1,25 @@
+# install_htcondor_latest.yaml
+
+- name: download htcondor script
+  get_url:
+    url: https://get.htcondor.org
+    dest: /tmp/install_htcondor.sh
+    validate_certs: yes
+
+- name: run the script
+  shell: /bin/bash /tmp/install_htcondor.sh --no-dry-run --channel stable
+  ignore_errors: yes
+
+- name: allow SHA1 Hashing
+  shell: update-crypto-policies --set DEFAULT:SHA1
+  when: ansible_facts['distribution_major_version'] == '9'
+
+- name: install HTCondor repository GPG keys
+  rpm_key:
+    key: http://research.cs.wisc.edu/htcondor/yum/RPM-GPG-KEY-HTCondor
+    state: present
+
+- name: install HTCondor
+  yum:
+    name: ['condor-all']
+    state: latest
