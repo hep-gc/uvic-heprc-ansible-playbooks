@@ -3,7 +3,7 @@ import logging
 import logging.handlers
 import os
 
-def setup_logger(logfile, loglevel, s3_name, verbose):
+def setup_logger(logfile, loglevel, xrootd_name, verbose):
     """Setup the logger format to be used throughout the script.
 
     Arguments:
@@ -23,7 +23,7 @@ def setup_logger(logfile, loglevel, s3_name, verbose):
     _logger.setLevel(_num_loglevel)
 
     # create default value for logfile if not specified
-    logfile = logfile or os.path.join("/var/log/xrootd/", s3_name, "s3_storage_stats.log")        
+    logfile = logfile or os.path.join("/var/log/xrootd/", xrootd_name, "s3_storage_stats.log")        
 
     # Set file where to log and the mode to use and set the format to use.
     _log_handler_file = logging.handlers.TimedRotatingFileHandler(

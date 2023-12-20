@@ -15,7 +15,7 @@ def main():
     logger.setup_logger(
         logfile=ARGS.logfile,
         loglevel=ARGS.loglevel,
-        s3_name=ARGS.s3_name,
+        xrootd_name=ARGS.xrootd_name,
         verbose=ARGS.verbose,
     )
 

@@ -163,16 +163,6 @@ def add_general_options(parser):
         help="Show on stderr events according to loglevel."
     )
 
-    parser.add_argument(
-        '-n', '--name',
-        action='store',
-        default='',
-        dest='s3_name',
-        help="Set the name of the s3 service. "
-             "Default: ''"
-    )
-
-
 
 def add_logging_options(parser):
     """Add logging optional arguments.
@@ -190,7 +180,7 @@ def add_logging_options(parser):
         default=False,
         dest='logfile',
         help="Set logfiles path. "
-             "Default: /var/log/xrootd/[S3_NAME]/s3_storage_stats.log"
+             "Default: /var/log/xrootd/[XROOTD_NAME]/s3_storage_stats.log"
     )
 
     group_logging.add_argument(
@@ -201,4 +191,14 @@ def add_logging_options(parser):
         dest='loglevel',
         help="Set log output level. "
         "Default: WARNING."
+    )
+
+    group_logging.add_argument(
+        '-n', '--name',
+        action='store',
+        default='',
+        dest='xrootd_name',
+        help="Set the name of the xrootd instance. "
+             "Used in the logfile path. "
+             "Default: ''"
     )

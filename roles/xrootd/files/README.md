@@ -25,7 +25,6 @@ positional arguments:
 
 optional arguments:
   -h, --help           show this help message and exit
-
 ```
 
 #### Sub-commands
@@ -63,9 +62,9 @@ Help:
 ```bash
 s3-storage-stats checksums get -h
 usage: s3-storage-stats checksums get [-h] [-c CONFIG_PATH] [--force] [-v]
-                                         [-n S3_NAME] [--logfile LOGFILE]
+                                         [--logfile LOGFILE]
                                          [--loglevel {DEBUG,INFO,WARNING,ERROR}]
-                                         -t HASH_TYPE -f FILE
+                                         [-n XROOTD_NAME] -t HASH_TYPE -f FILE
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -74,14 +73,15 @@ optional arguments:
                         one argument. Default: '/etc/xrootd/s3cfg'.
   --force               Force command execution.
   -v, --verbose         Show on stderr events according to loglevel.
-  -n S3_NAME, --name S3_NAME
-                        Set the name of the s3 service. Default: ''
 
 Logging options:
   --logfile LOGFILE     Set logfiles path. Default:
-                        /var/log/xrootd/[S3_NAME]/s3_storage_stats.log
+                        /var/log/xrootd/[XROOTD_NAME]/s3_storage_stats.log
   --loglevel {DEBUG,INFO,WARNING,ERROR}
                         Set log output level. Default: WARNING.
+  -n XROOTD_NAME, --name XROOTD_NAME
+                        Set the name of the xrootd instance. Used in the
+                        logfile path. Default: ''
 
 Checksum required options:
   -t HASH_TYPE, --hash_type HASH_TYPE
@@ -121,10 +121,10 @@ Help:
 ```bash
 s3-storage-stats checksums put -h
 usage: s3-storage-stats checksums put [-h] [-c CONFIG_PATH] [--force] [-v]
-                                         [-n S3_NAME] [--logfile LOGFILE]
+                                         [--logfile LOGFILE]
                                          [--loglevel {DEBUG,INFO,WARNING,ERROR}]
-                                         -t HASH_TYPE -f FILE --checksum
-                                         CHECKSUM
+                                         [-n XROOTD_NAME] -t HASH_TYPE -f FILE
+                                         --checksum CHECKSUM
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -133,14 +133,15 @@ optional arguments:
                         one argument. Default: '/etc/xrootd/s3cfg'.
   --force               Force command execution.
   -v, --verbose         Show on stderr events according to loglevel.
-  -n S3_NAME, --name S3_NAME
-                        Set the name of the s3 service. Default: ''
 
 Logging options:
   --logfile LOGFILE     Set logfiles path. Default:
-                        /var/log/xrootd/[S3_NAME]/s3_storage_stats.log
+                        /var/log/xrootd/[XROOTD_NAME]/s3_storage_stats.log
   --loglevel {DEBUG,INFO,WARNING,ERROR}
                         Set log output level. Default: WARNING.
+  -n XROOTD_NAME, --name XROOTD_NAME
+                        Set the name of the xrootd instance. Used in the
+                        logfile path. Default: ''
 
 Checksum required options:
   -t HASH_TYPE, --hash_type HASH_TYPE
@@ -188,9 +189,9 @@ Help:
 ```bash
 s3-storage-stats reports -h
 usage: s3-storage-stats reports [-h] [-c CONFIG_PATH] [--force] [-v]
-                                   [-n S3_NAME] [--logfile LOGFILE]
+                                   [--logfile LOGFILE]
                                    [--loglevel {DEBUG,INFO,WARNING,ERROR}]
-                                   [-p PREFIX]
+                                   [-n XROOTD_NAME] [-p PREFIX]
                                    {} ...
 
 positional arguments:
@@ -203,14 +204,15 @@ optional arguments:
                         one argument. Default: '/etc/xrootd/s3cfg'.
   --force               Force command execution.
   -v, --verbose         Show on stderr events according to loglevel.
-  -n S3_NAME, --name S3_NAME
-                        Set the name of the s3 service. Default: ''
 
 Logging options:
   --logfile LOGFILE     Set logfiles path. Default:
-                        /var/log/xrootd/[S3_NAME]/s3_storage_stats.log
+                        /var/log/xrootd/[XROOTD_NAME]/s3_storage_stats.log
   --loglevel {DEBUG,INFO,WARNING,ERROR}
                         Set log output level. Default: WARNING.
+  -n XROOTD_NAME, --name XROOTD_NAME
+                        Set the name of the xrootd instance. Used in the
+                        logfile path. Default: ''
 
 Report options:
   -p PREFIX, --prefix PREFIX

@@ -114,12 +114,12 @@ class S3StorageShare:
         returns None if the metadata does not exist
         """
         _metadata = self.get_object_metadata(object_url)
-        
+
         try:
             _logger.info(f"Checking if metadata contains checksum of hash type {hash_type}")
             _logger.debug(f"Metadata being checked: {_metadata}")
             return _metadata[hash_type]
-        
+
         except KeyError:
             _logger.warning(f"No checksum found for hash type {hash_type}")
             return None
@@ -158,14 +158,14 @@ class S3StorageShare:
             # no metadata exists of this hash type, add metadata
             _metadata.setdefault(hash_type, checksum)
             _logger.info(f"New metadata detected, calling API to upload: {_metadata}")
-            
+
             self.put_object_metadata(_metadata, object_url)
 
         elif force:
             # metadata already exists, replace metadata
             _metadata[hash_type] = checksum
             _logger.info(f"Force flag detected, calling API to update: {_metadata}")
-            
+
             self.put_object_metadata(_metadata, object_url)
 
         else:
