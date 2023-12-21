@@ -1,0 +1,39 @@
+# # s3_storage_stats.yaml
+# ---
+
+- name: install python3
+  yum:
+    name: python3
+
+- name: create s3 log directory
+  file:
+    state: directory
+    path: "/var/log/xrootd/{{server_type}}"
+    owner: root
+    group: root
+
+- name: create log file for s3-storage-stats
+  file:
+    state: touch
+    path: "/var/log/xrootd/{{server_type}}/s3_storage_stats.log"
+    owner: root
+    group: root
+
+- name: install s3-storage-stats
+  command: python3 -m pip install s3-storage-stats>=1.0.9
+
+- name: copy checksum script to the machine
+  template:
+    src: checksum.sh
+    dest: /usr/local/bin/checksum.sh
+    owner: root
+    group: root
+    mode: 0700
+
+- name: copy the reports script to the machine
+  template:
+    src: report.sh
+    dest: /usr/local/bin/report.sh
+    owner: root
+    group: root
+    mode: 0700
