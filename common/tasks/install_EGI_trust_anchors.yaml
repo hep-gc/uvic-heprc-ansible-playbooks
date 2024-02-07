@@ -8,7 +8,8 @@
     owner: root
     group: root
     mode: 0755
-
+    force: no
+    
 - name: install EGI trust anchors
   yum:
     name: ca-policy-egi-core

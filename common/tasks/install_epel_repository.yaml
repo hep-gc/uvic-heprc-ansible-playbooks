@@ -1,7 +1,12 @@
 ---
 # file: install_epel_repository.yaml
+- name: check if epel is already installed using a local mirror
+  stat: 
+    path: /etc/yum.repos.d/epel.repo
+  register: epel_test_result
+    
 - name: Install epel repository
   package:
     name: epel-release
     state: present
-      
+  when: epel_test_result.stat.exists == False
