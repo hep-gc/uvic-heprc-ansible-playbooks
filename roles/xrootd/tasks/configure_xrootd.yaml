@@ -55,20 +55,20 @@
     state: directory
   when: server_type == "s3_proxy"
 
-- name: Generate macaroon secret
-  command: 
-     cmd: openssl rand -base64 -out {{role_path}}/files/macaroon-secret 64
-     creates: "{{role_path}}/files/macaroon-secret"
-  delegate_to: 127.0.0.1
-  run_once: True
+#- name: Generate macaroon secret
+#  command: 
+#     cmd: openssl rand -base64 -out {{role_path}}/files/macaroon-secret 64
+#     creates: "{{role_path}}/files/macaroon-secret"
+#  delegate_to: 127.0.0.1
+#  run_once: True
 
-- name: Copy macaroon secret
-  copy:
-    src: macaroon-secret
-    dest: "/etc/xrootd/macaroon-secret"
-    owner: xrootd
-    group: xrootd
-    mode: 0600
+#- name: Copy macaroon secret
+#  copy:
+#    src: macaroon-secret
+#    dest: "/etc/xrootd/macaroon-secret"
+#    owner: xrootd
+#    group: xrootd
+#    mode: 0600
 
 - name: Enable XRootD service
   systemd:
