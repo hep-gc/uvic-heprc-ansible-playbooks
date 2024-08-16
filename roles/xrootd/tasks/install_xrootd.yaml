@@ -10,3 +10,14 @@
   package:
     name: xrootd, xrootd-voms, xrootd-client
     state: latest
+
+- name: open xrootd port 1094
+  firewalld: zone=public port=1094/tcp state=enabled permanent=true
+  notify:
+    - restart firewalld
+
+- name: open xrootd port 1095
+  firewalld: zone=public port=1095/tcp state=enabled permanent=true
+  notify:
+    - restart firewalld
+
