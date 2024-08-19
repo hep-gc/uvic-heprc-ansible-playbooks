@@ -46,7 +46,7 @@
     dest: /etc/grid-security/vomsdir/belle/voms.cc.kek.jp.pem
 
 
-#- name: add vomses file
-#  copy: 
-#    src: etc_vomses_belle
-#    dest: /etc/vomses/belle
+- name: add vomses file
+  copy: 
+    src: etc_vomses_belle
+    dest: /etc/vomses/belle
