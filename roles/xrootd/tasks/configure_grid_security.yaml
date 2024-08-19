@@ -19,6 +19,8 @@
     dest: /etc/grid-security/xrd/xrdcert.pem
     owner: xrootd
     group: xrootd
+    mode: 0644
+    
 - name: Add xrdkey
   copy:
     remote_src: true
@@ -28,12 +30,23 @@
     group: xrootd
     mode: 0600
 
-- name: Ensure belle directory exists
+- name: Ensure belle vomsdir directory exists
   file:
     path: /etc/grid-security/vomsdir/belle
     state: directory
 
+- name: Ensure vomses directory exists
+  file:
+    path: /etc/vomses
+    state: directory
+
 - name: Add KEK voms file
   copy:
-    src: voms.cc.kek.jp.lsc
-    dest: /etc/grid-security/vomsdir/belle/voms.cc.kek.jp.lsc
+    src: voms.cc.kek.jp.pem
+    dest: /etc/grid-security/vomsdir/belle/voms.cc.kek.jp.pem
+
+
+#- name: add vomses file
+#  copy: 
+#    src: etc_vomses_belle
+#    dest: /etc/vomses/belle
