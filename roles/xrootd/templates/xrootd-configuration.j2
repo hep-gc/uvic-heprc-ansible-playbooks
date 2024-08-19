@@ -36,11 +36,12 @@ fi
 # TLS Setup
 xrd.tls /etc/grid-security/xrd/xrdcert.pem /etc/grid-security/xrd/xrdkey.pem
 xrd.tlsca certdir /etc/grid-security/certificates
+xrd.tlscipher all
 xrootd.tls all -data
 
-if $redirector
+#if $redirector
   # Pass
-else
+#else
   xrootd.seclib libXrdSec.so
   sec.protocol gsi -dlgpxy:request \
                    -exppxy:=creds \
@@ -49,31 +50,30 @@ else
                    -gmapopt:nomap \
                    -vomsat:require \
                    -vomsfun:default
-fi
+#fi
 
-xrootd.seclib libXrdSec.so
-http.secxtractor libXrdHttpVOMS.so
+#http.secxtractor libXrdHttpVOMS.so
 
 if exec xrootd
-  xrd.protocol http libXrdHttp.so
+  xrd.protocol http:1094 libXrdHttp.so
 fi
 
 # Authorization configuration
 ofs.authorize
 acc.audit deny grant
-acc.authdb /etc/xrootd/Authfile
+acc.authdb /mnt/xrootd/Authfile
 
 # TPC Setup
-xrootd.chksum adler32
+xrootd.chksum max 80 adler32
 
-ofs.tpc fcreds ?gsi =X509_USER_PROXY
-ofs.tpc require client gsi
-ofs.tpc scan stderr
-ofs.tpc echo
-ofs.tpc ttl 300 600
-ofs.tpc xfr 100
-ofs.tpc autorm
-ofs.tpc pgm /etc/xrootd/tpc.sh
+#ofs.tpc fcreds ?gsi =X509_USER_PROXY
+#ofs.tpc require client gsi
+#ofs.tpc scan stderr
+#ofs.tpc echo
+#ofs.tpc ttl 300 600
+#ofs.tpc xfr 100
+#ofs.tpc autorm
+#ofs.tpc pgm /etc/xrootd/tpc.sh
 
 
 http.exthandler xrdtpc libXrdHttpTPC.so
@@ -81,7 +81,8 @@ http.header2cgi Authorization authz
 http.staticpreload http://static/robots.txt /etc/xrootd/robots.txt
 
 # Macaroon setup
+http.secretkey /mnt/xrootd/macaroon-secret
 http.exthandler xrdmacaroons libXrdMacaroons.so
-macaroons.secretkey /etc/xrootd/macaroon-secret
-all.sitename test-sitename
-ofs.authlib libXrdMacaroons.so
+macaroons.secretkey /mnt/xrootd/macaroon-secret
+all.sitename UVic-RAW-SE
+ofs.authlib ++ libXrdMacaroons.so
