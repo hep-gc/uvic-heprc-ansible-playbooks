@@ -17,7 +17,7 @@
     dest: /etc/xrootd/robots.txt
 
 - name: Add Authfile
-  template:
+  copy:
     src: Authfile
     dest: "/etc/xrootd/Authfile"
     owner: xrootd
@@ -70,8 +70,8 @@
 #    group: xrootd
 #    mode: 0600
 
-- name: Enable XRootD service
-  systemd:
-    name: xrootd@{{server_type}}
-    enabled: true
-    state: restarted
+#- name: Enable XRootD service
+#  systemd:
+#    name: xrootd@{{server_type}}
+#    enabled: true
+#    state: restarted
