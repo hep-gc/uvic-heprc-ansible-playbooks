@@ -4,22 +4,46 @@
 # {{export_path}}
 # {{localroot}}
 
+- name: Create xrootd conf directories 
+  file:
+    path: /var/spool/xrootd/config
+    state: directory
+    owner: xrootd
+    group: xrootd
+
+- name: Create xrootd bin directories 
+  file:
+    path: /var/spool/xrootd/bin
+    state: directory
+    owner: xrootd
+    group: xrootd
+
+- name: Create xrootd log directories 
+  file:
+    path: /var/spool/xrootd/log
+    state: directory
+    owner: xrootd
+    group: xrootd
+
+
 - name: Add xrootd server configuration
   template:
     src: xrootd-configuration.j2
-    dest: "/etc/xrootd/xrootd-{{server_type}}.cfg"
+    dest: "/var/spool/xrootd/config/xrootd-rdc.cfg"
     owner: xrootd
     group: xrootd
 
 - name: Add robots.txt
   copy:
     src: robots.txt
-    dest: /etc/xrootd/robots.txt
+    dest: /var/spool/xrootd/config/robots.txt
+    owner: xrootd
+    group: xrootd
 
 - name: Add Authfile
   copy:
     src: Authfile
-    dest: "/etc/xrootd/Authfile"
+    dest: "/var/spool/xrootd/config/Authfile"
     owner: xrootd
     group: xrootd
 
@@ -34,7 +58,7 @@
 - name: Add the standalone tpc script
   template:
     src: tpc.sh
-    dest: "/etc/xrootd/tpc.sh"
+    dest: "/var/spool/xrootd/bin/tpc.sh"
     owner: xrootd
     group: xrootd
     mode: u+x
@@ -43,7 +67,7 @@
 - name: Add the s3 tpc script
   template:
     src: tpc-s3.sh
-    dest: "/etc/xrootd/tpc.sh"
+    dest: "/var/spool/xrootd/bin/tpc.sh"
     owner: xrootd
     group: xrootd
     mode: u+x
@@ -62,16 +86,41 @@
 #  delegate_to: 127.0.0.1
 #  run_once: True
 
-#- name: Copy macaroon secret
-#  copy:
-#    src: macaroon-secret
-#    dest: "/etc/xrootd/macaroon-secret"
-#    owner: xrootd
-#    group: xrootd
-#    mode: 0600
+- name: Copy macaroon secret
+  copy:
+    src: /root/xrootd//macaroon-secret
+    dest: "/var/spool/xrootd/config/macaroon-secret"
+    owner: xrootd
+    group: xrootd
+    mode: 0600
 
 #- name: Enable XRootD service
 #  systemd:
 #    name: xrootd@{{server_type}}
 #    enabled: true
 #    state: restarted
+- name: Copy start script
+  copy:
+    src: start-xrootd.sh
+    dest: /var/spool/xrootd/bin/start-xrootd.sh
+    owner: xrootd
+    group: xrootd
+    mode: u+x
+
+- name: Copy end script
+  copy:
+    src: end-xrootd.sh
+    dest: /var/spool/xrootd/bin/end-xrootd.sh
+    owner: xrootd
+    group: xrootd
+    mode: u+x
+
+- name: Copy monitor script
+  copy:
+    src: monitor-xrd.sh
+    dest: /var/spool/xrootd/bin/monitor-xrd.sh
+    owner: xrootd
+    group: xrootd
+    mode: u+x
+
+
