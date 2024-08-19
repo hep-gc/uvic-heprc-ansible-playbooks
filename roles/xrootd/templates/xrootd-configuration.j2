@@ -28,7 +28,7 @@ else if named s3_proxy
   setenv AWS_ACCESS_KEY_ID < /etc/xrootd/access_key
   setenv AWS_SECRET_ACCESS_KEY < /etc/xrootd/secret_key
 
-else if named standalone
+else
   all.role server
   oss.localroot {{localroot}}
 fi
@@ -61,7 +61,7 @@ fi
 # Authorization configuration
 ofs.authorize
 acc.audit deny grant
-acc.authdb /mnt/xrootd/Authfile
+acc.authdb /var/spool/xrootd/config/Authfile
 
 # TPC Setup
 xrootd.chksum max 80 adler32
@@ -73,16 +73,16 @@ xrootd.chksum max 80 adler32
 #ofs.tpc ttl 300 600
 #ofs.tpc xfr 100
 #ofs.tpc autorm
-#ofs.tpc pgm /etc/xrootd/tpc.sh
+#ofs.tpc pgm /var/spool/xrootd/bin/tpc.sh
 
 
 http.exthandler xrdtpc libXrdHttpTPC.so
 http.header2cgi Authorization authz
-http.staticpreload http://static/robots.txt /etc/xrootd/robots.txt
+http.staticpreload http://static/robots.txt /var/spool/xrootd/config/robots.txt
 
 # Macaroon setup
-http.secretkey /mnt/xrootd/macaroon-secret
+http.secretkey /var/spool/xrootd/config/macaroon-secret
 http.exthandler xrdmacaroons libXrdMacaroons.so
-macaroons.secretkey /mnt/xrootd/macaroon-secret
+macaroons.secretkey /var/spool/xrootd/config/macaroon-secret
 all.sitename UVic-RAW-SE
 ofs.authlib ++ libXrdMacaroons.so
