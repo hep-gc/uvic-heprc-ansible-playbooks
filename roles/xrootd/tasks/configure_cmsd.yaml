@@ -6,8 +6,8 @@
     owner: xrootd
     group: xrootd
   
-- name: Restart cmsd
-  systemd:
-    name: cmsd@{{server_type}}
-    enabled: true
-    state: restarted
+#- name: Restart cmsd
+#  systemd:
+#    name: cmsd@{{server_type}}
+#    enabled: true
+#    state: restarted
