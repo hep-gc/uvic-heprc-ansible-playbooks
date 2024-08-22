@@ -79,6 +79,7 @@ xrootd.chksum max 80 adler32
 http.exthandler xrdtpc libXrdHttpTPC.so
 http.header2cgi Authorization authz
 http.staticpreload http://static/robots.txt /var/spool/xrootd/config/robots.txt
+http.secxtractor libXrdVoms.so
 
 # Macaroon setup
 http.secretkey /var/spool/xrootd/config/macaroon-secret
