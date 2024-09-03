@@ -8,7 +8,7 @@ admin_email: root@localhost
 csv2_branch: stable-2.10
 
 # FQDN for the ci server (for both web hosting and certificate purposes
-csv2_ci_fqdn: <REPLACE ME>
+csv2_ci_fqdn: 206.12.154.76
 
 # password for the JKS file and conversion steps
 jenkins_ssl_pw: <REPLACE ME>
@@ -16,7 +16,7 @@ jenkins_ssl_pw: <REPLACE ME>
 
 i_service_connection:
 -
-    ipv4: <REPLACE ME> # IPV4 address of your target csv2 host
+    ipv4: 206.12.154.76 # IPV4 address of your target csv2 host
     ipv4fqdn: '{{ csv2_ci_fqdn }}'
 
 i_virtualhosts:
