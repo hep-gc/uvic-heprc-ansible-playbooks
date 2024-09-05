@@ -47,12 +47,6 @@
     group: root
     recurse: yes
 
-- name: make jenkins run as root user (1/3)
-  ansible.builtin.lineinfile:
-    path: /etc/sysconfig/jenkins
-    regexp: '^JENKINS_USER=.*$'
-    line: JENKINS_USER="root"
-
 - name: make jenkins run as root user (2/3)
   ansible.builtin.lineinfile:
     path: /usr/lib/systemd/system/jenkins.service
@@ -72,8 +66,18 @@
     owner:
     group:
     mode: 0700
-  notify:
-  - run prepare_copy_jenkins_keystore
+
+- name: create jenkins ssl keystore directory
+  ansible.builtin.file: 
+    state: directory
+    path: /etc/systemd/system/jenkins.service.d
+    owner: root
+    group: root
+    mode: 0700
+
+- name: run copy jenkins keystore
+  ansible.builtin.shell: yes | /usr/local/sbin/prepare_copy_jenkins_keystore
+    
 
 - name: install custom jenkins config for SSL
   template:
@@ -99,10 +103,12 @@
   command: firewall-cmd --permanent --zone=public --add-port=8443/tcp
   notify:
     - restart firewalld
-  ignore_errors: yes
+  ignore_errors: yes  
+
 
 - name: start jenkins
   systemd:
     name: jenkins
-    state: restarted
     enabled: yes
+    state: restarted
+    

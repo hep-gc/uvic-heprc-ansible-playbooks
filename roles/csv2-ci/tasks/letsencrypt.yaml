@@ -132,11 +132,6 @@
   - initial_letsencrypt_status.stat.exists == False
   - archive_status.stat.exists == True
 
-- name: set hostname to FQDN of machine
-  ansible.builtin.hostname:
-    name: "{{ i_service_connection.0.ipv4fqdn }}"
-  when: csv2_ci_openstack == True
-
 - name: run /usr/local/sbin/get_letsencrypt_cert
   shell: /usr/local/sbin/get_letsencrypt_cert
 

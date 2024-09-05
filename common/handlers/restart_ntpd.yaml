@@ -1,11 +1,14 @@
 ---
-# restart_network.yaml
-- name: restart network with service
-  service: name=network enabled=yes state=restarted
-  listen: restart network
-  when: ansible_facts['distribution_major_version'] == "7"
+# This is the original (not like chronyd).
+- name: restart ntpd with service
+  service: name=ntpd enabled=yes state=restarted
+  listen: restart ntpd
+  when: (container is undefined) or (container == False)
+  ignore_errors: yes
 
-- name: Disable NetworkManager
-  service: name=NetworkManager enabled=no state=stopped
-  listen: restart network
-  when: ansible_facts['distribution_major_version'] == "8"
+- name: restart ntpd with systemd
+  systemd: name=ntpd enabled=yes state=restarted
+  listen: restart ntpd
+  when: 
+  - container is defined
+  - container == True

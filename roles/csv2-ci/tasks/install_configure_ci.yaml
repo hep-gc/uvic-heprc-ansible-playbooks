@@ -4,9 +4,9 @@
 - name: update certificate trust
   command: /usr/bin/update-ca-trust
 
-- name: pull down uvic-heprc-ansilbe-playbooks
+- name: pull down uvic-heprc-ansible-playbooks
   git:
-    repo: git@github.com:hep-gc/uvic-heprc-ansible-playbooks.git
+    repo: https://github.com/hep-gc/uvic-heprc-ansible-playbooks.git
     dest: /opt/deployment/uvic-heprc-ansible-playbooks/
     force: yes
     update: yes
