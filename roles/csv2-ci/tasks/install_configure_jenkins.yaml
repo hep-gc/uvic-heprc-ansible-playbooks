@@ -9,17 +9,34 @@
 - name: import jenkins key from url
   rpm_key:
     state: present
-    key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+    key: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 
 - name: yum update
   yum:
     name: '*'
     state: latest
 
-- name: install jdk
+# ensure latest jdk supported by jenkins as of 2024/09/09 it is java-21
+# when the java version needs to be changed, edit the two tasks below
+- name: install java-21-openjdk
   yum:
-    name: java-11-openjdk-devel
+    name: java-21-openjdk-devel
     state: present
+
+
+# ensure java alternative is set to latest installed openjdk
+# this could also be configured in jenkins instead of globally
+- name: set java alternative
+  community.general.alternatives:
+    name: java
+    link: /usr/bin/java
+    state: "selected"
+    path: /etc/alternatives/jre_21_openjdk/bin/java
+
+- name: remove unecessary java packages
+  yum:
+    name: ['java-1.8.0-openjdk', 'java-1.8.0-openjdk-headless']
+    state: "absent"
 
 - name: install jenkins
   yum:
@@ -47,13 +64,14 @@
     group: root
     recurse: yes
 
-- name: make jenkins run as root user (2/3)
+#these two tasks could be added to etc_systemd_system_jenkins.service.d_override.conf.j2
+- name: make jenkins run as root user (1/2)
   ansible.builtin.lineinfile:
     path: /usr/lib/systemd/system/jenkins.service
     regexp: '^User=.*$'
     line: User=root
 
-- name: make jenkins run as root user (3/3)
+- name: make jenkins run as root user (2/2)
   ansible.builtin.lineinfile:
     path: /usr/lib/systemd/system/jenkins.service
     regexp: '^Group=.*$'
