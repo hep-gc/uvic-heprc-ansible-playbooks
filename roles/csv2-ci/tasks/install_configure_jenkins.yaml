@@ -11,11 +11,6 @@
     state: present
     key: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 
-- name: yum update
-  yum:
-    name: '*'
-    state: latest
-
 # ensure latest jdk supported by jenkins as of 2024/09/09 it is java-21
 # when the java version needs to be changed, edit the two tasks below
 - name: install java-21-openjdk
@@ -26,17 +21,13 @@
 
 # ensure java alternative is set to latest installed openjdk
 # this could also be configured in jenkins instead of globally
+# This may not be necessary now that jna is not installed in install_other_required_packages.yaml
 - name: set java alternative
   community.general.alternatives:
     name: java
     link: /usr/bin/java
     state: "selected"
     path: /etc/alternatives/jre_21_openjdk/bin/java
-
-- name: remove unecessary java packages
-  yum:
-    name: ['java-1.8.0-openjdk', 'java-1.8.0-openjdk-headless']
-    state: "absent"
 
 - name: install jenkins
   yum:
@@ -92,6 +83,15 @@
     owner: root
     group: root
     mode: 0700
+
+- name: Ensure keytool path exists
+  ansible.builtin.file:
+    src: /etc/alternatives/java_sdk/bin/keytool
+    dest: /usr/bin/keytool
+    owner: root
+    group: root
+    mode: 0700
+    state: link
 
 - name: run copy jenkins keystore
   ansible.builtin.shell: yes | /usr/local/sbin/prepare_copy_jenkins_keystore
