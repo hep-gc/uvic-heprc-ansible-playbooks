@@ -13,7 +13,7 @@ if [ "$#" -ne 9 ]; then
  fi
 
 
-# $1 is host_number
+# $1 is host_machine
 host_machine=${1}
 target_name=$(echo $host_machine|cut -d. -f1)
 host_port=22
