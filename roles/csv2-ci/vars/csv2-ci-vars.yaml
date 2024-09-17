@@ -10,9 +10,6 @@ csv2_branch: stable-2.11
 # FQDN for the ci server (for both web hosting and certificate purposes
 csv2_ci_fqdn: <REPLACE ME>
 
-# Flag if using openstack machine
-csv2_ci_openstack: <REPLACE ME>
-
 # password for the JKS file and conversion steps
 jenkins_ssl_pw: <REPLACE ME>
 
