@@ -132,7 +132,6 @@
   - initial_letsencrypt_status.stat.exists == False
   - archive_status.stat.exists == True
 
-#temp
 - name: set hostname to FQDN of machine
   ansible.builtin.hostname:
     name: "{{ i_service_connection.0.ipv4fqdn }}"
