@@ -18,10 +18,8 @@
     name: java-21-openjdk-devel
     state: present
 
-
 # ensure java alternative is set to latest installed openjdk
 # this could also be configured in jenkins instead of globally
-# This may not be necessary now that jna is not installed in install_other_required_packages.yaml
 - name: set java alternative
   community.general.alternatives:
     name: java
@@ -34,26 +32,17 @@
     name: jenkins
     state: latest
 
-- name: change permissions for ansible directories (1/3)
+- name: change permissions for ansible directories
   file:
-    path: /var/lib/jenkins
+    path: "{{ item }}"
     owner: root
     group: root
     recurse: yes
+  with_items:
+    - /var/lib/jenkins
+    - /var/cache/jenkins
+    - /var/log/jenkins
 
-- name: change permissions for ansible directories (2/3)
-  file:
-    path: /var/cache/jenkins
-    owner: root
-    group: root
-    recurse: yes
-
-- name: change permissions for ansible directories (3/3)
-  file:
-    path: /var/log/jenkins
-    owner: root
-    group: root
-    recurse: yes
 
 #these two tasks could be added to etc_systemd_system_jenkins.service.d_override.conf.j2
 - name: make jenkins run as root user (1/2)
