@@ -1,77 +1,78 @@
 ---
 # install_configure_jenkins.yaml
 
-- name: get jenkins long term release repo
-  get_url:
+- name: Get jenkins long term release repo
+  ansible.builtin.get_url:
     url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
     dest: /etc/yum.repos.d/jenkins.repo
+    mode: "0644"
 
-- name: import jenkins key from url
-  rpm_key:
+- name: Import jenkins key from url
+  ansible.builtin.rpm_key:
     state: present
     key: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 
 # ensure latest jdk supported by jenkins as of 2024/09/09 it is java-21
 # when the java version needs to be changed, edit the two tasks below
-- name: install java-21-openjdk
-  yum:
+- name: Install java-21-openjdk
+  ansible.builtin.yum:
     name: java-21-openjdk-devel
     state: present
 
 # ensure java alternative is set to latest installed openjdk
 # this could also be configured in jenkins instead of globally
-- name: set java alternative
+- name: Set java alternative
   community.general.alternatives:
     name: java
     link: /usr/bin/java
     state: "selected"
     path: /etc/alternatives/jre_21_openjdk/bin/java
 
-- name: install jenkins
-  yum:
+- name: Install jenkins
+  ansible.builtin.yum:
     name: jenkins
     state: latest
 
-- name: change permissions for ansible directories
-  file:
+- name: Change permissions for ansible directories
+  ansible.builtin.file:
     path: "{{ item }}"
     owner: root
     group: root
-    recurse: yes
+    recurse: true
   with_items:
     - /var/lib/jenkins
     - /var/cache/jenkins
     - /var/log/jenkins
 
 
-#these two tasks could be added to etc_systemd_system_jenkins.service.d_override.conf.j2
-- name: make jenkins run as root user (1/2)
+# these two tasks could be added to etc_systemd_system_jenkins.service.d_override.conf.j2
+- name: Make jenkins run as root user (1/2)
   ansible.builtin.lineinfile:
     path: /usr/lib/systemd/system/jenkins.service
     regexp: '^User=.*$'
     line: User=root
 
-- name: make jenkins run as root user (2/2)
+- name: Make jenkins run as root user (2/2)
   ansible.builtin.lineinfile:
     path: /usr/lib/systemd/system/jenkins.service
     regexp: '^Group=.*$'
     line: Group=root
 
-- name: install jenkins certificate keystore conversion script (depends on letsencrypt)
-  template:
+- name: Install jenkins certificate keystore conversion script (depends on letsencrypt)
+  ansible.builtin.template:
     src: usr_local_sbin_prepare_copy_jenkins_keystore.j2
     dest: /usr/local/sbin/prepare_copy_jenkins_keystore
     owner:
     group:
-    mode: 0700
+    mode: "0700"
 
-- name: create jenkins ssl keystore directory
-  ansible.builtin.file: 
+- name: Create jenkins ssl keystore directory
+  ansible.builtin.file:
     state: directory
     path: /etc/systemd/system/jenkins.service.d
     owner: root
     group: root
-    mode: 0700
+    mode: "0700"
 
 - name: Ensure keytool path exists
   ansible.builtin.file:
@@ -79,43 +80,65 @@
     dest: /usr/bin/keytool
     owner: root
     group: root
-    mode: 0700
+    mode: "0700"
     state: link
 
-- name: run copy jenkins keystore
-  ansible.builtin.shell: yes | /usr/local/sbin/prepare_copy_jenkins_keystore
-    
+- name: Run copy jenkins keystore
+  ansible.builtin.shell: /usr/local/sbin/prepare_copy_jenkins_keystore
 
-- name: install custom jenkins config for SSL
+
+- name: Install custom jenkins config for SSL
   template:
     src: etc_systemd_system_jenkins.service.d_override.conf.j2
     dest: /etc/systemd/system/jenkins.service.d/override.conf
     owner: root
     group: root
-    mode: 0700
+    mode: "0700"
 
-- name: install jenkins keystore conversion cron task
-  copy:
-    src: etc_cron.d_prepare_copy_jenkins_keystore
-    dest: /etc/cron.d/prepare_copy_jenkins_keystore
+# replace this with letsencrypt hooks
+# - name: install jenkins keystore conversion cron task
+#   copy:
+#     src: etc_cron.d_prepare_copy_jenkins_keystore
+#     dest: /etc/cron.d/prepare_copy_jenkins_keystore
+#     owner: root
+#     group: root
+#     mode: 0644
+
+- name: Install letsencrypt prehook to stop Jenkins
+  ansible.builtin.copy:
+    src: etc_letsencrypt_renewal-hooks_pre_stop_jenkins.sh
+    dest: /etc/letsencrypt/renewal-hooks/pre/stop_jenkins.sh
     owner: root
     group: root
-    mode: 0644
+    mode: "0700"
 
-- name: daemon-reload to pick up config changes
-  systemd:
-    daemon_reload: yes
+- name: Install letsencrypt deploy hook to run jenkins keystore conversion and restart jenkins
+  ansible.builtin.copy:
+    src: /usr/local/sbin/prepare_copy_jenkins_keystore
+    dest: /etc/letsencrypt/renewal-hooks/deploy/prepare_copy_jenkins_keystore
+    owner: root
+    group: root
+    mode: "0700"
+    remote_src: true
 
-- name: open jenkins ssl port (if firewalld is installed)
-  command: firewall-cmd --permanent --zone=public --add-port=8443/tcp
+- name: Daemon-reload to pick up config changes
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Open jenkins ssl port (if firewalld is installed)
+  ansible.builtin.command: firewall-cmd --permanent --zone=public --add-port=8443/tcp
   notify:
     - restart firewalld
-  ignore_errors: yes  
+  ignore_errors: yes
 
 
-- name: start jenkins
-  systemd:
+- name: Start jenkins
+  ansible.builtin.systemd_service:
     name: jenkins
-    enabled: yes
+    enabled: true
     state: restarted
-    
+...
+
+# to remove
+# etc_cron.d_prepare_copy_jenkins_keystore
+# etc_cron.d_get_letsencrypt_cert

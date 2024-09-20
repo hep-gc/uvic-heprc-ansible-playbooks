@@ -4,13 +4,15 @@
 - name: update certificate trust
   command: /usr/bin/update-ca-trust
 
+#change the branch back to main before pr
 - name: pull down uvic-heprc-ansible-playbooks
   git:
     repo: https://github.com/hep-gc/uvic-heprc-ansible-playbooks.git
     dest: /opt/deployment/uvic-heprc-ansible-playbooks/
     force: yes
     update: yes
-    version: master
+    version: csv2-ci-alma9
+    # version: master
     accept_hostkey: yes
   become: no
 
@@ -21,10 +23,6 @@
     force: yes
     update: yes
     version: "{{ csv2_branch }}"
-
-- name: set timezone
-  timezone:
-    name: "{{ timezone }}"
 
 - name: set up web tests
   shell: yes | /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_centos.sh ci_install 
