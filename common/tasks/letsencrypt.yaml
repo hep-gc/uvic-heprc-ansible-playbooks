@@ -195,6 +195,11 @@
     name: snapd.socket
     state: started
 
+- name: Restart snapd service
+  ansible.builtin.systemd_service:
+    name: snapd.service
+    state: restarted
+
 - name: Install certbot
   community.general.snap:
     classic: true
