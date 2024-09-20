@@ -1,27 +1,30 @@
 # Overriding the following defaults varables (see csv2-public-default-vars.yaml):
 
+timezone: America/Vancouver
+
+#certbot requires port 80 inbound
 csv2_fqdn: <REPLACE ME> #full domain name of your target csv2 host ex
 
-cs_git_branch: stable-2.10.5
+cs_git_branch: stable-2.11
 db_upgrade_file: none
-schema_model: stable-2.10.4.rc1
+schema_model: stable-2.11.1.rc1
 
-admin_email: <REPLACE ME> # Email address you'd like to recieve admin mail to, usually the root on the csv2 host
+admin_email: root@{{ csv2_fqdn }} # Email address you'd like to recieve admin mail to, usually the root on the csv2 host
 
 install_phpMyAdmin: False
-web_debug: False
+web_debug: True
 
 favicon_colour: red
 
-container: False
+container: True
 local_web: False
 
-openstack_vm: False
-ci_target: False
+openstack_vm: True
+ci_target: True
 
 i_service_connection:
--
-    ipv4: <REPLACE ME> # IPV4 address of your target csv2 host
+-       #set_ci_target.sh in csv2-ci/files may not set ipv4 properly
+    ipv4: 206.12.154.91 # IPV4 address of your target csv2 host
     ipv4fqdn: '{{ csv2_fqdn }}'
 
 i_virtualhosts:
