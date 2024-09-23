@@ -65,6 +65,7 @@
 - name: set timezone
   timezone:
     name: "{{ timezone }}"
+  when: timezone is defined
 
 - name: update the TLS root certificates
   command: update-ca-trust
