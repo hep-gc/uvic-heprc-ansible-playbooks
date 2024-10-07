@@ -63,7 +63,7 @@
 #   register: archive_status
 #   delegate_to: 127.0.0.1
 - name: set timezone
-  timezone:
+  community.general.timezone:
     name: "{{ timezone }}"
   when: timezone is defined
 

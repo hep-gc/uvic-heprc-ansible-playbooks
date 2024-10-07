@@ -25,7 +25,7 @@
     version: "{{ csv2_branch }}"
 
 - name: set up web tests
-  shell: yes | /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_centos.sh ci_install 
+  shell: yes | /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_alma9.sh ci_install 
 
 - name: ensure csv2 cli config dir exists
   file:
@@ -44,4 +44,24 @@
     src: ../files/settings.yaml
     dest: /root/.csv2/unit-test/settings.yaml
     owner: root
-    group: root 
+    group: root
+
+# ensure pip is intalled
+- name: Ensure pip is installed
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - python3
+    - pip
+
+# not necessary with new /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_alma9.sh
+- name: Ensure python3 packages are installed
+  ansible.builtin.pip:
+    name: "{{ item }}"
+  loop:
+    - requests
+    - pytest
+    - pytest-rerunfailures
+    - selenium
+    - requests-toolbelt

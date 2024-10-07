@@ -17,12 +17,14 @@
 
 - name: install other required packages
   package:
-    name: ['ansible', 'git', 'make', 's-nail', 'xauth', 'xorg-x11-fonts-Type1', 'xterm']
+    name: ['ansible', 'git', 'make', 's-nail', 'xauth', 'xorg-x11-fonts-Type1', 'xterm', 'xorg-x11-server-Xvfb']
     state: latest
   when: ansible_facts['distribution_major_version'] == "9" 
 # make required by letsencrypt.yaml
 # git required by install_configure_ci.yaml
 # ansible required by jenkins pipeline
+
+#need xvfb
 
 #TODO 
 # verify if/where snail, xauth, xorg-x11-fonts, xterm are required
