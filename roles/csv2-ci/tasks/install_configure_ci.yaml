@@ -24,9 +24,6 @@
     update: yes
     version: "{{ csv2_branch }}"
 
-- name: set up web tests
-  shell: yes | /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_alma9.sh ci_install 
-
 - name: ensure csv2 cli config dir exists
   file:
     path: /root/.csv2/unit-test
@@ -53,9 +50,19 @@
     state: present
   loop:
     - python3
-    - pip
+    - python3-pip
 
-# not necessary with new /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_alma9.sh
+# remove python3-requests yum package (conflicts with openstack pip)
+- name: Ensure python3-requests is not present
+  ansible.builtin.yum:
+    name: python3-requests
+    state: absent
+
+# these are also handled in
+# /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_alma9.sh
+# maybe work on eliminating this redundancy
+# (currently only on branch: travis-web-test-setup-alma)
+# https://github.com/hep-gc/cloudscheduler/blob/6478f037d53ff0fe711d4fb320ef8c85b3fd7176/unit_tests/web_tests/setup_scripts/web_test_setup_full_alma9.sh
 - name: Ensure python3 packages are installed
   ansible.builtin.pip:
     name: "{{ item }}"
@@ -65,3 +72,46 @@
     - pytest-rerunfailures
     - selenium
     - requests-toolbelt
+    - python-openstackclient
+    - python-keystoneclient
+    - python-novaclient
+
+
+- name: Run web test setup script
+  ansible.builtin.shell: yes | /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_alma9.sh ci_install
+
+
+# add csv2-ci var for credentials file location
+# and copy credentials to remote here
+- name: Copy credentials file to remote
+  ansible.builtin.copy:
+    remote_src: false
+    src: "{{ csv2_ci_web_credentials_path }}"
+    dest: /root/cloudscheduler/unit_tests/credentials.yaml
+    mode: "0644"
+
+# add csv2-ci var for ssh key file location
+# and copy + register ssh key on remote here
+- name: Copy ssh key to remote
+  ansible.builtin.copy:
+    remote_src: false
+    src: "{{ csv2_ci_ssh_key_path }}"
+    dest: /root/.ssh/id_rsa
+    mode: "0600"
+
+- name: Enable ssh-agent
+  ansible.builtin.command:
+    cmd: eval `ssh-agent`
+
+- name: Add ssh key
+  ansible.builtin.command:
+    cmd: ssh-add
+
+# edit ssh config here accoridng to wiki
+- name: Configure ssh-config
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/ssh_config
+    line: "{{ item }}"
+  loop:
+    - StrictHostKeyChecking no
+    - UserKnownHostsFile=/dev/null

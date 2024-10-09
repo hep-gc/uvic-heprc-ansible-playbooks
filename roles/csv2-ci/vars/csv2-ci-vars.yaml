@@ -23,3 +23,8 @@ i_virtualhosts:
 -
     virtualhost: '{{ i_service_connection.0.ipv4fqdn }}'
 
+# location of credentials file for web tests
+csv2_ci_web_credentials_path: <REPLACE ME>
+
+#location of private ssh key for remote
+csv2_ci_ssh_key_path: <REPLACE ME>
