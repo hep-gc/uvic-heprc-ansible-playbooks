@@ -201,6 +201,11 @@
     name: snapd.service
     state: restarted
 
+- name: Restart snapd seeded service
+  ansible.builtin.systemd_service:
+    name: snapd.seeded.service
+    state: restarted
+
 - name: Install certbot
   community.general.snap:
     classic: true
