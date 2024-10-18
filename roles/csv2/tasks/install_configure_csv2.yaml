@@ -175,14 +175,33 @@
       update: no
       version: master
 
-- name: install plotly js graphing package
-  git:
-      repo: 'https://github.com/plotly/plotly.js.git'
-      dest: /opt/cloudscheduler/web_frontend/cloudscheduler/csv2/static/plotly.js/
-      accept_hostkey: yes
-      force: yes
-      update: no
-      version: master      
+# Installing plotly via git clone was working intermittently previously and was only changed due to curl errors (92, 56)
+# that may be indicative of a network issue. This may not actually require a change.
+# - name: install plotly js graphing package
+#   git:
+#       repo: 'https://github.com/plotly/plotly.js.git'
+#       dest: /opt/cloudscheduler/web_frontend/cloudscheduler/csv2/static/plotly.js/
+#       accept_hostkey: yes
+#       force: yes
+#       update: no
+#       version: master      
+
+- name: Download plotly zip
+  ansible.builtin.uri:
+    dest: /root/Downloads/plotlytest.zip
+    url: https://codeload.github.com/plotly/plotly.js/zip/refs/heads/master
+
+- name: Unarchive plotly
+  ansible.builtin.unarchive:
+    remote_src: true
+    dest: /opt/cloudscheduler/web_frontend/cloudscheduler/csv2/static/
+    src: /root/Downloads/plotlytest.zip
+
+- name: Rename unzipped plotly directory
+  ansible.builtin.command: mv /opt/cloudscheduler/web_frontend/cloudscheduler/csv2/static/plotly.js-master /opt/cloudscheduler/web_frontend/cloudscheduler/csv2/static/plotly.js
+  args:
+    creates: /opt/cloudscheduler/web_frontend/cloudscheduler/csv2/static/plotly.js
+    removes: /opt/cloudscheduler/web_frontend/cloudscheduler/csv2/static/plotly.js-master
 
 - name: list current csv2 services
   shell:
