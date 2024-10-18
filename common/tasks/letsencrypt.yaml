@@ -359,10 +359,4 @@
 #     src: /var/log/letsencrypt/{{ i_service_connection.0.ipv4fqdn }}.tar.gz
 #     dest: "{{ letsencrypt_archive }}/{{ i_service_connection.0.ipv4fqdn }}.tar.gz"
 #     flat: yes
-
-
-# to remove:
-#common/files/etc_cron.d_copy-certificates-to-users
-#common/files/etc_cron.d_get_letsencrypt_cert
-#common/templates/etc_letsencrypt_VirtualHosts.j2
-#common/templates/usr_local_sbin_get_letsecrypt_cert.j2
+...
