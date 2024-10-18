@@ -6,18 +6,18 @@
     state: directory
     owner: condor
     group: condor
-    mode: 0700
+    mode: "0700"
   with_items:
-  - "/usr/local/etc/certificates"
-  - "/usr/local/etc/certificates/{{ ansible_fqdn }}"
-  - "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}"
-  - "/etc/grid-security/condor-worker"
-  - "/var/lib/condor/.globus"
+    - "/usr/local/etc/certificates"
+    - "/usr/local/etc/certificates/{{ ansible_fqdn }}"
+    - "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}"
+    - "/etc/grid-security/condor-worker"
+    - "/var/lib/condor/.globus"
   when:
-  - htcondor_cert is defined
-  - htcondor_key is defined
-  - htcondor_worker_cert is defined
-  - htcondor_worker_key is defined
+    - htcondor_cert is defined
+    - htcondor_key is defined
+    - htcondor_worker_cert is defined
+    - htcondor_worker_key is defined
 
 - name: install x509 certificates
   copy:
@@ -25,18 +25,18 @@
     dest: "{{ item.dest }}"
     owner: condor
     group: condor
-    mode: 0400
+    mode: "0400"
   with_items:
-  - {src: "{{ htcondor_cert }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/cert.pem"}
-  - {src: "{{ htcondor_cert }}", dest: "/etc/grid-security/hostcert.pem"}
-  - {src: "{{ htcondor_worker_cert }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/cert.pem"}
-  - {src: "{{ htcondor_worker_cert }}", dest: "/var/lib/condor/.globus/usercert.pem"}
-  - {src: "{{ htcondor_worker_cert }}", dest: "/etc/grid-security/condor-worker/hostcert.pem"}
+    - {src: "{{ htcondor_cert }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/cert.pem"}
+    - {src: "{{ htcondor_cert }}", dest: "/etc/grid-security/hostcert.pem"}
+    - {src: "{{ htcondor_worker_cert }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/cert.pem"}
+    - {src: "{{ htcondor_worker_cert }}", dest: "/var/lib/condor/.globus/usercert.pem"}
+    - {src: "{{ htcondor_worker_cert }}", dest: "/etc/grid-security/condor-worker/hostcert.pem"}
   when:
-  - htcondor_cert is defined
-  - htcondor_key is defined
-  - htcondor_worker_cert is defined
-  - htcondor_worker_key is defined
+    - htcondor_cert is defined
+    - htcondor_key is defined
+    - htcondor_worker_cert is defined
+    - htcondor_worker_key is defined
 
 - name: install x509 keys
   copy:
@@ -44,18 +44,18 @@
     dest: "{{ item.dest }}"
     owner: condor
     group: condor
-    mode: 0400
+    mode: "0400"
   with_items:
-  - {src: "{{ htcondor_key }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/privkey.pem"}
-  - {src: "{{ htcondor_key }}", dest: "/etc/grid-security/hostkey.pem"}
-  - {src: "{{ htcondor_worker_key }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/privkey.pem"}
-  - {src: "{{ htcondor_worker_key }}", dest: "/var/lib/condor/.globus/userkey.pem"}
-  - {src: "{{ htcondor_worker_key }}", dest: "/etc/grid-security/condor-worker/hostkey.pem"}
+    - {src: "{{ htcondor_key }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/privkey.pem"}
+    - {src: "{{ htcondor_key }}", dest: "/etc/grid-security/hostkey.pem"}
+    - {src: "{{ htcondor_worker_key }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/privkey.pem"}
+    - {src: "{{ htcondor_worker_key }}", dest: "/var/lib/condor/.globus/userkey.pem"}
+    - {src: "{{ htcondor_worker_key }}", dest: "/etc/grid-security/condor-worker/hostkey.pem"}
   when:
-  - htcondor_cert is defined
-  - htcondor_key is defined
-  - htcondor_worker_cert is defined
-  - htcondor_worker_key is defined
+    - htcondor_cert is defined
+    - htcondor_key is defined
+    - htcondor_worker_cert is defined
+    - htcondor_worker_key is defined
 
 - name: set_fact
   set_fact:
@@ -74,9 +74,9 @@
     state: directory
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
-    mode: 0755
+    mode: "0755"
   with_items:
-  - "{{ certificate_users }}"
+    - "{{ certificate_users }}"
 
 - name: create empty usercert pem files for certificate users
   file:
@@ -84,43 +84,42 @@
     state: touch
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
-    mode: 0444
+    mode: "0444"
   with_items:
-  - "{{ certificate_users }}"
+    - "{{ certificate_users }}"
 
-- name: create empty userkey pem files for certificate users
+- name: Create empty userkey pem files for certificate users
   file:
     dest: "{{ item.globus }}/{{ item.pfx }}key.pem"
     state: touch
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
-    mode: 0400
+    mode: "0400"
   with_items:
-  - "{{ certificate_users }}"
+    - "{{ certificate_users }}"
 
-- name: install bash script to update cert and key for certificate users
-  template:
-    src: etc_letsencrypt_renewal-hooks_post_copy_certificates_to_users.j2
-    dest: /etc/letsencrypt/renewal-hooks/post/copy_certificates_to_users.sh
+- name: Add prehook to bring down httpd before renewing certificate
+  ansible.builtin.copy:
+    src: etc_letsencrypt_renewal-hooks_pre_stop_httpd.sh
+    dest: /etc/letsencrypt/renewal-hooks/pre/stop_httpd.sh
     owner: root
     group: root
-    mode: 0700
+    mode: "0700"
   when:
-  - certificate_users is defined
+    - certificate_users is defined
 
-#- name: copy certificates to users crontab entry
-#  copy:
-#    src: etc_cron.d_copy-certificates-to-users
-#    dest: /etc/cron.d/copy-certificates-to-users
-#    owner: root
-#    group: root
-#    mode: 0644
-#  when:
-#  - certificate_users is defined
-
-- name: copy certificates to users
-  command:
-    cmd: /etc/letsencrypt/renewal-hooks/post/copy_certificates_to_users.sh
+- name: Install bash script to update cert and key for certificate users and restart httpd
+  ansible.builtin.template:
+    src: etc_letsencrypt_renewal-hooks_deploy_copy_certificates_to_users.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/copy_certificates_to_users.sh
+    owner: root
+    group: root
+    mode: "0700"
   when:
-  - certificate_users is defined
+    - certificate_users is defined
 
+- name: Copy certificates to users
+  ansible.builtin.command:
+    cmd: /etc/letsencrypt/renewal-hooks/deploy/copy_certificates_to_users.sh
+  when:
+    - certificate_users is defined

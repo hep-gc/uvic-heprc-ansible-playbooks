@@ -2,10 +2,10 @@
 timezone: America/Vancouver
 
 # Admin email for root mail forwarding
-admin_email: root@localhost
+admin_email: <REPLACE ME>
 
 # Branch for ci server to follow
-csv2_branch: stable-2.10
+csv2_branch: stable-2.11
 
 # FQDN for the ci server (for both web hosting and certificate purposes
 csv2_ci_fqdn: <REPLACE ME>
@@ -16,10 +16,15 @@ jenkins_ssl_pw: <REPLACE ME>
 
 i_service_connection:
 -
-    ipv4: <REPLACE ME> # IPV4 address of your target csv2 host
+    ipv4:  <REPLACE ME> # IPV4 address of your target csv2 host
     ipv4fqdn: '{{ csv2_ci_fqdn }}'
 
 i_virtualhosts:
 -
     virtualhost: '{{ i_service_connection.0.ipv4fqdn }}'
 
+# location of credentials file for web tests
+csv2_ci_web_credentials_path: <REPLACE ME>
+
+#location of private ssh key for remote
+csv2_ci_ssh_key_path: <REPLACE ME>

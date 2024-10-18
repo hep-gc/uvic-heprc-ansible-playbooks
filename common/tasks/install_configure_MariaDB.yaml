@@ -20,36 +20,36 @@
   - (container is undefined) or (container == False)
   ignore_errors: yes
 
-- name: setup the MariaDB repository
-  copy:
-    src: etc_yum.repos.d_MariaDB.repo
-    dest: /etc/yum.repos.d/MariaDB.repo
-    owner: root
-    group: root
-    mode: 0644
+# if this installs mariadb 11 ssl will break
+- name: ensure mariadb installed
+  ansible.builtin.yum:
+    name: mariadb
+    state: present
 
-- name: update MariaDB repo for Alma 9
-  replace:
-    path: /etc/yum.repos.d/MariaDB.repo
-    regexp: '^baseurl = .*'
-    replace: 'baseurl = http://mirror.mariadb.org/yum/11.2.1/rhel9-amd64/'
-  when: ansible_facts['distribution_major_version'] == '9'
+- name: gather package facts
+  ansible.builtin.package_facts:
+    manager: rpm
+
+- name: fail if mariadb other than 10 present
+  ansible.builtin.fail:
+    msg: MariaDB not 10 was installed. 
+  when: "not ansible_facts.packages['mariadb'][0].version | regex_search('^10.*')"
 
 - name: install mariadb (MySQL) packages
   yum:
-    name: ['expect', 'MariaDB-server', 'MariaDB-client', 'MariaDB-devel', 'MariaDB-common',
-          'MariaDB-shared', 'zlib-devel', 'openssl-devel', 'python3-PyMySQL']
+    name: ['expect', 'mariadb-server',  'mariadb-devel', 'mariadb-common',
+           'zlib-devel', 'openssl-devel', 'python3-PyMySQL']
     state: latest
   notify:
   - restart mariadb
+### removed 'MariaDB-shared','mariadb-client',
 
-- name: install mariadb (MySQL) packages on centos 7
-  yum:
-    name: ['MariaDB-compat', 'MySQL-python', 'python2-PyMySQL']
-    state: latest
-  notify:
-  - restart mariadb
-  when: ansible_facts['distribution_major_version'] == '7'
+- name: ensure mysql standalone error directories exist
+  ansible.builtin.file:
+    path: /var/log/mysql
+    state: directory
+    owner: mysql
+    group: root
 
 - name: ensure mariadb is running and enabled with service
   service: name=mariadb state=restarted enabled=yes

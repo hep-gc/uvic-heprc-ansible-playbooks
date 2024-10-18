@@ -1,10 +1,13 @@
 # Overriding the following defaults varables (see csv2-public-default-vars.yaml):
 
+# Timezone
+timezone: America/Vancouver
+ 
 csv2_fqdn: <REPLACE ME> #full domain name of your target csv2 host ex
 
-cs_git_branch: stable-2.10.5
+cs_git_branch: stable-2.11
 db_upgrade_file: none
-schema_model: stable-2.10.4.rc1
+schema_model: stable-2.11.1.rc1
 
 admin_email: <REPLACE ME> # Email address you'd like to recieve admin mail to, usually the root on the csv2 host
 
@@ -27,4 +30,3 @@ i_service_connection:
 i_virtualhosts:
 -
     virtualhost: '{{ i_service_connection.0.ipv4fqdn }}'
-

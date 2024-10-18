@@ -1,0 +1,7 @@
+[Service]
+User=root
+Environment="JENKINS_PORT=-1"
+Environment="JENKINS_HTTPS_PORT=8443"
+Environment="JENKINS_HTTPS_KEYSTORE=/var/lib/jenkins/jenkinsserver.jks"
+Environment="JENKINS_HTTPS_KEYSTORE_PASSWORD={{ jenkins_ssl_pw }}"
+Environment="JENKINS_HTTPS_LISTEN_ADDRESS={{ i_service_connection.0.ipv4 }}"

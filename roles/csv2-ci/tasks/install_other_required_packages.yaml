@@ -1,32 +1,30 @@
 ---
 # install_other_required_packages.yaml
 
-- name: enable powertools for non Centos
+- name: enable PowerTools for Centos 8
   command: /usr/bin/dnf config-manager --set-enabled powertools
-  args:
-    warn: false
-  when: ansible_facts['distribution'] != "CentOS" 
+  when: ansible_facts['distribution_major_version'] == "8"
+
+- name: enable CRB for EL9
+  command: dnf config-manager --set-enabled crb
+  when: ansible_facts['distribution_major_version'] == "9"
+
+- name: install other required packages for EL7 and EL8
+  yum:
+    name: ['@development', 'mailx', 'xauth', 'xorg-x11-apps', 'xorg-x11-fonts-Type1']
+  when: ansible_facts['distribution_major_version'] in ("7", "8")
+
 
 - name: install other required packages
-  yum:
-    name: ['@development', 'mailx', 'xauth', 'xorg-x11-apps', 'xorg-x11-fonts-Type1', 'python3', 
-'python3-devel', 'python3-pip', 'python3-setuptools', 'Xvfb']
+  package:
+    name: ['ansible', 'git', 'make', 's-nail', 'xauth', 'xorg-x11-fonts-Type1', 'xterm', 'xorg-x11-server-Xvfb']
     state: latest
+  when: ansible_facts['distribution_major_version'] == "9" 
+# make required by letsencrypt.yaml
+# git required by install_configure_ci.yaml
+# ansible required by jenkins pipeline
 
-- name: upgrade pip 
-  pip:
-    name: pip
-    executable: pip3
-    state: latest
+#need xvfb
 
-- name: upgrade pip3 setuptools
-  pip:
-    name: setuptools
-    executable: pip3
-    state: latest
-
-- name: install required python3 modules
-  pip:
-    name: ["ansible", "pytest==7.0.1", "pytest-rerunfailures==10.2", "requests_toolbelt"]
-    executable: pip3
-  
+#TODO 
+# verify if/where snail, xauth, xorg-x11-fonts, xterm are required
