@@ -10,7 +10,7 @@
     dest: /opt/deployment/uvic-heprc-ansible-playbooks/
     force: yes
     update: yes
-    version: csv2-ci-alma9
+    version: master
     accept_hostkey: yes
   become: no
 
