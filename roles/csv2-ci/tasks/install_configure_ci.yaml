@@ -10,7 +10,7 @@
     dest: /opt/deployment/uvic-heprc-ansible-playbooks/
     force: yes
     update: yes
-    version: master
+    version: csv2-ci-alma9
     accept_hostkey: yes
   become: no
 
@@ -96,13 +96,11 @@
     dest: /root/.ssh/id_rsa
     mode: "0600"
 
-- name: Enable ssh-agent
-  ansible.builtin.shell:
-    cmd: eval `ssh-agent`
+- name: Enable ssh-agent and add key
+  ansible.builtin.shell: |
+    eval "$(ssh-agent)"
+    ssh-add
 
-- name: Add ssh key
-  ansible.builtin.command:
-    cmd: ssh-add
 
 # edit ssh config here accoridng to wiki
 - name: Configure ssh-config
