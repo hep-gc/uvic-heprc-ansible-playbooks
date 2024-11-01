@@ -36,8 +36,6 @@
   - local_web is defined
   - local_web == True
 
-- import_tasks: install_configure_ntpd.yaml
-
 - import_tasks: install_configure_MariaDB.yaml
 
 - import_tasks: create_mysqldb_csv2.yaml
