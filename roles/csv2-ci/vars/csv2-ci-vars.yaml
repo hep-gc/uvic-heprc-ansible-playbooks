@@ -2,7 +2,7 @@
 timezone: America/Vancouver
 
 # Admin email for root mail forwarding
-admin_email: root@localhost
+admin_email: root@{{ csv2_ci_fqdn }}"
 
 # Branch for ci server to follow
 csv2_branch: stable-2.11
