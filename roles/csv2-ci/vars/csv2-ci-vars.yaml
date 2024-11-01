@@ -2,7 +2,7 @@
 timezone: America/Vancouver
 
 # Admin email for root mail forwarding
-admin_email: root@{{ csv2_ci_fqdn }}"
+admin_email: root@{{ csv2_ci_fqdn }}
 
 # Branch for ci server to follow
 csv2_branch: stable-2.11
@@ -16,7 +16,7 @@ jenkins_ssl_pw: <REPLACE ME>
 
 i_service_connection:
 -
-    ipv4:  <REPLACE ME> # IPV4 address of your target csv2 host
+    ipv4: <REPLACE ME> # IPV4 address of your target csv2 host
     ipv4fqdn: '{{ csv2_ci_fqdn }}'
 
 i_virtualhosts:
