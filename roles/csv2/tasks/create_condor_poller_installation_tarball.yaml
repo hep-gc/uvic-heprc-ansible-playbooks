@@ -1,3 +1,4 @@
+---
 
 - name: fetch cloudscheduler remote templates
   fetch:
@@ -66,6 +67,15 @@
     group: condor
     mode: 0400
 
+- name: Remove certificate references from condor_poller config
+  ansible.builtin.lineinfile:
+    path: /tmp/gentgz/cloudscheduler/etc/cloudscheduler/condor_poller.yaml
+    regexp: "^{{ item }}"
+    line: "{{ item }}''"
+  loop:
+    - "    condor_worker_cert:"
+    - "    condor_worker_key:"
+
 - name: generate repository index.html
   template:
     src: "/tmp/cloudscheduler/{{ inventory_hostname }}/opt/cloudscheduler/repository/index.html.j2.pfile"
@@ -92,3 +102,4 @@
     path: /tmp/gentgz
     state: absent
 
+...
