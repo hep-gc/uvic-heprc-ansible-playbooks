@@ -122,9 +122,6 @@
   yum:
     name: libguestfs-tools-c
 
-#- name: upgrade pip3 to latest version before install certbot
-#  command: pip3 install --upgrade pip
-
 - name: upgrade pip3 setuptools
   pip:
     name:
@@ -425,7 +422,6 @@
   set_fact:
     haproxy_name: "{{ 'haproxy.service' if ansible_facts['distribution_major_version'] == '9' else 'HAProxy.service'}}"
 
-#haproxy trying to bind to 0.0.0.0:5000
 - name: ensure HAProxy service is enabled and running
   systemd:
     name: "{{ item }}"
