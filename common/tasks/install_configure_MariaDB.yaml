@@ -20,29 +20,43 @@
   - (container is undefined) or (container == False)
   ignore_errors: yes
 
-# if this installs mariadb 11 ssl will break
-- name: ensure mariadb installed
-  ansible.builtin.yum:
-    name: mariadb
-    state: present
+# This repository contains mariadb 10.11 
+# https://mariadb.org/download/?t=repo-config&d=Red+Hat+Enterprise+Linux+9&v=10.11&r_m=xtom_fre
+- name: Add MariaDB repository
+  ansible.builtin.copy:
+    src: ../files/etc_yum.repos.d_MariaDB.repo
+    dest: /etc/yum.repos.d/MariaDB.repo
+    remote_src: false
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Install MariaDB with dnf
+  ansible.builtin.dnf:
+    name:
+      - MariaDB-server < 11
+      - MariaDB-client < 11
+      - MariaDB-devel < 11
+      - MariaDB-common < 11
+    state: latest
+
+- name: Restart MariaDB with systemd
+  ansible.builtin.systemd:
+    service: mariadb
+    state: restarted
 
 - name: gather package facts
   ansible.builtin.package_facts:
     manager: rpm
 
-- name: fail if mariadb other than 10 present
-  ansible.builtin.fail:
-    msg: MariaDB not 10 was installed. 
-  when: "not ansible_facts.packages['mariadb'][0].version | regex_search('^10.*')"
-
 - name: install mariadb (MySQL) packages
   yum:
-    name: ['expect', 'mariadb-server',  'mariadb-devel', 'mariadb-common',
+    name: ['expect',
            'zlib-devel', 'openssl-devel', 'python3-PyMySQL']
     state: latest
   notify:
   - restart mariadb
-### removed 'MariaDB-shared','mariadb-client',
+### removed 'MariaDB-shared','mariadb-client', 'mariadb-server',   included in dnf install
 
 - name: ensure mysql standalone error directories exist
   ansible.builtin.file:
