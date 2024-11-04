@@ -3,7 +3,7 @@
 
 - include_vars: csv2-ci-vars.yaml
 - include: create_installation_directories.yaml
-- include: configure_yum_updates.yaml
+- include: perform_yum_updates.yaml
 - include: install_other_required_packages.yaml
 - include: configure_root_mail_forwarding.yaml
 - include: letsencrypt.yaml
