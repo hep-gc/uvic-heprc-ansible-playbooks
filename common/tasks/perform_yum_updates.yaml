@@ -18,9 +18,6 @@
     state: present
   when: ansible_facts['distribution_major_version'] == "7"
 
-- name: disable yum auto_updates
-  script: bash-disable_yum_auto_updates creates=/root/ansible_script_logs/bash-disable_yum_auto_updates.log
-
 - name: install other packages
   yum:
     name: ['nano', 'mc']
