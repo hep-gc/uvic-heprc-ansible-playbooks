@@ -1,0 +1,8 @@
+---
+# ensure mnt/hosts/hostname
+- name: Ensure hosts backup directory exists
+  ansible.builtin.file:
+    path: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}
+    state: directory
+    mode: "0644"
+...

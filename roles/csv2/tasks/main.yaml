@@ -16,15 +16,13 @@
 
 - import_tasks: create_installation_directories.yaml
 
+- import_tasks: configure_backup_directory.yaml
 
 - import_tasks: configure_other_required_repositories.yaml
 
 - import_tasks: perform_yum_updates.yaml
 
 - import_tasks: install_other_required_packages.yaml
-
-
-
 
 - import_tasks: install_python3.yaml
 

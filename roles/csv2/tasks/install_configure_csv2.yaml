@@ -599,13 +599,33 @@
     group: cloudscheduler
     mode: 0774
     state: directory
-  with_items:  
-  - /var/local/cloudscheduler/ec2
-  - /var/local/cloudscheduler/image_cache
-  - /var/local/cloudscheduler/run
-  - /var/local/cloudscheduler/schema_backups
-  - /var/local/cloudscheduler/signals
-  - /var/log/cloudscheduler
+  with_items:
+    - /var/local/cloudscheduler/ec2
+    - /var/local/cloudscheduler/image_cache
+    - /var/local/cloudscheduler/run
+    # - /var/local/cloudscheduler/schema_backups
+    - /var/local/cloudscheduler/signals
+    - /var/log/cloudscheduler
+
+- name: Create cloudscheduler backup directory
+  ansible.builtin.file:
+    path: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups
+    owner: cloudscheduler
+    group: cloudscheduler
+    mode: "0774"
+    state: directory
+
+- name: Link schema backups to backup directory
+  ansible.builtin.file:
+    path: /var/local/cloudscheduler/schema_backups
+    src: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups
+    force: true
+    owner: cloudscheduler
+    group: cloudscheduler
+    mode: "0744"
+    state: link
+
+  #manipulate backup directory
 
 - name: create empty cloudscheduler log files (owner=cloudscheduler, group=cloudscheduler)
   file:
