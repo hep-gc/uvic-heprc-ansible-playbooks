@@ -3,9 +3,20 @@
 
 - include_vars: csv2-ci-vars.yaml
 - include: create_installation_directories.yaml
+- include: configure_backup_directory.yaml
 - include: perform_yum_updates.yaml
 - include: install_other_required_packages.yaml
 - include: configure_root_mail_forwarding.yaml
 - include: letsencrypt.yaml
 - include: install_configure_ci.yaml
 - include: install_configure_jenkins.yaml
+
+# /mnt//host1/
+#               cloudscheduler/
+#                             schema_backups
+#                             ...
+#               certificates/
+# /mnt/../host2/
+#               cloudscheduler/
+#               certificates/
+...

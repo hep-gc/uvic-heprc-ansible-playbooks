@@ -1,67 +1,25 @@
 ---
-# file: roles/osctl/tasks/letsencrypt.yaml
+# file: common/tasks/letsencrypt.yaml
 #
 # Note: Set the variable "letsencrypt_test: true" to use the letsencrypt test
 # server. This variable is referenced by the handler "run get_letsencrypt_cert".
 
-# Note: This file used to handle backing up letsencrypt
-# certificates to a tar.gz in /etc/letsencrypt
-# and restoring from this backup if it is present
-# through usr_local_sbin_get_letsencrypt_cert.j2
-# This is no longer done. A new method for handling  
-# backups is yet to be decided
-
-
-# these facts are for the letsencrypt backup routine
-# - set_fact:
-#     homedir: "{{ lookup('ansible.builtin.env', 'HOME') }}"
-#   when:
-#     ansible_version.major >= 3
-
-# - set_fact:
-#     homedir: "{{ lookup('env','HOME') }}"
-#   when:
-#     ansible_version.major < 3
-
-# - name: set_fact letsencrypt_archive if undefined
-#   set_fact:
-#     letsencrypt_archive: "{{ homedir }}/archive/letsencrypt"
-#   when:
-#     letsencrypt_archive is undefined
-
 - name: set_fact letsencrypt_test
   set_fact:
-    letsencrypt_test: false
+    letsencrypt_test: false 
   when:
     letsencrypt_test is undefined
-
-- name: get initial python3 status
-  stat:
-    path: /usr/bin/python3
-  register: initial_python3_status
-
-- name: stat letsencrypt opt dir
-  stat:
-    path: /opt/letsencrypt
-  register: initial_optdir_status
-
-# new certbot installation method, no need for this flag 
-# - name: stat certbot dir
-#   stat:
-#     path: /opt/letsencrypt/bin/certbot
-#   register: initial_certbot_status
 
 - name: stat letsencrypt status
   stat:
     path: /etc/letsencrypt
   register: initial_letsencrypt_status
 
-# Part of archive routine
-# - name: stat letsencrypt archive status
-#   stat:
-#     path: "{{ letsencrypt_archive }}/{{ i_service_connection.0.ipv4fqdn }}.tar.gz"
-#   register: archive_status
-#   delegate_to: 127.0.0.1
+- name: stat letsencrypt archive status
+  stat:
+    path: "/mnt/hosts/{{i_service_connection.0.ipv4fqdn }}/letsencrypt/{{ i_service_connection.0.ipv4fqdn }}.tar.gz"
+  register: archive_status
+
 - name: set timezone
   community.general.timezone:
     name: "{{ timezone }}"
@@ -71,108 +29,29 @@
   command: update-ca-trust
   when: initial_letsencrypt_status.stat.exists == False
 
-- name: install python2 virtualenv command
-  pip:
-    name: ["virtualenv"]
-  when: initial_python3_status.stat.exists == False
-
-- name: create python2 virtual environment for letsencrypt
-  command: virtualenv /opt/letsencrypt
-  when:
-  - initial_python3_status.stat.exists == False
-  - initial_optdir_status.stat.exists == False
-
-- name: install certbot into the python2 virtual environment
-  command: /opt/letsencrypt/bin/pip install certbot
-  when:
-  - initial_python3_status.stat.exists == False
-  - initial_certbot_status.stat.exists == False
-
-- name: create python3 virtual environment for letsencrypt
-  command: python3 -m venv /opt/letsencrypt
-  when:
-  - initial_python3_status.stat.exists == True
-  - initial_optdir_status.stat.exists == False
-
-# --- begin python3 certbot
-###
-# - name: upgrade pip3 to latest version before install certbot
-#   command: /opt/letsencrypt/bin/pip3 install --upgrade pip
-#   when:
-#   - initial_python3_status.stat.exists == True
-#   - initial_certbot_status.stat.exists == False
-
-# ###
-# - name: install non-broken ssl version for certbot
-#   command: /opt/letsencrypt/bin/pip3 install pyOpenSSL==23.1.1
-#   when:
-#   - initial_python3_status.stat.exists == True
-#   - initial_certbot_status.stat.exists == False
-
-# ###
-# - name: install certbot into the python3 virtual environment
-#   command: /opt/letsencrypt/bin/pip3 install certbot
-#   when:
-#   - initial_python3_status.stat.exists == True
-#   - initial_certbot_status.stat.exists == False
-
-# ---- end of python certbot
-
 - name: ensure the letsencrypt management directory exists
   file:
     dest: /etc/letsencrypt
     state: directory
     owner: root
     group: root
-    mode: 0755
-  when: 
-  - initial_letsencrypt_status.stat.exists == False
-  #- archive_status.stat.exists == False
+    mode: "0755"
+  when:
+    - not initial_letsencrypt_status.stat.exists
+    - not archive_status.stat.exists
 
-# This is not necessary, no script referencing virtual hosts file any more
-# - name: install the virtual hosts configuration file
-#   template:
-#     src: etc_letsencrypt_VirtualHosts.j2
-#     dest: /etc/letsencrypt/VirtualHosts
-#     owner: root
-#     group: root
-#     mode: 0644
-
-# remove
-# - name: install custom command to retrieve letsencrypt certificates
-#   template:
-#     src: usr_local_sbin_get_letsencrypt_cert.j2
-#     dest: /usr/local/sbin/get_letsencrypt_cert
-#     owner: root
-#     group: root
-#     mode: 0700
-
-# part of the letsencrypt backup routine
-# - name: install the current SSL tar file
-#   unarchive:
-#     src: "{{ letsencrypt_archive }}/{{ i_service_connection.0.ipv4fqdn }}.tar.gz"
-#     dest: /etc/
-#   when:
-#   - initial_letsencrypt_status.stat.exists == False
-#   - archive_status.stat.exists == True
-# the behaviour of this tar file is not defined in the new certbot task
+- name: Install the current SSL tar file
+  ansible.builtin.unarchive:
+    src: "/mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt/{{ i_service_connection.0.ipv4fqdn }}.tar.gz"
+    dest: /etc/
+    remote_src: true
+  when:
+    - not initial_letsencrypt_status.stat.exists
+    - archive_status.stat.exists
 
 - name: Set hostname to FQDN of machine
   ansible.builtin.hostname:
     name: "{{ i_service_connection.0.ipv4fqdn }}"
-
-# - name: run /usr/local/sbin/get_letsencrypt_cert
-#   shell: /usr/local/sbin/get_letsencrypt_cert
-
-# - name: install cron task for letsencrypt
-#   copy:
-#     src: etc_cron.d_get_letsencrypt_cert
-#     dest: /etc/cron.d/get_letsencrypt_cert
-#     owner: root
-#     group: root
-#     mode: 0644
-
-# certbot task
 
 # --- certbot install ---
 - name: Install snapd for certbot
@@ -353,10 +232,22 @@
 - name: meta
   meta: flush_handlers
 
-# Part of letsencrypt archive
-# - name: archive SSL certificates
-#   fetch:
-#     src: /var/log/letsencrypt/{{ i_service_connection.0.ipv4fqdn }}.tar.gz
-#     dest: "{{ letsencrypt_archive }}/{{ i_service_connection.0.ipv4fqdn }}.tar.gz"
-#     flat: yes
+# Archive current letsencrypt certs to backup dir
+- name: Ensure letsencrypt backup directory exists
+  ansible.builtin.file:
+    path: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt
+    state: directory
+    owner: root
+    group: root
+    mode: "600"
+
+- name: Create letsencrypt archive
+  community.general.archive:
+    path: /etc/letsencrypt
+    dest: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt/{{ i_service_connection.0.ipv4fqdn }}.tar.gz
+    force_archive: true
+    owner: root
+    group: root
+    mode: "0600"
+
 ...
