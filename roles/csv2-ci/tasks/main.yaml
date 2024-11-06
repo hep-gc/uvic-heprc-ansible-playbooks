@@ -10,13 +10,4 @@
 - include: letsencrypt.yaml
 - include: install_configure_ci.yaml
 - include: install_configure_jenkins.yaml
-
-# /mnt//host1/
-#               cloudscheduler/
-#                             schema_backups
-#                             ...
-#               certificates/
-# /mnt/../host2/
-#               cloudscheduler/
-#               certificates/
 ...
