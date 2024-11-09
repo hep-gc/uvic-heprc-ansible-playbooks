@@ -237,13 +237,13 @@
   - /var/local/cloudscheduler/etc/condor/config.d/htcondor_distinguished_names
   - /var/lib/condor/.globus
 
+# these templates could probably be moved into the ansible repo instead of pulling down the cloudscheduler repo to the deploying machine
 - name: fetch cloudscheduler templates
   fetch:
     src: "{{ item }}"
     dest: /tmp/cloudscheduler/
   with_items:
   - '/opt/cloudscheduler/etc/cloudscheduler/cloudscheduler.yaml.j2'
-  - '/opt/cloudscheduler/usr/local/etc/haproxy.conf.j2'
   - '/opt/cloudscheduler/etc/httpd/conf.d/csv2_ssl.conf.j2'
   - '/opt/cloudscheduler/web_frontend/cloudscheduler/cloudscheduler_web/settings.py.j2'
 
@@ -343,92 +343,65 @@
   notify:
     restart httpd
 
-- name: install firewalld 
-  yum:
-    name: firewalld
+# firewalld should be handled by machine setup
+# - name: install firewalld 
+#   yum:
+#     name: firewalld
 
-- name: install python firewalld for ansible
-  yum:
-    name: python-firewall
+# - name: install python firewalld for ansible
+#   yum:
+#     name: python-firewall
 
-- name: enable firewalld
-  systemd:
-    name: firewalld
-    enabled: yes
-    state: restarted
+# - name: enable firewalld
+#   systemd:
+#     name: firewalld
+#     enabled: yes
+#     state: restarted
 
-- name: open https port
-  firewalld:
-    service: https
-    permanent: true
-    state: enabled 
-    immediate: true
+# - name: open https port
+#   firewalld:
+#     service: https
+#     permanent: true
+#     state: enabled 
+#     immediate: true
 
-- name: open http port
-  firewalld:
-    service: http
-    permanent: true
-    state: enabled 
-    immediate: true
+# - name: open http port
+#   firewalld:
+#     service: http
+#     permanent: true
+#     state: enabled 
+#     immediate: true
 
-- name: open influxdb ssl port
-  firewalld:
-    port: 8086/tcp
-    permanent: true
-    state: enabled 
-    immediate: true
+# - name: open influxdb ssl port
+#   firewalld:
+#     port: 8086/tcp
+#     permanent: true
+#     state: enabled 
+#     immediate: true
  
 ### HAProxy ####################################################################################################################################################
 
-- name: import_tasks
-  import_tasks: install_CentOS_HAProxy.yaml
+- name: Install haproxy
+  ansible.builtin.dnf:
+    name: haproxy
+    state: latest
 
-- name: install HAProxy service wrapper
-  copy:
-    remote_src: yes
-    src: /opt/cloudscheduler/usr/local/sbin/haproxy_wrapper.afile
-    dest: /usr/local/sbin/haproxy_wrapper
+- name: Install haproxy config file
+  ansible.builtin.template:
+    src: etc_haproxy_haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
     owner: root
     group: root
-    mode: 0744
-  notify:
-    restart httpd
-
-- name: configure HAProxy
-  template:
-    src: "/tmp/cloudscheduler/{{ inventory_hostname }}/opt/cloudscheduler/usr/local/etc/haproxy.conf.j2"
-    dest: /usr/local/etc/haproxy.conf
-    owner: root
-    group: root
-    mode: 0644
-  notify:
-      restart httpd
-
-- name: create/update HAProxy service file in systemd directory
-  copy:
-    remote_src: yes
-    src: "/opt/cloudscheduler/etc/systemd/system/{{ item }}.afile"
-    dest: "/etc/systemd/system/{{ item }}"
-    owner: root
-    group: root
-    mode: 0644
-  with_items:
-  - HAProxy.service
+    mode: "0644"
 
 - name: reload daemons 
   command: systemctl daemon-reload
 
-- name: determine name of HAProxy service
-  set_fact:
-    haproxy_name: "{{ 'haproxy.service' if ansible_facts['distribution_major_version'] == '9' else 'HAProxy.service'}}"
-
-- name: ensure HAProxy service is enabled and running
+- name: Ensure haproxy service is enabled and running
   systemd:
-    name: "{{ item }}"
-    enabled: yes
+    name: haproxy.service
+    enabled: true
     state: restarted
-  with_items:
-  - "{{ haproxy_name }}"
 
 ### container configuration ####################################################################################################################################
 
@@ -530,6 +503,7 @@
 
 ### cloudscheduler #############################################################################################################################################
 
+# this task may be able to be skipped as it is handled with a certbot deploy hook
 - name: import_tasks
   import_tasks: copy_certificates_to_users.yaml
 
