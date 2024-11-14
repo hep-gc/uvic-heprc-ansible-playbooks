@@ -1,0 +1,3 @@
+#!/bin/bash
+cd /etc/letsencrypt/live/{{ csv2_fqdn }}
+cat fullchain.pem privkey.pem > web_crt_key.pem

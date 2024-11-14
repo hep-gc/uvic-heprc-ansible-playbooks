@@ -23,13 +23,7 @@
 
 - import_tasks: install_other_required_packages.yaml
 
-
-
-
 - import_tasks: install_python3.yaml
-
-- import_tasks: letsencrypt.yaml
-  when: (local_web is undefined) or (local_web == False)
 
 - import_tasks: create_localhost_cert.yaml
   when: 
@@ -42,6 +36,9 @@
 
 - name: Configure httpd
   include: install_configure_httpd.yaml
+
+- import_tasks: letsencrypt.yaml
+  when: (local_web is undefined) or (local_web == False)
 
 - import_tasks: install_configure_phpmyadmin.yaml
   when:
@@ -58,10 +55,6 @@
 
 - import_tasks: install_configure_csv2.yaml
 
-- import_tasks: configure_ci_target.yaml
-  when:
-  - ci_target is defined
-  - ci_target == True
 
 - import_tasks: create_condor_poller_installation_tarball.yaml
 
@@ -72,3 +65,5 @@
   - register_ELK is defined
   - register_ELK == True
   - ELK_server is defined
+
+...
