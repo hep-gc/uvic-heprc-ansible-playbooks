@@ -237,16 +237,6 @@
   - /var/local/cloudscheduler/etc/condor/config.d/htcondor_distinguished_names
   - /var/lib/condor/.globus
 
-# these templates could probably be moved into the ansible repo instead of pulling down the cloudscheduler repo to the deploying machine
-- name: fetch cloudscheduler templates
-  fetch:
-    src: "{{ item }}"
-    dest: /tmp/cloudscheduler/
-  with_items:
-  - '/opt/cloudscheduler/etc/cloudscheduler/cloudscheduler.yaml.j2'
-  - '/opt/cloudscheduler/etc/httpd/conf.d/csv2_ssl.conf.j2'
-  - '/opt/cloudscheduler/web_frontend/cloudscheduler/cloudscheduler_web/settings.py.j2'
-
 ### configure amqp #############################################################################################################################################
 
 - name: prerequisite services are enabled and running
@@ -331,53 +321,18 @@
 
 - name: set django setttings
   template:
-    src: "/tmp/cloudscheduler/{{ inventory_hostname }}/opt/cloudscheduler/web_frontend/cloudscheduler/cloudscheduler_web/settings.py.j2"
+    src: "opt_cloudscheduler_web_frontend_cloudscheduler_cloudscheduler_web_settings.py.j2"
     dest: /opt/cloudscheduler/web_frontend/cloudscheduler/cloudscheduler_web/settings.py
   notify:
     restart httpd
 
 - name: set cloudscheduler apache config
   template:
-    src: "/tmp/cloudscheduler/{{ inventory_hostname }}/opt/cloudscheduler/etc/httpd/conf.d/csv2_ssl.conf.j2"
+    src: "etc_httpd_conf.d_csv2_ssl.conf.j2"
     dest: /etc/httpd/conf.d/csv2_ssl.conf
   notify:
     restart httpd
 
-# firewalld should be handled by machine setup
-# - name: install firewalld 
-#   yum:
-#     name: firewalld
-
-# - name: install python firewalld for ansible
-#   yum:
-#     name: python-firewall
-
-# - name: enable firewalld
-#   systemd:
-#     name: firewalld
-#     enabled: yes
-#     state: restarted
-
-# - name: open https port
-#   firewalld:
-#     service: https
-#     permanent: true
-#     state: enabled 
-#     immediate: true
-
-# - name: open http port
-#   firewalld:
-#     service: http
-#     permanent: true
-#     state: enabled 
-#     immediate: true
-
-# - name: open influxdb ssl port
-#   firewalld:
-#     port: 8086/tcp
-#     permanent: true
-#     state: enabled 
-#     immediate: true
  
 ### HAProxy ####################################################################################################################################################
 
@@ -547,11 +502,11 @@
 
 - name: install cloudscheduler.yaml config file
   template:
-    src: "/tmp/cloudscheduler/{{ inventory_hostname }}/opt/cloudscheduler/etc/cloudscheduler/cloudscheduler.yaml.j2"
+    src: "etc_cloudscheduler_cloudscheduler.yaml.j2"
     dest: /etc/cloudscheduler/cloudscheduler.yaml
     owner: root
     group: cloudscheduler
-    mode: 0640
+    mode: "0640"
   notify:
       restart httpd
 
@@ -855,3 +810,4 @@
 - name: meta
   meta: flush_handlers
 
+...
