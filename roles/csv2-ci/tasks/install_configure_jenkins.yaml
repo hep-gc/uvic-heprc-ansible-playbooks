@@ -83,10 +83,6 @@
     mode: "0700"
     state: link
 
-- name: Run copy jenkins keystore
-  ansible.builtin.shell: /usr/local/sbin/prepare_copy_jenkins_keystore
-
-
 - name: Install custom jenkins config for SSL
   template:
     src: etc_systemd_system_jenkins.service.d_override.conf.j2
@@ -95,22 +91,8 @@
     group: root
     mode: "0700"
 
-- name: Install letsencrypt prehook to stop Jenkins
-  ansible.builtin.copy:
-    src: etc_letsencrypt_renewal-hooks_pre_stop_jenkins.sh
-    dest: /etc/letsencrypt/renewal-hooks/pre/stop_jenkins.sh
-    owner: root
-    group: root
-    mode: "0700"
-
-- name: Install letsencrypt deploy hook to run jenkins keystore conversion and restart jenkins
-  ansible.builtin.copy:
-    src: /usr/local/sbin/prepare_copy_jenkins_keystore
-    dest: /etc/letsencrypt/renewal-hooks/deploy/prepare_copy_jenkins_keystore
-    owner: root
-    group: root
-    mode: "0700"
-    remote_src: true
+- name: Include tasks for letsencrypt
+  ansible.builtin.include_tasks: letsencrypt.yaml
 
 - name: Daemon-reload to pick up config changes
   ansible.builtin.systemd:

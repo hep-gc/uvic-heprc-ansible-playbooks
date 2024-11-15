@@ -127,6 +127,7 @@
     -d {{ item.item.virtualhost }} --agree-tos
     --email {{ admin_email }}
     {{ deploy_hooks }}
+    certonly
   loop: "{{ i_virtualhosts_certificates_store.results }}"
   when: not item.stat.exists and 'httpd.service' not in services
   changed_when: not item.stat.exists

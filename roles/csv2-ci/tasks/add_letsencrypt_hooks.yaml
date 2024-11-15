@@ -1,0 +1,27 @@
+---
+- name: Ensure deploy hooks directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    recurse: true
+  loop:
+    - /etc/letsencrypt/renewal-hooks/deploy
+    - /etc/letsencrypt/renewal-hooks/pre
+    - /etc/letsencrypt/renewal-hooks/post
+
+- name: Install letsencrypt deploy hook to run jenkins keystore conversion and restart jenkins
+  ansible.builtin.template:
+    src: usr_local_sbin_prepare_copy_jenkins_keystore.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/prepare_copy_jenkins_keystore
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Install letsencrypt prehook to stop Jenkins
+  ansible.builtin.copy:
+    src: etc_letsencrypt_renewal-hooks_pre_stop_jenkins.sh
+    dest: /etc/letsencrypt/renewal-hooks/pre/stop_jenkins.sh
+    owner: root
+    group: root
+    mode: "0700"
+...
