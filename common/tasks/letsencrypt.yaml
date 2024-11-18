@@ -11,11 +11,6 @@
 # This is no longer done. A new method for handling
 # backups is yet to be decided
 
-- name: stat letsencrypt opt dir
-  stat:
-    path: /opt/letsencrypt
-  register: initial_optdir_status
-
 - name: stat letsencrypt status
   stat:
     path: /etc/letsencrypt

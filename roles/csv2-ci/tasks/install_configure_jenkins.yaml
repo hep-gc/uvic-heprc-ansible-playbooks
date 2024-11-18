@@ -44,7 +44,6 @@
     - /var/cache/jenkins
     - /var/log/jenkins
 
-
 # these two tasks could be added to etc_systemd_system_jenkins.service.d_override.conf.j2
 - name: Make jenkins run as root user (1/2)
   ansible.builtin.lineinfile:
@@ -84,7 +83,7 @@
     state: link
 
 - name: Install custom jenkins config for SSL
-  template:
+  ansible.builtin.template:
     src: etc_systemd_system_jenkins.service.d_override.conf.j2
     dest: /etc/systemd/system/jenkins.service.d/override.conf
     owner: root
@@ -97,13 +96,6 @@
 - name: Daemon-reload to pick up config changes
   ansible.builtin.systemd:
     daemon_reload: true
-
-- name: Open jenkins ssl port (if firewalld is installed)
-  ansible.builtin.command: firewall-cmd --permanent --zone=public --add-port=8443/tcp
-  notify:
-    - restart firewalld
-  ignore_errors: yes
-
 
 - name: Start jenkins
   ansible.builtin.systemd_service:

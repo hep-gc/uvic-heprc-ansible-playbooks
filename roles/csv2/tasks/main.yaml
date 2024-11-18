@@ -35,7 +35,12 @@
 - import_tasks: create_mysqldb_csv2.yaml
 
 - name: Configure httpd
-  include: install_configure_httpd.yaml
+  ansible.builtin.include_tasks: install_configure_httpd.yaml
+
+- import_tasks: configure_ci_target.yaml
+  when:
+    - ci_target is defined
+    - ci_target == True
 
 - import_tasks: letsencrypt.yaml
   when: (local_web is undefined) or (local_web == False)

@@ -1,4 +1,4 @@
-
+---
 - set_fact:
     csv2_host: '{{ i_virtualhosts.0.virtualhost }}'
     ssl_cert_file: "/etc/letsencrypt/live/{{ i_service_connection.0.ipv4fqdn }}/fullchain.pem"
@@ -10,8 +10,8 @@
     ssl_cert_file: /local_ssl/localhost.crt
     ssl_key_file: /local_ssl/localhost.key
   when: 
-  - local_web is defined
-  - local_web == True    
+    - local_web is defined
+    - local_web == True
 
 - set_fact:
     ssl_ca_cert_arg: 'SSLCACertificatePath /etc/grid-security/certificates/'
@@ -20,32 +20,24 @@
 - set_fact:
     ssl_ca_cert_arg: 'SSLCACertificateFile /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem'
   when: 
-  - container is defined
-  - container == True
+    - container is defined
+    - container == True
 
 - set_fact:
     db_hostname: "{{ i_service_connection.0.ipv4fqdn }}"
   when:
-  - (db_on_localhost is undefined) or (db_on_localhost != true)
-
-#- set_fact:
-#    public_mariadb: False
+    - (db_on_localhost is undefined) or (db_on_localhost != true)
 
 - name: set_fact
   set_fact:
     db_hostname: "localhost"
   when:
-  - db_on_localhost is defined
-  - db_on_localhost == true
+    - db_on_localhost is defined
+    - db_on_localhost == true
 
 - name: set_fact
   set_fact:
     hostname: "{{ i_service_connection.0.ipv4fqdn }}"
-
-# this takes effect after reboot
-- name: disable SELinux
-  selinux: 
-    state: disabled
 
 - name: create cloudscheduler user
   user:
@@ -57,11 +49,11 @@
     state: directory
     group: cloudscheduler
   with_items:
-  - /etc/phpMyAdmin
-  - /var/lib/php
-  - /var/lib/php/session
+    - /etc/phpMyAdmin
+    - /var/lib/php
+    - /var/lib/php/session
   when:
-  - (install_phpMyAdmin is defined) and (install_phpMyAdmin == True)
+    - (install_phpMyAdmin is defined) and (install_phpMyAdmin == True)
 
 - name: change the group ownership of the phpmyadmin configuration file
   file:
@@ -69,9 +61,9 @@
     state: file
     group: cloudscheduler
   with_items:
-  - /etc/phpMyAdmin/config.inc.php
+    - /etc/phpMyAdmin/config.inc.php
   when:
-  - (install_phpMyAdmin is defined) and (install_phpMyAdmin == True)
+    - (install_phpMyAdmin is defined) and (install_phpMyAdmin == True)
 
 ### install software ###########################################################################################################################################
 
@@ -84,7 +76,7 @@
     dest: /tmp/rabbitmq_script.rpm.sh
     mode: a+x
   when: ansible_facts['distribution_major_version'] == '9'
-  
+
 - name: execute the script
   shell: sudo os=el dist=8 /tmp/rabbitmq_script.rpm.sh
   when: ansible_facts['distribution_major_version'] == '9'
@@ -125,11 +117,11 @@
 - name: upgrade pip3 setuptools
   pip:
     name:
-    - pip
-    - setuptools
+      - pip
+      - setuptools
     executable: pip3
     state: latest
-  
+
 - name: determine django package version
   set_fact:
     django_package: "{{ 'django' if ansible_facts['distribution_major_version'] == '9' else 'django==2.0.5'}}"
@@ -147,30 +139,30 @@
 
 - name: install mysql python packages
   pip:
-    name: ["mysqlclient", "mysql-connector", "sqlparse" ]
+    name: ["mysqlclient", "mysql-connector", "sqlparse"]
     executable: pip3
 
 - name: save any changes in the git repository that we are about to pull down
   git_reposave:
-      dest: /opt/cloudscheduler/
+    dest: /opt/cloudscheduler/
   ignore_errors: yes
 
 - name: pull down git repository
   git:
-      repo: 'https://github.com/hep-gc/cloudscheduler.git'
-      dest: /opt/cloudscheduler/
-      force: yes
-      update: yes
-      version: "{{ cs_git_branch }}"
+    repo: 'https://github.com/hep-gc/cloudscheduler.git'
+    dest: /opt/cloudscheduler/
+    force: yes
+    update: yes
+    version: "{{ cs_git_branch }}"
 
 - name: install ace js code editor
   git:
-      repo: 'https://github.com/ajaxorg/ace-builds.git'
-      dest: /opt/cloudscheduler/web_frontend/cloudscheduler/csv2/static/ace-builds/
-      accept_hostkey: yes
-      force: yes
-      update: no
-      version: master
+    repo: 'https://github.com/ajaxorg/ace-builds.git'
+    dest: /opt/cloudscheduler/web_frontend/cloudscheduler/csv2/static/ace-builds/
+    accept_hostkey: yes
+    force: yes
+    update: no
+    version: master
 
 # Installing plotly via git clone was working intermittently previously and was only changed due to curl errors (92, 56)
 # that may be indicative of a network issue. This may not actually require a change.
@@ -224,18 +216,18 @@
     path: "{{ item }}"
     state: absent
   with_items:
-  - /etc/condor/config.d/gsi.container
-  - /etc/cron.d/copy-letsencrypt-to-users
-  - /etc/cron.d/copy_letsencrypt_to_users.sh
-  - /etc/cron.d/csv2-copy-certificates-to-users
-  - /etc/cron.d/create_condor_proxies
-  - /etc/cron.d/csv2-ec2-instance-types
-  - /etc/httpd/conf.d/welcome.conf
-  - /etc/systemd/system/csv2-glint.service
-  - /etc/logrotate.d/cspollers.conf
-  - /etc/logrotate.d/csv2-pollers
-  - /var/local/cloudscheduler/etc/condor/config.d/htcondor_distinguished_names
-  - /var/lib/condor/.globus
+    - /etc/condor/config.d/gsi.container
+    - /etc/cron.d/copy-letsencrypt-to-users
+    - /etc/cron.d/copy_letsencrypt_to_users.sh
+    - /etc/cron.d/csv2-copy-certificates-to-users
+    - /etc/cron.d/create_condor_proxies
+    - /etc/cron.d/csv2-ec2-instance-types
+    - /etc/httpd/conf.d/welcome.conf
+    - /etc/systemd/system/csv2-glint.service
+    - /etc/logrotate.d/cspollers.conf
+    - /etc/logrotate.d/csv2-pollers
+    - /var/local/cloudscheduler/etc/condor/config.d/htcondor_distinguished_names
+    - /var/lib/condor/.globus
 
 ### configure amqp #############################################################################################################################################
 
@@ -245,7 +237,7 @@
     enabled: yes
     state: restarted
   with_items:
-  - rabbitmq-server
+    - rabbitmq-server
 
 - name: wait for prerequisite services
   wait_for:
@@ -254,20 +246,20 @@
 
 - name: define csv2 amqp (rabbitmq) users
   rabbitmq_user:
-      user: "{{ item }}"
-      password: "new user temporary password"
-      vhost: /
-      configure_priv: .*
-      read_priv: .*
-      write_priv: .*
-      state: present
+    user: "{{ item }}"
+    password: "new user temporary password"
+    vhost: /
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    state: present
   with_items:
-  - "{{ amqp_users }}"
+    - "{{ amqp_users }}"
 
 - name: update csv2 amqp (rabbitmq) user passwords (cannot make "rabbitmq_user" work with "update_password=always" and "with_items")
   command: "rabbitmqctl change_password {{ item }} {{ amqp_user_passwords[item] }}"
   with_items:
-  - "{{ amqp_users }}"
+    - "{{ amqp_users }}"
 
 ### httpd ######################################################################################################################################################
 
@@ -305,8 +297,7 @@
     line: "Group cloudscheduler"
   notify:
     restart httpd
-  when:
-    config_apache_group.stdout == "0"
+  when: config_apache_group.stdout == "0"
 
 - name: allow proxy certificates
   copy:
@@ -333,7 +324,6 @@
   notify:
     restart httpd
 
- 
 ### HAProxy ####################################################################################################################################################
 
 - name: Install haproxy
@@ -366,15 +356,15 @@
     regexp: '^        START = '
     line: '        START = TRUE'
   when: 
-  - container is defined
-  - container == True
-  - (openstack_vm is not defined) or (openstack_vm == False)
- 
+    - container is defined
+    - container == True
+    - (openstack_vm is not defined) or (openstack_vm == False)
+
 - name: Get public IP address
   ipify_facts:
-  when: 
-  - container is defined
-  - container == True
+  when:
+    - container is defined
+    - container == True
 
 - name: update cloudscheduler to remove ssl verification for private-web container target
   lineinfile:
@@ -388,16 +378,16 @@
     - container is defined
     - container == True
     - local_web is defined
-    - local_web == True  
+    - local_web == True
 
 - name: suppress python requests warning if ssl verification removed from cloudscheduler
   blockinfile:
-    path: /opt/cloudscheduler/cli/bin/csv2_common.py  
+    path: /opt/cloudscheduler/cli/bin/csv2_common.py
     insertafter: '^    import requests as py_requests'
     content: |2
           import urllib3
           urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-    
+
   when:
     - container is defined
     - container == True
@@ -416,9 +406,9 @@
   shell: pkill -9 mysql
   ignore_errors: yes
   when: 
-  - container is defined
-  - container == True
-  - (openstack_vm is not defined) or (openstack_vm == False)
+    - container is defined
+    - container == True
+    - (openstack_vm is not defined) or (openstack_vm == False)
 
 ### celery #####################################################################################################################################################
 
@@ -436,7 +426,7 @@
     path: "/var/log/celery/w{{ item }}.log"
     owner: cloudscheduler
     group: cloudscheduler
-    mode: 0664
+    mode: "0664"
   with_sequence: start=1 end=4
 
 - name: create celery run directory
@@ -445,7 +435,7 @@
     path: /var/run/celery
     owner: cloudscheduler
     group: cloudscheduler
-    mode: 0775
+    mode: "0775"
 
 - name: touch celery pid files before run
   file:
@@ -453,7 +443,7 @@
     path: "/var/run/celery/w{{ item }}.pid"
     owner: cloudscheduler
     group: cloudscheduler
-    mode: 0664
+    mode: "0664"
   with_sequence: start=1 end=4
 
 ### cloudscheduler #############################################################################################################################################
@@ -472,19 +462,12 @@
 - name: install influxDB ssl configuration file
   copy:
     src: etc_influxdb_influxdb.conf
-    dest: /etc/influxdb/influxdb.conf 
+    dest: /etc/influxdb/influxdb.conf
 
 - name: Start service InfluxDB
   service:
     name: influxdb
     state: restarted
-
-# name: add users to the cloudscheduler group
-# user:
-#   name: "{{ item }}"
-#   groups: cloudscheduler
-# with_items:
-# - condor
 
 - name: Create cloudscheduler config directory
   file:
@@ -517,50 +500,50 @@
     dest: "/etc/cloudscheduler/{{ item }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   with_items:
-  - celery
+    - celery
 
 - name: create cloudscheduler run time and log directory
   file: 
     path: "{{ item }}"
     owner: cloudscheduler
     group: cloudscheduler
-    mode: 0774
+    mode: "0774"
     state: directory
   with_items:  
-  - /var/local/cloudscheduler/ec2
-  - /var/local/cloudscheduler/image_cache
-  - /var/local/cloudscheduler/run
-  - /var/local/cloudscheduler/schema_backups
-  - /var/local/cloudscheduler/signals
-  - /var/log/cloudscheduler
+    - /var/local/cloudscheduler/ec2
+    - /var/local/cloudscheduler/image_cache
+    - /var/local/cloudscheduler/run
+    - /var/local/cloudscheduler/schema_backups
+    - /var/local/cloudscheduler/signals
+    - /var/log/cloudscheduler
 
 - name: create empty cloudscheduler log files (owner=cloudscheduler, group=cloudscheduler)
   file:
-      path: "/var/log/cloudscheduler/{{ item }}"
-      owner: cloudscheduler
-      group: cloudscheduler
-      mode: 0644
-      state: touch
+    path: "/var/log/cloudscheduler/{{ item }}"
+    owner: cloudscheduler
+    group: cloudscheduler
+    mode: "0644"
+    state: touch
   with_items:
-      - csv2_web.log
-      - ec2Poller.log
-      - main.log
-      - openstackpoller.log
+    - csv2_web.log
+    - ec2Poller.log
+    - main.log
+    - openstackpoller.log
 #     - condor_poller.log
-      - timeseriesPoller.log
-      - watch_csv2.logging
+    - timeseriesPoller.log
+    - watch_csv2.logging
 
 - name: create empty cloudscheduler log files (owner=root, group=root)
   file:
-      path: "/var/log/cloudscheduler/{{ item }}"
-      owner: root
-      group: root
-      mode: 0644
-      state: touch
+    path: "/var/log/cloudscheduler/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+    state: touch
   with_items:
-  - vm_data.logging
+    - vm_data.logging
 
 - name: copy logrotate files
   copy:
@@ -569,12 +552,12 @@
     dest: "/etc/logrotate.d/{{ item }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   with_items:
-  - csv2-log
-  - csv2-condor
-  - csv2-vm-data
-  - csv2-signals
+    - csv2-log
+    - csv2-condor
+    - csv2-vm-data
+    - csv2-signals
 
 
 - name: install csv2 sudoers
@@ -584,7 +567,7 @@
     dest: "/etc/sudoers.d/{{ item }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   with_items:
     - cloudscheduler
     - condor
@@ -603,12 +586,12 @@
     dest: /etc/my.cnf.d/server.cnf
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
 
 - name: ensure mariadb is running
   systemd:
-      name: mariadb
-      state: restarted
+    name: mariadb
+    state: restarted
 
 - name: install csv2 database schema
   command: "/opt/cloudscheduler/utilities/db_upgrade {{ schema_model }} -i {{ db_upgrade_file }} -r live"
@@ -715,7 +698,7 @@
   command: "{{ mysql_command }} -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 -e 'INSERT INTO csv2_group_metadata (group_name, metadata_name, enabled, priority, metadata, mime_type) VALUES (\"csv2-group\", \"{{ item }}\", \"1\", \"0\", LOAD_FILE(\"/opt/cloudscheduler/metadata/{{ item }}\"), \"cloud-config\")'"
   ignore_errors: yes
   with_items:
-  - default.yaml.j2
+    - default.yaml.j2
 
 - name: ensure public index file exists
   copy:
@@ -724,7 +707,7 @@
     force: yes
     group: cloudscheduler
     owner: cloudscheduler
-    mode: 0775
+    mode: "0775"
 
 - name: ensure public last update file exists
   copy:
@@ -733,7 +716,7 @@
     force: yes
     group: cloudscheduler
     owner: cloudscheduler
-    mode: 0775
+    mode: "0775"
 
 - name: generate original public page
   command: python3 /opt/cloudscheduler/web_frontend/cloudscheduler/csv2/gen_public_page.py
@@ -747,11 +730,11 @@
     dest: "/etc/cron.d/{{ item }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   with_items:
-  - csv2-signal-log-cleanup
-  - csv2-watch
-  - generate-public-page
+    - csv2-signal-log-cleanup
+    - csv2-watch
+    - generate-public-page
 
 - name: make a soft link to the cloudscheduler executable
   file:
