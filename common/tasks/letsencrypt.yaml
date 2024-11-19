@@ -148,6 +148,8 @@
 - name: Show certbot renewal
   ansible.builtin.debug:
     msg: "{{ out.stdout }}"
+  when: out is not search("No renewals were attempted")
+
 
 - name: Start HAProxy service if present
   ansible.builtin.systemd_service:

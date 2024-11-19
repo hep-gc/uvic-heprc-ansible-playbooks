@@ -1,23 +1,25 @@
 ---
 # install_configure_httpd.yaml
 
-- name: install packages required by httpd
+- name: Install packages required by httpd
   yum:
     name: ['httpd', 'httpd-tools', 'mod_ssl']
     state: latest
   notify:
   - restart httpd
 
-- name: set up port 80 listener virtualhost host for each i_virtualhosts (required for letsencrypt)
+- name: Set up port 80 listener virtualhost host for each i_virtualhosts (required for letsencrypt)
   ansible.builtin.template:
     src: etc_httpd_conf.d_virtualhost.conf.j2
     dest: /etc/httpd/conf.d/{{ item.virtualhost }}.conf
     owner: root
     mode: "0644"
+    force: false
   loop: "{{ i_virtualhosts }}"
 
-- name: enable and start httpd
-  systemd:
+- name: Enable and start httpd
+  ansible.builtin.systemd:
     name: httpd
-    enabled: yes
+    enabled: true
     state: restarted
+...
