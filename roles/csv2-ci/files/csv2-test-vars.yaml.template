@@ -13,7 +13,7 @@ web_debug: True
 
 favicon_colour: red
 
-container: True
+container: False
 local_web: False
 
 openstack_vm: True

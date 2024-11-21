@@ -52,8 +52,8 @@
   ansible.builtin.include_tasks: install_configure_httpd.yaml
 
 - name: Configure letsencrypt certificates
-  ansible.builtin.import_tasks: letsencrypt.yaml
-  when: (local_web is undefined) or (local_web)
+  ansible.builtin.include_tasks: letsencrypt.yaml
+  when: (local_web is undefined) or (not local_web)
 
 - name: Install and configure phpmyadmin
   ansible.builtin.import_tasks: install_configure_phpmyadmin.yaml
