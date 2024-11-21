@@ -30,6 +30,9 @@
 - name: Perform yum updates
   ansible.builtin.import_tasks: perform_yum_updates.yaml
 
+- name: Install Configure Firewalld
+  ansible.builtin.include_tasks: install_configure_firewalld.yaml
+
 - name: Install other required packages
   ansible.builtin.import_tasks: install_other_required_packages.yaml
 

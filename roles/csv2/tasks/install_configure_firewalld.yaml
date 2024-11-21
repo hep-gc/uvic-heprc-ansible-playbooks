@@ -1,0 +1,62 @@
+---
+# install_configure_firewalld.yaml
+
+# this also installs firewall-cmd and python-firewall
+- name: Ensure Firewalld is Present
+  ansible.builtin.dnf:
+    name: firewalld
+    state: present
+
+- name: Start Firewalld
+  ansible.builtin.systemd:
+    name: firewalld
+    state: started
+
+- name: Open ports required for csv2
+  ansible.posix.firewalld:
+    zone: public
+    state: enabled
+    permanent: true
+    port: "{{ item }}"
+  loop:
+    - 80/tcp          # http
+    - 443/tcp         # https
+    - 8086/tcp        # influxdb
+  notify: restart firewalld
+
+- name: Open firewall when public mariadb
+  ansible.posix.firewalld:
+    service: mysql
+    state: enabled
+    permanent: true
+    zone: public
+  when:
+    - public_mariadb is defined
+    - public_mariadb == true
+    - (container is undefined) or (container == False)
+  ignore_errors: yes
+  notify: restart firewalld
+
+- name: Open HTCondor service port
+  ansible.posix.firewalld:
+    zone: public
+    port: "{{ htcondor_collector_port }}/tcp"
+    state: enabled
+    permanent: true
+  when: (container is undefined) or (not container)
+  ignore_errors: true
+  notify: restart firewalld
+
+- name: Open HTCondor ephemeral ports
+  ansible.posix.firewalld:
+    zone: public
+    port: "{{ htcondor_low_port }}-{{ htcondor_high_port }}/tcp"
+    state: enabled
+    permanent: true
+  when: (container is undefined) or (not container)
+  ignore_errors: true
+  notify: restart firewalld
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+...

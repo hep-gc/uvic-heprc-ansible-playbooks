@@ -1,15 +1,5 @@
 # configure_EL7_HTCondor.yaml
 
-- name: open HTCondor service port
-  firewalld: zone=public port="{{ htcondor_collector_port }}/tcp"  state=enabled immediate=yes permanent=yes
-  when: (container is undefined) or (container == False)
-  ignore_errors: yes
-
-- name: open HTCondor ephemeral ports
-  firewalld: zone=public port="{{ htcondor_low_port }}-{{ htcondor_high_port }}/tcp"  state=enabled immediate=yes permanent=yes
-  when: (container is undefined) or (container == False)
-  ignore_errors: yes
-
 - name: HTCondor local configuration
   copy:
     src: etc_condor_condor_config.local

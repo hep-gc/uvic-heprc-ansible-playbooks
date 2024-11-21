@@ -12,14 +12,6 @@
 #   {{ public_mariadb }}        - Anything other than "true" is treated as "false". 
 #   {{ etc_my_cnf_d }}          - A list of configuration files, see play "configure mariadb server" below.
 
-- name: if required (public_mariadb = true specified), open the firewall for public access
-  firewalld: service=mysql state=enabled permanent=true immediate=true zone=public
-  when:
-  - public_mariadb is defined
-  - public_mariadb == true
-  - (container is undefined) or (container == False)
-  ignore_errors: yes
-
 # This repository contains mariadb 10.11 
 # https://mariadb.org/download/?t=repo-config&d=Red+Hat+Enterprise+Linux+9&v=10.11&r_m=xtom_fre
 - name: Add MariaDB repository
