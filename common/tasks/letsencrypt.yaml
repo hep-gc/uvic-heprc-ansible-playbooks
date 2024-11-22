@@ -154,6 +154,16 @@
 # remove certonly, remove --email
 # deploy hooks in /etc/letsencrypt/renewal-hooks/deploy do not run on the initial deployment, only renewals
 
+# this step deploys certs on apcahe virtualhosts if they were restored from a backup
+- name: Redeploy certs on virtualhosts (apache)
+  ansible.builtin.command: >-
+    certbot -n --apache -d {{ item.item.virtualhost }} --agree-tos
+    --email {{ admin_email }}
+    {{ deploy_hooks }}
+    --reuse-key
+  loop: "{{ i_virtualhosts_certificates_store.results }}"
+  when: archive_status.stat.exists and 'httpd.service' in services
+
 - name: Certbot renew certificates
   ansible.builtin.command: certbot -n renew
   register: out
