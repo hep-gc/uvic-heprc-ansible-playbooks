@@ -1,5 +1,18 @@
 ---
 # install_configure_jenkins.yaml
+- name: Open ports required for Jenkins
+  ansible.posix.firewalld:
+    zone: public
+    state: enabled
+    permanent: true
+    port: "{{ item }}"
+  loop:
+    - 8443/tcp          # https
+  ignore_errors: true
+  notify: restart firewalld
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: Get jenkins long term release repo
   ansible.builtin.get_url:

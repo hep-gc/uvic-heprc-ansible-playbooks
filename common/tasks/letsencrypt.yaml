@@ -25,10 +25,6 @@
   command: update-ca-trust
   when: initial_letsencrypt_status.stat.exists == False
 
-- name: Set hostname to FQDN of machine
-  ansible.builtin.hostname:
-    name: "{{ i_service_connection.0.ipv4fqdn }}"
-
 # --- certbot install ---
 - name: Install snapd for certbot
   ansible.builtin.dnf:
@@ -176,5 +172,4 @@
 
 - name: meta
   meta: flush_handlers
-
 ...

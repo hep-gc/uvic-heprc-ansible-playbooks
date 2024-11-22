@@ -455,6 +455,20 @@
 - name: import_tasks
   import_tasks: configure_EL7_HTCondor.yaml
 
+- name: Open ports required for influxdb
+  ansible.posix.firewalld:
+    zone: public
+    state: enabled
+    permanent: true
+    port: "{{ item }}"
+  loop:
+    - 8086/tcp        # influxdb
+  ignore_errors: true
+  notify: restart firewalld
+
+- name: Flush firewalld handlers
+  ansible.builtin.meta: flush_handlers
+
 - name: create influx admin user
   command: influx -execute "CREATE USER admin WITH PASSWORD '{{ influx_admin_pass }}' WITH ALL PRIVILEGES"
   ignore_errors: yes
@@ -776,13 +790,36 @@
     state: restarted
   with_items: "{{ current_csv2_services.stdout_lines }}"
 
-- name: create new default group "default"
-  command: "cloudscheduler group add -su csv2_default -spw '{{ csv2_default_password }}' -sa {{ csv2_web_address }} -gn default -un csv2_default -htcf {{ condor_manager }}"
-  ignore_errors: yes
+- name: Create new default group "default"
+  ansible.builtin.command: >-
+    cloudscheduler group add
+    -su csv2_default
+    -spw '{{ csv2_default_password }}'
+    -sa {{ csv2_web_address }}
+    -gn default
+    -un csv2_default
+    -htcf {{ condor_manager }}
+  register: default_out
+  failed_when:
+    - default_out.rc != 0
+    - "'HTTP response code' in default_out.stdout"
+  changed_when:
+    - "'successfully added' in default_out.stdout"
 
-- name: remove old setup group csv2_default
-  command: "cloudscheduler group delete -su csv2_default -spw '{{ csv2_default_password }}' -sa {{ csv2_web_address }} -gn csv2-group -Y"
-  ignore_errors: yes
+- name: Remove old setup group csv2_default
+  ansible.builtin.command: >-
+    cloudscheduler group delete
+    -su csv2_default
+    -spw '{{ csv2_default_password }}'
+    -sa {{ csv2_web_address }}
+    -gn csv2-group
+    -Y
+  register: csv2_default_out
+  failed_when:
+    - csv2_default_out.rc != 0
+    - "'HTTP response code' in csv2_default_out.stdout"
+  changed_when:
+    - "'succesfully deleted' in csv2_default_out.stdout"
 
 - name: TEST STEP DISABLE EC2
   systemd:
@@ -790,7 +827,6 @@
     state: stopped
     enabled: yes
 
-- name: meta
-  meta: flush_handlers
-
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
 ...
