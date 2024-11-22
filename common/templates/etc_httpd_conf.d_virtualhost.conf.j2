@@ -1,0 +1,5 @@
+<VirtualHost *:80>
+    ServerName {{ item.virtualhost }}
+    ServerAlias www.{{ item.virtualhost }}
+    ErrorLog /var/log/httpd/error.log
+</VirtualHost>

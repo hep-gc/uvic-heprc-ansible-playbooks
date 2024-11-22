@@ -98,16 +98,6 @@
   with_items:
     - "{{ certificate_users }}"
 
-- name: Add prehook to bring down httpd before renewing certificate
-  ansible.builtin.copy:
-    src: etc_letsencrypt_renewal-hooks_pre_stop_httpd.sh
-    dest: /etc/letsencrypt/renewal-hooks/pre/stop_httpd.sh
-    owner: root
-    group: root
-    mode: "0700"
-  when:
-    - certificate_users is defined
-
 - name: Install bash script to update cert and key for certificate users and restart httpd
   ansible.builtin.template:
     src: etc_letsencrypt_renewal-hooks_deploy_copy_certificates_to_users.j2

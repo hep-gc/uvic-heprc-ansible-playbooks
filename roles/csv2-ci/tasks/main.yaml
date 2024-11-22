@@ -1,13 +1,28 @@
 ---
 # ci server main.yaml
 
-- include_vars: csv2-ci-vars.yaml
-- include: create_installation_directories.yaml
-- include: configure_backup_directory.yaml
-- include: perform_yum_updates.yaml
-- include: install_other_required_packages.yaml
-- include: configure_root_mail_forwarding.yaml
-- include: letsencrypt.yaml
-- include: install_configure_ci.yaml
-- include: install_configure_jenkins.yaml
+- name: Include vars
+  ansible.builtin.include_vars: csv2-ci-vars.yaml
+
+- name: Include create_installation_directories
+  ansible.builtin.include_tasks: create_installation_directories.yaml
+
+- name: Configure backup directory
+  include: configure_backup_directory.yaml
+
+- name: Include perform_yum_updates
+  ansible.builtin.include_tasks: perform_yum_updates.yaml
+
+- name: Include install_other_required_packages
+  ansible.builtin.include_tasks: install_other_required_packages.yaml
+
+- name: Include configure_root_mail_forwarding
+  ansible.builtin.include_tasks: configure_root_mail_forwarding.yaml
+
+- name: Include install_configure_ci
+  ansible.builtin.include_tasks: install_configure_ci.yaml
+
+- name: Include install_configure_jenkins
+  ansible.builtin.include_tasks: install_configure_jenkins.yaml
+
 ...

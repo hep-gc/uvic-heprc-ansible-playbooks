@@ -5,13 +5,15 @@
     name: epel-release
     state: present
 
-- name: install other packages
-  ansible.builtin.dnf:
-    name: ['nano', 'mc']
-    state: present
-
 - name: update all installed packages
   ansible.builtin.dnf:
     name: '*'
     state: latest
   ignore_errors: true
+
+- name: install other packages
+  ansible.builtin.dnf:
+    name: ['nano', 'mc']
+    state: present
+
+

@@ -58,8 +58,6 @@
 
 # these are also handled in
 # /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_alma9.sh
-# (currently only on branch: travis-web-test-fix)
-# https://github.com/hep-gc/cloudscheduler/blob/travis-web-test-fix/unit_tests/web_tests/setup_scripts/web_test_setup_full_alma9.sh
 - name: Ensure python3 packages are installed
   ansible.builtin.pip:
     name: "{{ item }}"
@@ -73,13 +71,9 @@
     - python-keystoneclient
     - python-novaclient
 
-
 - name: Run web test setup script
   ansible.builtin.shell: yes | /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_alma9.sh ci_install
 
-
-# add csv2-ci var for credentials file location
-# and copy credentials to remote here
 - name: Copy credentials file to remote
   ansible.builtin.copy:
     remote_src: false
@@ -87,8 +81,6 @@
     dest: /root/cloudscheduler/unit_tests/credentials.yaml
     mode: "0644"
 
-# add csv2-ci var for ssh key file location
-# and copy + register ssh key on remote here
 - name: Copy ssh key to remote
   ansible.builtin.copy:
     remote_src: false
@@ -101,7 +93,6 @@
     eval "$(ssh-agent)"
     ssh-add
 
-
 # edit ssh config here accoridng to wiki
 - name: Configure ssh-config
   ansible.builtin.lineinfile:
@@ -110,3 +101,4 @@
   loop:
     - StrictHostKeyChecking no
     - UserKnownHostsFile=/dev/null
+...

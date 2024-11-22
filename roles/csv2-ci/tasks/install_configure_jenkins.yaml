@@ -1,5 +1,18 @@
 ---
 # install_configure_jenkins.yaml
+- name: Open ports required for Jenkins
+  ansible.posix.firewalld:
+    zone: public
+    state: enabled
+    permanent: true
+    port: "{{ item }}"
+  loop:
+    - 8443/tcp          # https
+  ignore_errors: true
+  notify: restart firewalld
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: Get jenkins long term release repo
   ansible.builtin.get_url:
@@ -44,7 +57,6 @@
     - /var/cache/jenkins
     - /var/log/jenkins
 
-
 # these two tasks could be added to etc_systemd_system_jenkins.service.d_override.conf.j2
 - name: Make jenkins run as root user (1/2)
   ansible.builtin.lineinfile:
@@ -83,45 +95,20 @@
     mode: "0700"
     state: link
 
-- name: Run copy jenkins keystore
-  ansible.builtin.shell: /usr/local/sbin/prepare_copy_jenkins_keystore
-
-
 - name: Install custom jenkins config for SSL
-  template:
+  ansible.builtin.template:
     src: etc_systemd_system_jenkins.service.d_override.conf.j2
     dest: /etc/systemd/system/jenkins.service.d/override.conf
     owner: root
     group: root
     mode: "0700"
 
-- name: Install letsencrypt prehook to stop Jenkins
-  ansible.builtin.copy:
-    src: etc_letsencrypt_renewal-hooks_pre_stop_jenkins.sh
-    dest: /etc/letsencrypt/renewal-hooks/pre/stop_jenkins.sh
-    owner: root
-    group: root
-    mode: "0700"
-
-- name: Install letsencrypt deploy hook to run jenkins keystore conversion and restart jenkins
-  ansible.builtin.copy:
-    src: /usr/local/sbin/prepare_copy_jenkins_keystore
-    dest: /etc/letsencrypt/renewal-hooks/deploy/prepare_copy_jenkins_keystore
-    owner: root
-    group: root
-    mode: "0700"
-    remote_src: true
+- name: Include tasks for letsencrypt
+  ansible.builtin.include_tasks: letsencrypt.yaml
 
 - name: Daemon-reload to pick up config changes
   ansible.builtin.systemd:
     daemon_reload: true
-
-- name: Open jenkins ssl port (if firewalld is installed)
-  ansible.builtin.command: firewall-cmd --permanent --zone=public --add-port=8443/tcp
-  notify:
-    - restart firewalld
-  ignore_errors: yes
-
 
 - name: Start jenkins
   ansible.builtin.systemd_service:

@@ -1,14 +1,5 @@
 ---
 
-- name: fetch cloudscheduler remote templates
-  fetch:
-    src: "{{ item }}"
-    dest: /tmp/cloudscheduler/
-  with_items:
-  - '/opt/cloudscheduler/etc/cloudscheduler/condor_poller.yaml.j2.pfile'
-  - '/opt/cloudscheduler/repository/index.html.j2.pfile'
-  - '/opt/cloudscheduler/repository/install_condor_poller.sh.j2'
-
 - name: create condor_poller directory structure
   file:
     path: "{{ item }}"
@@ -61,11 +52,11 @@
 
 - name: generate condor_poller configuration file
   template:
-    src: "/tmp/cloudscheduler/{{ inventory_hostname }}/opt/cloudscheduler/etc/cloudscheduler/condor_poller.yaml.j2.pfile"
+    src: "tmp_gentgz_cloudscheduler_etc_cloudscheduler_condor_poller.yaml.j2.pfile"
     dest: /tmp/gentgz/cloudscheduler/etc/cloudscheduler/condor_poller.yaml
     owner: condor
     group: condor
-    mode: 0400
+    mode: "0400"
 
 - name: Remove certificate references from condor_poller config
   ansible.builtin.lineinfile:
@@ -76,21 +67,21 @@
     - "    condor_worker_cert:"
     - "    condor_worker_key:"
 
-- name: generate repository index.html
-  template:
-    src: "/tmp/cloudscheduler/{{ inventory_hostname }}/opt/cloudscheduler/repository/index.html.j2.pfile"
+- name: Generate repository index.html
+  ansible.builtin.template:
+    src: "opt_cloudscheduler_repository_index.html.j2.pfile"
     dest: /opt/cloudscheduler/repository/index.html
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
 
-- name: generate condor poller install script
-  template:
-    src: "/tmp/cloudscheduler/{{ inventory_hostname }}/opt/cloudscheduler/repository/install_condor_poller.sh.j2"
+- name: Generate condor poller install script
+  ansible.builtin.template:
+    src: "opt_cloudscheduler_repository_install_condor_poller.sh.j2"
     dest: /opt/cloudscheduler/repository/install_condor_poller.sh
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
 
 - name: build the condor_poller tarball
   command:
