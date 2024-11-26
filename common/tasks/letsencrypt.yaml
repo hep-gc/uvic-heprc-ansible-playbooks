@@ -10,8 +10,8 @@
   register: initial_letsencrypt_status
 
 - name: stat letsencrypt archive status
-  stat:
-    path: "/mnt/hosts/{{i_service_connection.0.ipv4fqdn }}/letsencrypt/{{ i_service_connection.0.ipv4fqdn }}.tar.gz"
+  ansible.builtin.stat:
+    path: "/mnt/hosts/{{i_service_connection.0.ipv4fqdn }}/letsencrypt/latest"
   register: archive_status
 
 - name: set timezone
@@ -36,7 +36,7 @@
 
 - name: Install the current SSL tar file
   ansible.builtin.unarchive:
-    src: "/mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt/{{ i_service_connection.0.ipv4fqdn }}.tar.gz"
+    src: "/mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt/latest"
     dest: /etc/
     remote_src: true
   when:
@@ -102,7 +102,6 @@
 - name: Register deploy hooks
   ansible.builtin.find:
     paths: /etc/letsencrypt/renewal-hooks/deploy
-  # when: hooks_present.stat.exists
   register: deploy_hook_find
 
 - name: Set deploy hook fact
@@ -174,7 +173,6 @@
     msg: "{{ out.stdout }}"
   when: out is not search("No renewals were attempted")
 
-
 - name: Start HAProxy service if present
   ansible.builtin.systemd_service:
     name: haproxy.service
@@ -210,13 +208,24 @@
     group: root
     mode: "600"
 
+- name: Set current timestamp
+  ansible.builtin.set_fact:
+    current_timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
+
 - name: Create letsencrypt archive
   community.general.archive:
     path: /etc/letsencrypt
-    dest: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt/{{ i_service_connection.0.ipv4fqdn }}.tar.gz
+    dest: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt/{{ i_service_connection.0.ipv4fqdn }}_{{ current_timestamp }}.tar.gz
     force_archive: true
     owner: root
     group: root
     mode: "0600"
+
+- name: Update latest symlink
+  ansible.builtin.file:
+    src: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt/{{ i_service_connection.0.ipv4fqdn }}_{{ current_timestamp }}.tar.gz
+    path: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt/latest
+    state: link
+    force: true
 
 ...
