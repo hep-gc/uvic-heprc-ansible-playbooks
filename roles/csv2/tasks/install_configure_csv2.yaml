@@ -532,7 +532,12 @@
     - /var/local/cloudscheduler/signals
     - /var/log/cloudscheduler
 
-- name: Create cloudscheduler backup directory
+- name: Stat database archive status
+  ansible.builtin.stat:
+    path: "/mnt/hosts/{{i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups/latest"
+  register: db_archive_status
+
+- name: Ensure cloudscheduler backup directory is present
   ansible.builtin.file:
     path: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups
     owner: cloudscheduler
@@ -549,6 +554,10 @@
     group: cloudscheduler
     mode: "0744"
     state: link
+
+# - meta: end_play
+
+# restore db from backup if db_archive_status.exists here or later
 
 - name: create empty cloudscheduler log files (owner=cloudscheduler, group=cloudscheduler)
   file:
@@ -624,9 +633,11 @@
     name: mariadb
     state: restarted
 
-- name: install csv2 database schema
+- name: install csv2 database schema if db_upgrade specified
   command: "/opt/cloudscheduler/utilities/db_upgrade {{ schema_model }} -i {{ db_upgrade_file }} -r live"
   register: db_upgrade
+
+  # database is restored, we can probably skip most of the rest
 
 - name: retrieve privileges for remote users
   command: "/opt/cloudscheduler/utilities/mysql_privileges {{ item.0 }},{{ item.1 }} {{ item.2 }}"
@@ -664,7 +675,7 @@
 - name: define csv2 database remote users and priveleges
   command: "mysql -u root -p'{{ database_user_passwords['root'] }}' -e '{{ item }}' csv2"
   with_items: "{{ stdout_lines }}"
-  when: mysql_privileges is defined
+  when: mysql_privileges is defined 
 
 - name: generate schema
   command: /opt/cloudscheduler/utilities/generate_schema.py
@@ -837,6 +848,22 @@
     - "'HTTP response code' in csv2_default_out.stdout"
   changed_when:
     - "'succesfully deleted' in csv2_default_out.stdout"
+  when: not db_archive_status.stat.exists
+
+- name: Get list of dumps from backup
+  ansible.builtin.find:
+    paths: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups/latest
+    contains: '^-- MariaDB dump'
+  register: dumplist
+
+- name: Install csv2 database from backup if present
+  ansible.builtin.shell: >-
+    mariadb -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 < {{ dump.path }}
+  when: db_archive_status.stat.exists
+  loop: "{{ dumplist.files }}"
+  loop_control:
+    loop_var: dump
+  register: db_upgrade
 
 - name: TEST STEP DISABLE EC2
   systemd:
