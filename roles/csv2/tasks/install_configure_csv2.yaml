@@ -455,6 +455,22 @@
 - name: import_tasks
   import_tasks: configure_EL7_HTCondor.yaml
 
+- name: Register output of csv2 db status check
+  ansible.builtin.shell: >-
+    echo "SELECT SCHEMA_NAME
+    FROM INFORMATION_SCHEMA.SCHEMATA
+    WHERE SCHEMA_NAME = 'csv2';"
+    | mariadb
+  register: csv2_db_status
+  changed_when: false
+
+- name: Set csv2_db_exists status
+  ansible.builtin.set_fact:
+    csv2_db_exists: "{{ ['SCHEMA_NAME', 'csv2'] == csv2_db_status.stdout_lines }}"
+
+- name: include create_mysqldb_csv2.yaml
+  ansible.builtin.include_tasks: create_mysqldb_csv2.yaml
+
 - name: Open ports required for influxdb
   ansible.posix.firewalld:
     zone: public
@@ -595,7 +611,6 @@
     - csv2-vm-data
     - csv2-signals
 
-
 - name: install csv2 sudoers
   copy:
     remote_src: yes
@@ -629,7 +644,7 @@
     name: mariadb
     state: restarted
 
-- name: install csv2 database schema if db_upgrade specified
+- name: install csv2 database schema
   command: "/opt/cloudscheduler/utilities/db_upgrade {{ schema_model }} -i {{ db_upgrade_file }} -r live"
   register: db_upgrade
 
@@ -647,12 +662,6 @@
   set_fact:
     stderr_lines: "{{ stderr_lines + item.stderr_lines }}"
   with_items: "{{ mysql_privileges.results }}"
-  when: mysql_privileges is defined
-
-- name: debug
-  debug:
-    msg: "{{ item }}"
-  with_nested: "{{ stderr_lines }}"
   when: mysql_privileges is defined
 
 - name: set_fact
@@ -849,14 +858,13 @@
     contains: '^-- MariaDB dump'
   register: dumplist
 
-- name: Install csv2 database from backup if present
+- name: Install csv2 database from backup if present and db does not exist already
   ansible.builtin.shell: >-
     mariadb -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 < {{ dump.path }}
-  when: db_archive_status.stat.exists
+  when: db_archive_status.stat.exists and not csv2_db_exists
   loop: "{{ dumplist.files }}"
   loop_control:
     loop_var: dump
-  register: db_upgrade
 
 - name: TEST STEP DISABLE EC2
   systemd:

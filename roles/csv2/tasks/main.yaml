@@ -51,9 +51,6 @@
 - name: Install configure MariaDB
   ansible.builtin.import_tasks: install_configure_MariaDB.yaml
 
-- name: Create mysql db
-  ansible.builtin.import_tasks: create_mysqldb_csv2.yaml
-
 - name: Configure httpd
   ansible.builtin.include_tasks: install_configure_httpd.yaml
 
