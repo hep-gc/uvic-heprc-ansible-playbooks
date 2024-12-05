@@ -1,7 +1,0 @@
----
-# configure_selinux.yaml
-- name: Set selinux to disabled
-  ansible.posix.selinux:
-    state: disabled
-
-...
