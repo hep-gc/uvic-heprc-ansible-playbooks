@@ -1,0 +1,15 @@
+---
+# check_selinux.yaml
+
+- name: Get selinux state
+  ansible.builtin.command: getenforce
+  register: getenforce
+  changed_when: false
+
+# Fails the play if selinux is enabled and warns the user
+- name: Fail if selinux is enabled
+  ansible.builtin.fail:
+    msg: "selinux is set to Enabled. Cloudscheduler will not work properly in this state."
+  when: getenforce.stdout != 'Disabled'
+
+...

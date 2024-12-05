@@ -22,6 +22,9 @@
 - name: Install_configure_firewalld
   ansible.builtin.import_tasks: "install_firewalld.yaml"
 
+- name: Ensure SELinux is disabled
+  ansible.builtin.import_tasks: check_selinux.yaml
+
 - name: Configure root mail forwarding
   ansible.builtin.import_tasks: configure_root_mail_forwarding.yaml
 
@@ -34,8 +37,6 @@
 - name: Perform yum updates
   ansible.builtin.import_tasks: perform_yum_updates.yaml
 
-- name: Disable SELinux
-  ansible.builtin.import_tasks: configure_selinux.yaml
 
 - name: Install other required packages
   ansible.builtin.import_tasks: install_other_required_packages.yaml
