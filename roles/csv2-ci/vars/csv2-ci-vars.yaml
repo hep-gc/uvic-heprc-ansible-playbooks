@@ -13,6 +13,8 @@ csv2_ci_fqdn: <REPLACE ME>
 # password for the JKS file and conversion steps
 jenkins_ssl_pw: <REPLACE ME>
 
+# If set to 'true', firewalld will be installed if it is not already present and rules will be added. This should be set to 'false' if you are using an external firewall.
+use_firewalld: <REPLACE ME>
 
 i_service_connection:
 -
