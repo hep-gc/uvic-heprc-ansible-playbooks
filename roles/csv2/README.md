@@ -7,11 +7,13 @@
 ### Recommended Configuration for the Cloudscheduler machine
 
 
-- OS: CentOS 7 (Alma9 version in development)
+- OS: Almalinux 9
 - Minimal machine  Requirements: 4+ cores, 8GB+ RAM, 100GB+ disk
   - more needed when using the HTCondor on the cloudscheduler machine instead of an external one
-- Other requirements: machine needs to have hostname based on DNS for its IPv4
-- Open ports needed: 
+- Other requirements: 
+  - machine needs to have hostname based on DNS for its IPv4
+  - machine will need to have selinux disabled
+- Open ports needed (these will be configured for the machine if use_firewalld is set to true): 
   - 80(http) 
   - 443(https) 
   - 15671(AMQP for external condor machines only; managed by csv2) 

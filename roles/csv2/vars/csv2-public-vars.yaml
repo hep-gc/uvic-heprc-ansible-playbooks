@@ -11,6 +11,7 @@ schema_model: stable-2.11.1.rc1
 
 admin_email: <REPLACE ME> # Email address you'd like to recieve admin mail to, usually the root on the csv2 host
 
+use_firewalld: <REPLACE ME> # If set to 'true', firewalld will be installed if it is not already present and rules will be added. This should be set to 'false' if you are using an external firewall.
 install_phpMyAdmin: False
 web_debug: False
 

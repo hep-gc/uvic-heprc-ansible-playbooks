@@ -6,6 +6,7 @@
     public_mariadb: false
   when: internal_system_install is not defined
 
+
 - name: Include vars csv2-public-secret-vars.yaml
   ansible.builtin.include_vars: "csv2-public-secrets.yaml"
   when: internal_system_install is not defined
@@ -17,6 +18,9 @@
 - name: Include vars csv2-public-vars.yaml
   ansible.builtin.include_vars: "csv2-public-vars.yaml"
   when: internal_system_install is not defined
+
+- name: Install_configure_firewalld
+  ansible.builtin.import_tasks: "install_firewalld.yaml"
 
 - name: Configure root mail forwarding
   ansible.builtin.import_tasks: configure_root_mail_forwarding.yaml

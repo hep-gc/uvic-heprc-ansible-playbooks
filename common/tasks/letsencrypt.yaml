@@ -132,8 +132,6 @@
   loop: "{{ i_virtualhosts_certificates_store.results }}"
   when: not item.stat.exists and 'httpd.service' in services
   changed_when: not item.stat.exists
-# test removing -d, certbot should automatically act on all virtualhost folders
-# remove certonly, remove --email
 # deploy hooks in /etc/letsencrypt/renewal-hooks/deploy do not run on the initial deployment, only renewals
 
 - name: Certbot renew certificates
