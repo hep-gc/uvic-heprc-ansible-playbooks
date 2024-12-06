@@ -21,6 +21,18 @@
     name: "{{ timezone }}"
   when: timezone is defined
 
+- name: Open ports required for http
+  ansible.posix.firewalld:
+    zone: public
+    state: enabled
+    permanent: true
+    port: "80/tcp"  #http
+  ignore_errors: true
+  notify: restart firewalld
+
+- name: Flush handlers
+  meta: flush_handlers
+
 - name: update the TLS root certificates
   command: update-ca-trust
   when: initial_letsencrypt_status.stat.exists == False
