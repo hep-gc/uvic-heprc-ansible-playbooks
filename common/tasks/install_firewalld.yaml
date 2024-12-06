@@ -1,0 +1,33 @@
+---
+# install_configure_firewalld.yaml
+
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
+- name: Fail if use_firewalld is left undefined
+  ansible.builtin.fail:
+    msg: "use_firewalld is not defined"
+  when:
+    use_firewalld is undefined
+
+- name: Fail if use_firewalld is false and firewalld is running
+  ansible.builtin.fail:
+    msg: "use_firewalld disabled but firewalld is running."
+  when:
+    - not use_firewalld
+    - ansible_facts.services['firewalld.service'] is defined
+    - ansible_facts.services['firewalld.service']['state'] == 'running'
+
+- name: Install firewalld
+  ansible.builtin.dnf:
+    name: firewalld
+    state: latest
+  when: use_firewalld
+
+- name: Start and enable firewalld
+  ansible.builtin.systemd:
+    name: firewalld
+    enabled: true
+    state: started
+  when: use_firewalld
+...

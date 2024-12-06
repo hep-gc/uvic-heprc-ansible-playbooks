@@ -4,6 +4,9 @@
 - name: Include vars
   ansible.builtin.include_vars: csv2-ci-vars.yaml
 
+- name: Include install_firewalld
+  ansible.builtin.include_tasks: install_firewalld.yaml
+
 - name: Include create_installation_directories
   ansible.builtin.include_tasks: create_installation_directories.yaml
 

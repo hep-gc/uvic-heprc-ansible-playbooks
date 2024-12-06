@@ -19,6 +19,18 @@
     name: "{{ timezone }}"
   when: timezone is defined
 
+- name: Open ports required for http
+  ansible.posix.firewalld:
+    zone: public
+    state: enabled
+    permanent: true
+    port: "80/tcp"  #http
+  ignore_errors: true
+  notify: restart firewalld
+
+- name: Flush handlers
+  meta: flush_handlers
+
 - name: update the TLS root certificates
   command: update-ca-trust
   when: initial_letsencrypt_status.stat.exists == False
@@ -149,8 +161,6 @@
   loop: "{{ i_virtualhosts_certificates_store.results }}"
   when: not item.stat.exists and 'httpd.service' in services
   changed_when: not item.stat.exists
-# test removing -d, certbot should automatically act on all virtualhost folders
-# remove certonly, remove --email
 # deploy hooks in /etc/letsencrypt/renewal-hooks/deploy do not run on the initial deployment, only renewals
 
 # this step deploys certs on apcahe virtualhosts if they were restored from a backup
