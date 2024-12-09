@@ -449,6 +449,7 @@
 ### cloudscheduler #############################################################################################################################################
 
 # this task may be able to be skipped as it is handled with a certbot deploy hook
+
 - name: import_tasks
   import_tasks: copy_certificates_to_users.yaml
 
@@ -644,7 +645,7 @@
     name: mariadb
     state: restarted
 
-- name: install csv2 database schema
+- name: install csv2 database schema and restore from backup if present
   command: "/opt/cloudscheduler/utilities/db_upgrade {{ schema_model }} -i {{ db_upgrade_file }} -r live"
   register: db_upgrade
 
@@ -787,7 +788,6 @@
     dest: /usr/bin/cloudscheduler
     state: link
 
-
 - name: create influx reader user
   command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
   ignore_errors: yes
@@ -851,20 +851,6 @@
     - "'HTTP response code' in csv2_default_out.stdout"
   changed_when:
     - "'succesfully deleted' in csv2_default_out.stdout"
-
-- name: Get list of dumps from backup
-  ansible.builtin.find:
-    paths: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups/latest
-    contains: '^-- MariaDB dump'
-  register: dumplist
-
-- name: Install csv2 database from backup if present and db does not exist already
-  ansible.builtin.shell: >-
-    mariadb -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 < {{ dump.path }}
-  when: db_archive_status.stat.exists and not csv2_db_exists
-  loop: "{{ dumplist.files }}"
-  loop_control:
-    loop_var: dump
 
 - name: TEST STEP DISABLE EC2
   systemd:
