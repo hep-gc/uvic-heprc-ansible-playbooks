@@ -562,10 +562,20 @@
     mode: "0774"
     state: directory
 
-- name: Link schema backups to backup directory
+- name: Link user_data_backup_dir to backup directory
   ansible.builtin.file:
     path: /var/local/cloudscheduler/schema_backups
     src: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups
+    force: true
+    owner: cloudscheduler
+    group: cloudscheduler
+    mode: "0744"
+    state: link
+
+- name: Link host backup_dir location to backup directory
+  ansible.builtin.file:
+    path: /opt/cloudscheduler/schema/schema_backup/{{ i_service_connection.0.ipv4fqdn }}
+    src: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups/latest/
     force: true
     owner: cloudscheduler
     group: cloudscheduler
