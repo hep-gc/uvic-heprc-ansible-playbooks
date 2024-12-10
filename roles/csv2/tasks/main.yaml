@@ -1,11 +1,10 @@
 ---
-# cloudscheduler (v2) server maim.yaml
+# cloudscheduler (v2) server main.yaml
 
 - name: Set fact public_mariadb
   ansible.builtin.set_fact:
     public_mariadb: false
   when: internal_system_install is not defined
-
 
 - name: Include vars csv2-public-secret-vars.yaml
   ansible.builtin.include_vars: "csv2-public-secrets.yaml"
@@ -25,9 +24,6 @@
 - name: Ensure SELinux is disabled
   ansible.builtin.import_tasks: check_selinux.yaml
 
-- name: Configure root mail forwarding
-  ansible.builtin.import_tasks: configure_root_mail_forwarding.yaml
-
 - name: Create installation directories
   ansible.builtin.import_tasks: create_installation_directories.yaml
 
@@ -36,7 +32,6 @@
 
 - name: Perform yum updates
   ansible.builtin.import_tasks: perform_yum_updates.yaml
-
 
 - name: Install other required packages
   ansible.builtin.import_tasks: install_other_required_packages.yaml
@@ -102,5 +97,4 @@
     - register_ELK is defined
     - register_ELK
     - ELK_server is defined
-
 ...

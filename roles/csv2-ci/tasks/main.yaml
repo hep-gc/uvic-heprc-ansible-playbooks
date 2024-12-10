@@ -16,9 +16,6 @@
 - name: Include install_other_required_packages
   ansible.builtin.include_tasks: install_other_required_packages.yaml
 
-- name: Include configure_root_mail_forwarding
-  ansible.builtin.include_tasks: configure_root_mail_forwarding.yaml
-
 - name: Include install_configure_ci
   ansible.builtin.include_tasks: install_configure_ci.yaml
 
