@@ -2,7 +2,6 @@
 - include_vars: htcondor-public-default-vars.yaml
 - include_vars: htcondor-public-vars.yaml
 
-- import_tasks: configure_root_mail_forwarding.yaml
 - import_tasks: create_installation_directories.yaml
 - import_tasks: install_other_required_packages.yaml
 - import_tasks: install_python3.yaml
