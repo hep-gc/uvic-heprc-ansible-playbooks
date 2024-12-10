@@ -1,3 +1,6 @@
+---
+# add_letsencrypt_hooks.yaml
+
 - name: Ensure deploy hooks directories exist
   ansible.builtin.file:
     path: "{{ item }}"
@@ -16,3 +19,12 @@
     owner: root
     group: root
     mode: "0700"
+
+- name: Install letsencrypt deploy hook to create backup
+  ansible.builtin.template:
+    src: etc_letsencrypt_renewal-hooks_deploy_make_backup.sh.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/make_backup.sh
+    owner: root
+    group: root
+    mode: "0700"
+...
