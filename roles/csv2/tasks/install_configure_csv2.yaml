@@ -545,9 +545,16 @@
     - ec2Poller.log
     - main.log
     - openstackpoller.log
-#     - condor_poller.log
     - timeseriesPoller.log
     - watch_csv2.logging
+
+- name: Create condor poller log file
+  ansible.builtin.file:
+    path: "/var/log/cloudscheduler/condor_poller.log"
+    owner: condor
+    group: condor
+    mode: "0644"
+    state: touch
 
 - name: create empty cloudscheduler log files (owner=root, group=root)
   file:

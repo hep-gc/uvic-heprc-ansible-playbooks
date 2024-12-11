@@ -1,3 +1,4 @@
+---
 # install_EL7_HTCondor.yaml
 
 - name: configure HTCondor repository
@@ -20,11 +21,11 @@
     url: https://get.htcondor.org
     dest: /tmp/install_htcondor.sh
     validate_certs: yes
-  when: ansible_facts['distribution_major_version'] == '9' and htcondor_installed.msg != "Nothing to do"
+  when: ansible_facts['distribution_major_version'] == '9' and "Nothing to do" not in htcondor_installed.msg
 
-- name: run the script
+- name: run the HTCondor install script
   shell: /bin/bash /tmp/install_htcondor.sh --no-dry-run
-  when: ansible_facts['distribution_major_version'] == '9' and htcondor_installed.msg != "Nothing to do"
+  when: ansible_facts['distribution_major_version'] == '9' and "Nothing to do" not in htcondor_installed.msg
 
 - name: allow SHA1 Hashing
   shell: update-crypto-policies --set DEFAULT:SHA1
@@ -39,4 +40,5 @@
   yum:
     name: ['condor-all']
     state: latest
-
+  when: ansible_facts['distribution_major_version'] == '7'
+...
