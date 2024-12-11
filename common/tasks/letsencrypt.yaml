@@ -14,6 +14,14 @@
     path: "/mnt/hosts/{{i_service_connection.0.ipv4fqdn }}/letsencrypt/latest"
   register: archive_status
 
+- name: Ensure letsencrypt backup directory exists
+  ansible.builtin.file:
+    dest: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
 - name: set timezone
   community.general.timezone:
     name: "{{ timezone }}"
