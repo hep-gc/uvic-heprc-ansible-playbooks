@@ -155,6 +155,10 @@
     update: yes
     version: "{{ cs_git_branch }}"
 
+- name: Mark all directories as safe in /etc/gitconfig
+  ansible.builtin.command:
+    cmd: git config --system --add safe.directory '*'
+
 - name: install ace js code editor
   git:
     repo: 'https://github.com/ajaxorg/ace-builds.git'
