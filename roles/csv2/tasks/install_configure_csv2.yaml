@@ -155,6 +155,10 @@
     update: yes
     version: "{{ cs_git_branch }}"
 
+- name: Mark all directories as safe in /etc/gitconfig
+  ansible.builtin.command:
+    cmd: git config --system --add safe.directory '*'
+
 - name: install ace js code editor
   git:
     repo: 'https://github.com/ajaxorg/ace-builds.git'
@@ -323,6 +327,14 @@
     dest: /etc/httpd/conf.d/csv2_ssl.conf
   notify:
     restart httpd
+
+- name: Remove httpd config files from letsencrypt
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/httpd/conf.d/elephant98.heprc.uvic.ca.conf
+    - /etc/httpd/conf.d/elephant98.heprc.uvic.ca-le-ssl.conf
 
 ### HAProxy ####################################################################################################################################################
 
@@ -594,9 +606,16 @@
     - ec2Poller.log
     - main.log
     - openstackpoller.log
-#     - condor_poller.log
     - timeseriesPoller.log
     - watch_csv2.logging
+
+- name: Create condor poller log file
+  ansible.builtin.file:
+    path: "/var/log/cloudscheduler/condor_poller.log"
+    owner: condor
+    group: condor
+    mode: "0644"
+    state: touch
 
 - name: create empty cloudscheduler log files (owner=root, group=root)
   file:

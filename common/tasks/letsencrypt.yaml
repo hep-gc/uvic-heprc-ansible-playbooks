@@ -169,8 +169,7 @@
   when: not item.stat.exists and 'httpd.service' in services
   changed_when: not item.stat.exists
   register: apache_certs
-# deploy hooks in /etc/letsencrypt/renewal-hooks/deploy do not run on the initial deployment without specifying them
-# with the --deploy-hook flag
+# deploy hooks in /etc/letsencrypt/renewal-hooks/deploy do not run on the initial deployment
 
 # this step deploys certs on apcahe virtualhosts if they were restored from a backup
 - name: Redeploy certs on virtualhosts (apache)

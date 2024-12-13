@@ -29,7 +29,8 @@
 # https://mariadb.org/download/?t=repo-config&d=Red+Hat+Enterprise+Linux+9&v=10.11&r_m=xtom_fre
 - name: Add MariaDB repository
   ansible.builtin.copy:
-    src: ../files/etc_yum.repos.d_MariaDB.repo
+#    src: ../files/etc_yum.repos.d_MariaDB.repo
+    src: etc_yum.repos.d_MariaDB.repo
     dest: /etc/yum.repos.d/MariaDB.repo
     remote_src: false
     owner: root

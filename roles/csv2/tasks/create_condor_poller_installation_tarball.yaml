@@ -62,7 +62,7 @@
   ansible.builtin.lineinfile:
     path: /tmp/gentgz/cloudscheduler/etc/cloudscheduler/condor_poller.yaml
     regexp: "^{{ item }}"
-    line: "{{ item }}''"
+    line: "{{ item }}"
   loop:
     - "    condor_worker_cert:"
     - "    condor_worker_key:"
