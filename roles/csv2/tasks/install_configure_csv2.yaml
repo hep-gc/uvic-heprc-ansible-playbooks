@@ -328,6 +328,14 @@
   notify:
     restart httpd
 
+- name: Remove httpd config files from letsencrypt
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/httpd/conf.d/elephant98.heprc.uvic.ca.conf
+    - /etc/httpd/conf.d/elephant98.heprc.uvic.ca-le-ssl.conf
+
 ### HAProxy ####################################################################################################################################################
 
 - name: Install haproxy
