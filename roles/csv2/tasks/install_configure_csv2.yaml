@@ -760,20 +760,24 @@
 - name: create csv2_default user for csv2
   command: "{{ mysql_command }} -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 -e 'INSERT INTO csv2_user (username, password, is_superuser, join_date) VALUES (\"csv2_default\", \"{{ blowfish.hash }}\", 1, \"2018-04-01\")'"
   ignore_errors: yes
+  when: not db_archive_status.stat.exists
 
 - name: create csv2-group for the default csv2 user
   command: "{{ mysql_command }} -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 -e 'INSERT INTO csv2_groups (group_name, htcondor_fqdn, job_cpus, job_ram, job_disk, job_scratch, job_swap, vm_keep_alive) VALUES (\"csv2-group\", \"{{ condor_manager }}\", \"1\", \"1000\", \"5\", \"0\", \"0\", \"0\")'"
   ignore_errors: yes
+  when: not db_archive_status.stat.exists
 
 - name: add default csv2 user to csv2-group
   command: "{{ mysql_command }} -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 -e 'INSERT INTO csv2_user_groups (username, group_name) VALUES (\"csv2_default\", \"csv2-group\")'"
   ignore_errors: yes
+  when: not db_archive_status.stat.exists
 
 - name: add metadata files for csv2-group
   command: "{{ mysql_command }} -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 -e 'INSERT INTO csv2_group_metadata (group_name, metadata_name, enabled, priority, metadata, mime_type) VALUES (\"csv2-group\", \"{{ item }}\", \"1\", \"0\", LOAD_FILE(\"/opt/cloudscheduler/metadata/{{ item }}\"), \"cloud-config\")'"
   ignore_errors: yes
   with_items:
     - default.yaml.j2
+  when: not db_archive_status.stat.exists
 
 - name: ensure public index file exists
   copy:
@@ -865,6 +869,7 @@
     - "'HTTP response code' in default_out.stdout"
   changed_when:
     - "'successfully added' in default_out.stdout"
+  when: not db_archive_status.stat.exists
 
 - name: Remove old setup group csv2_default
   ansible.builtin.command: >-
@@ -880,6 +885,7 @@
     - "'HTTP response code' in csv2_default_out.stdout"
   changed_when:
     - "'succesfully deleted' in csv2_default_out.stdout"
+  when: not db_archive_status.stat.exists
 
 - name: TEST STEP DISABLE EC2
   systemd:
