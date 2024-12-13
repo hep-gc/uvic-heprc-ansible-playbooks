@@ -102,8 +102,8 @@
 - name: Set deploy hook fact
   ansible.builtin.set_fact:
     deploy_hooks: >-
-      {%- for item in deploy_hook_find.files %}
-      --deploy-hook {{ item.path }}
+      {%- for item in deploy_hook_find.files -%}
+      {{ item.path }};
       {%- endfor -%}
   when: deploy_hook_find is defined and (deploy_hook_find|length>0)
 
@@ -129,22 +129,28 @@
     certbot -n --standalone
     -d {{ item.item.virtualhost }} --agree-tos
     --email {{ admin_email }}
-    {{ deploy_hooks }}
     certonly
   loop: "{{ i_virtualhosts_certificates_store.results }}"
   when: not item.stat.exists and 'httpd.service' not in services
   changed_when: not item.stat.exists
+  register: standalone_certs
 
 # this step automatically handles apache virtualhosts
 - name: Set up new certificates for virtualhosts (apache)
   ansible.builtin.command: >-
     certbot -n --apache -d {{ item.item.virtualhost }} --agree-tos
     --email {{ admin_email }}
-    {{ deploy_hooks }}
   loop: "{{ i_virtualhosts_certificates_store.results }}"
   when: not item.stat.exists and 'httpd.service' in services
   changed_when: not item.stat.exists
+  register: apache_certs
 # deploy hooks in /etc/letsencrypt/renewal-hooks/deploy do not run on the initial deployment, only renewals
+
+- name: Run hooks after obtaining the initial certificate
+  ansible.builtin.shell: >-
+    {{ deploy_hooks }}
+  ignore_errors: True
+  when: apache_certs is changed or standalone_certs is changed
 
 - name: Certbot renew certificates
   ansible.builtin.command: certbot -n renew
@@ -155,7 +161,6 @@
   ansible.builtin.debug:
     msg: "{{ out.stdout }}"
   when: out is not search("No renewals were attempted")
-
 
 - name: Start HAProxy service if present
   ansible.builtin.systemd_service:
