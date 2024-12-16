@@ -48,12 +48,38 @@
     dest: "{{ item }}"
     state: directory
     group: cloudscheduler
+    mode: "0774"
   with_items:
     - /etc/phpMyAdmin
-    - /var/lib/php
-    - /var/lib/php/session
+    - /var/log/php-log
+    - /run/php-fpm
   when:
     - (install_phpMyAdmin is defined) and (install_phpMyAdmin == True)
+
+- name: Change the group ownership of the /var/lib/php and all subfiles
+  ansible.builtin.file:
+    dest: /var/lib/php
+    state: directory
+    group: cloudscheduler
+    mode: "0774"
+    recurse: true
+  when: (install_phpMyAdmin is defined) and (install_phpMyAdmin == True)
+
+- name: Register php log files
+  ansible.builtin.find:
+    paths: /var/log/php-fpm/
+    patterns: "*.log"
+  register: php_logs
+  when: (install_phpMyAdmin is defined) and (install_phpMyAdmin == True)
+
+- name: Change the group ownership of php log files
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: file
+    group: cloudscheduler
+    mode: "0664"
+  loop: "{{ php_logs.files }}"
+  when: (install_phpMyAdmin is defined) and (install_phpMyAdmin == True)
 
 - name: change the group ownership of the phpmyadmin configuration file
   file:
