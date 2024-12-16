@@ -1,3 +1,5 @@
 ---
 
-- include: restart_ntpd.yaml
+- include: restart_firewalld.yaml
+
+...

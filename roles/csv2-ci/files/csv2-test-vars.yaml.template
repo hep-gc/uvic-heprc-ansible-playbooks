@@ -1,5 +1,7 @@
 # Overriding the following defaults varables (see csv2-default-vars.yaml):
 
+timezone: America/Vancouver
+
 csv2_fqdn: {HOST}
 
 cs_git_branch: {GITBRANCH}
@@ -8,12 +10,13 @@ schema_model: {SCHEMA}
 
 admin_email: root@{{ csv2_fqdn }}
 
+use_firewalld: True
 install_phpMyAdmin: False
 web_debug: True
 
 favicon_colour: red
 
-container: True
+container: False
 local_web: False
 
 openstack_vm: True

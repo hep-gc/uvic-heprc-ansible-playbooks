@@ -4,9 +4,9 @@
 - name: update certificate trust
   command: /usr/bin/update-ca-trust
 
-- name: pull down uvic-heprc-ansilbe-playbooks
+- name: pull down uvic-heprc-ansible-playbooks
   git:
-    repo: git@github.com:hep-gc/uvic-heprc-ansible-playbooks.git
+    repo: https://github.com/hep-gc/uvic-heprc-ansible-playbooks.git
     dest: /opt/deployment/uvic-heprc-ansible-playbooks/
     force: yes
     update: yes
@@ -21,13 +21,6 @@
     force: yes
     update: yes
     version: "{{ csv2_branch }}"
-
-- name: set timezone
-  timezone:
-    name: "{{ timezone }}"
-
-- name: set up web tests
-  shell: yes | /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_centos.sh ci_install 
 
 - name: ensure csv2 cli config dir exists
   file:
@@ -46,4 +39,66 @@
     src: ../files/settings.yaml
     dest: /root/.csv2/unit-test/settings.yaml
     owner: root
-    group: root 
+    group: root
+
+# ensure pip is intalled
+- name: Ensure pip is installed
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - python3
+    - python3-pip
+
+# remove python3-requests yum package (conflicts with openstack pip)
+- name: Ensure python3-requests is not present
+  ansible.builtin.yum:
+    name: python3-requests
+    state: absent
+
+# these are also handled in
+# /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_alma9.sh
+- name: Ensure python3 packages are installed
+  ansible.builtin.pip:
+    name: "{{ item }}"
+  loop:
+    - requests
+    - pytest
+    - pytest-rerunfailures
+    - selenium
+    - requests-toolbelt
+    - python-openstackclient
+    - python-keystoneclient
+    - python-novaclient
+
+- name: Run web test setup script
+  ansible.builtin.shell: yes | /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_alma9.sh ci_install
+
+- name: Copy credentials file to remote
+  ansible.builtin.copy:
+    remote_src: false
+    src: "{{ csv2_ci_web_credentials_path }}"
+    dest: /root/cloudscheduler/unit_tests/credentials.yaml
+    mode: "0644"
+
+- name: Copy ssh key to remote
+  ansible.builtin.copy:
+    remote_src: false
+    src: "{{ csv2_ci_ssh_key_path }}"
+    dest: /root/.ssh/id_rsa
+    mode: "0600"
+
+- name: Enable ssh-agent and add key
+  ansible.builtin.shell: |
+    eval "$(ssh-agent)"
+    ssh-add
+
+# edit ssh config here accoridng to wiki
+- name: Configure ssh-config
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/ssh_config
+    line: "{{ item }}"
+  loop:
+    - StrictHostKeyChecking no
+    - UserKnownHostsFile=/dev/null
+...

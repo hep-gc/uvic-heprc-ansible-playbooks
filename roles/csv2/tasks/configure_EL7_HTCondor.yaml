@@ -1,14 +1,27 @@
 # configure_EL7_HTCondor.yaml
 
-- name: open HTCondor service port
-  firewalld: zone=public port="{{ htcondor_collector_port }}/tcp"  state=enabled immediate=yes permanent=yes
-  when: (container is undefined) or (container == False)
-  ignore_errors: yes
+- name: Open HTCondor service port
+  ansible.posix.firewalld:
+    zone: public
+    port: "{{ htcondor_collector_port }}/tcp"
+    state: enabled
+    permanent: true
+  when: (container is undefined) or (not container)
+  ignore_errors: true
+  notify: restart firewalld
 
-- name: open HTCondor ephemeral ports
-  firewalld: zone=public port="{{ htcondor_low_port }}-{{ htcondor_high_port }}/tcp"  state=enabled immediate=yes permanent=yes
-  when: (container is undefined) or (container == False)
-  ignore_errors: yes
+- name: Open HTCondor ephemeral ports
+  ansible.posix.firewalld:
+    zone: public
+    port: "{{ htcondor_low_port }}-{{ htcondor_high_port }}/tcp"
+    state: enabled
+    permanent: true
+  when: (container is undefined) or (not container)
+  ignore_errors: true
+  notify: restart firewalld
+
+- name: Flush firewalld handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: HTCondor local configuration
   copy:
@@ -104,3 +117,6 @@
   wait_for:
     timeout: 5
 
+- name: Flush condor handlers
+  ansible.builtin.meta: flush_handlers
+...

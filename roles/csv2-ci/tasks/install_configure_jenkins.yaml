@@ -1,108 +1,118 @@
 ---
 # install_configure_jenkins.yaml
+- name: Open ports required for Jenkins
+  ansible.posix.firewalld:
+    zone: public
+    state: enabled
+    permanent: true
+    port: "{{ item }}"
+  loop:
+    - 8443/tcp          # https
+  ignore_errors: true
+  notify: restart firewalld
 
-- name: get jenkins long term release repo
-  get_url:
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Get jenkins long term release repo
+  ansible.builtin.get_url:
     url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
     dest: /etc/yum.repos.d/jenkins.repo
+    mode: "0644"
 
-- name: import jenkins key from url
-  rpm_key:
+- name: Import jenkins key from url
+  ansible.builtin.rpm_key:
     state: present
-    key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+    key: https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
 
-- name: yum update
-  yum:
-    name: '*'
-    state: latest
-
-- name: install jdk
-  yum:
-    name: java-11-openjdk-devel
+# ensure latest jdk supported by jenkins as of 2024/09/09 it is java-21
+# when the java version needs to be changed, edit the two tasks below
+- name: Install java-21-openjdk
+  ansible.builtin.yum:
+    name: java-21-openjdk-devel
     state: present
 
-- name: install jenkins
-  yum:
+# ensure java alternative is set to latest installed openjdk
+# this could also be configured in jenkins instead of globally
+- name: Set java alternative
+  community.general.alternatives:
+    name: java
+    link: /usr/bin/java
+    state: "selected"
+    path: /etc/alternatives/jre_21_openjdk/bin/java
+
+- name: Install jenkins
+  ansible.builtin.yum:
     name: jenkins
     state: latest
 
-- name: change permissions for ansible directories (1/3)
-  file:
-    path: /var/lib/jenkins
+- name: Change permissions for ansible directories
+  ansible.builtin.file:
+    path: "{{ item }}"
     owner: root
     group: root
-    recurse: yes
+    recurse: true
+  with_items:
+    - /var/lib/jenkins
+    - /var/cache/jenkins
+    - /var/log/jenkins
 
-- name: change permissions for ansible directories (2/3)
-  file:
-    path: /var/cache/jenkins
-    owner: root
-    group: root
-    recurse: yes
-
-- name: change permissions for ansible directories (3/3)
-  file:
-    path: /var/log/jenkins
-    owner: root
-    group: root
-    recurse: yes
-
-- name: make jenkins run as root user (1/3)
-  ansible.builtin.lineinfile:
-    path: /etc/sysconfig/jenkins
-    regexp: '^JENKINS_USER=.*$'
-    line: JENKINS_USER="root"
-
-- name: make jenkins run as root user (2/3)
+# these two tasks could be added to etc_systemd_system_jenkins.service.d_override.conf.j2
+- name: Make jenkins run as root user (1/2)
   ansible.builtin.lineinfile:
     path: /usr/lib/systemd/system/jenkins.service
     regexp: '^User=.*$'
     line: User=root
 
-- name: make jenkins run as root user (3/3)
+- name: Make jenkins run as root user (2/2)
   ansible.builtin.lineinfile:
     path: /usr/lib/systemd/system/jenkins.service
     regexp: '^Group=.*$'
     line: Group=root
 
-- name: install jenkins certificate keystore conversion script (depends on letsencrypt)
-  template:
+- name: Install jenkins certificate keystore conversion script (depends on letsencrypt)
+  ansible.builtin.template:
     src: usr_local_sbin_prepare_copy_jenkins_keystore.j2
     dest: /usr/local/sbin/prepare_copy_jenkins_keystore
     owner:
     group:
-    mode: 0700
-  notify:
-  - run prepare_copy_jenkins_keystore
+    mode: "0700"
 
-- name: install custom jenkins config for SSL
-  template:
+- name: Create jenkins ssl keystore directory
+  ansible.builtin.file:
+    state: directory
+    path: /etc/systemd/system/jenkins.service.d
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Ensure keytool path exists
+  ansible.builtin.file:
+    src: /etc/alternatives/java_sdk/bin/keytool
+    dest: /usr/bin/keytool
+    owner: root
+    group: root
+    mode: "0700"
+    state: link
+
+- name: Install custom jenkins config for SSL
+  ansible.builtin.template:
     src: etc_systemd_system_jenkins.service.d_override.conf.j2
     dest: /etc/systemd/system/jenkins.service.d/override.conf
     owner: root
     group: root
-    mode: 0700
+    mode: "0700"
 
-- name: install jenkins keystore conversion cron task
-  copy:
-    src: etc_cron.d_prepare_copy_jenkins_keystore
-    dest: /etc/cron.d/prepare_copy_jenkins_keystore
-    owner: root
-    group: root
-    mode: 0644
+- name: Include tasks for letsencrypt
+  ansible.builtin.include_tasks: letsencrypt.yaml
 
-- name: daemon-reload to pick up config changes
-  systemd:
-    daemon_reload: yes
+- name: Daemon-reload to pick up config changes
+  ansible.builtin.systemd:
+    daemon_reload: true
 
-- name: open jenkins ssl port (if firewalld is installed)
-  command: firewall-cmd --permanent --zone=public --add-port=8443/tcp
-  notify:
-    - restart firewalld
-  ignore_errors: yes
-
-- name: start jenkins
-  systemd:
+- name: Start jenkins
+  ansible.builtin.systemd_service:
     name: jenkins
+    enabled: true
     state: restarted
-    enabled: yes
+...

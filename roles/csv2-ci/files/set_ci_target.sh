@@ -8,13 +8,13 @@ if [[ ! -f "/root/.ssh/id_rsa" ]]; then echo "Passwordless ssh key for root acce
 set -xe # Stop if step fails
 
 if [ "$#" -ne 9 ]; then
-    echo "Usage: ./set_ci_target.sh host_number git_branch db_upgrade_file schema_file default_pass tester_pass other_pass influx_pass influx_admin_pass"
+    echo "Usage: ./set_ci_target.sh host_machine git_branch db_upgrade_file schema_file default_pass tester_pass other_pass influx_pass influx_admin_pass"
     exit 1
  fi
 
-# $1 is host_number
+
+# $1 is host_machine
 host_machine=${1}
-host_number=$(curl ifconfig.me 2>/dev/null|cut -d. -f 4)
 target_name=$(echo $host_machine|cut -d. -f1)
 host_port=22
 

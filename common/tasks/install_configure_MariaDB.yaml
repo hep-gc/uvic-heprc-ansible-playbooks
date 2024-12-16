@@ -12,44 +12,64 @@
 #   {{ public_mariadb }}        - Anything other than "true" is treated as "false". 
 #   {{ etc_my_cnf_d }}          - A list of configuration files, see play "configure mariadb server" below.
 
-- name: if required (public_mariadb = true specified), open the firewall for public access
-  firewalld: service=mysql state=enabled permanent=true immediate=true zone=public
+- name: Open firewall when public mariadb
+  ansible.posix.firewalld:
+    service: mysql
+    state: enabled
+    permanent: true
+    zone: public
   when:
-  - public_mariadb is defined
-  - public_mariadb == true
-  - (container is undefined) or (container == False)
+    - public_mariadb is defined
+    - public_mariadb == true
+    - (container is undefined) or (container == False)
   ignore_errors: yes
+  notify: restart firewalld
 
-- name: setup the MariaDB repository
-  copy:
+# This repository contains mariadb 10.11 
+# https://mariadb.org/download/?t=repo-config&d=Red+Hat+Enterprise+Linux+9&v=10.11&r_m=xtom_fre
+- name: Add MariaDB repository
+  ansible.builtin.copy:
+#    src: ../files/etc_yum.repos.d_MariaDB.repo
     src: etc_yum.repos.d_MariaDB.repo
     dest: /etc/yum.repos.d/MariaDB.repo
+    remote_src: false
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
 
-- name: update MariaDB repo for Alma 9
-  replace:
-    path: /etc/yum.repos.d/MariaDB.repo
-    regexp: '^baseurl = .*'
-    replace: 'baseurl = http://mirror.mariadb.org/yum/11.2.1/rhel9-amd64/'
-  when: ansible_facts['distribution_major_version'] == '9'
+- name: Install MariaDB with dnf
+  ansible.builtin.dnf:
+    name:
+      - MariaDB-server < 11
+      - MariaDB-client < 11
+      - MariaDB-devel < 11
+      - MariaDB-common < 11
+    state: latest
+
+- name: Restart MariaDB with systemd
+  ansible.builtin.systemd:
+    service: mariadb
+    state: restarted
+
+- name: gather package facts
+  ansible.builtin.package_facts:
+    manager: rpm
 
 - name: install mariadb (MySQL) packages
   yum:
-    name: ['expect', 'MariaDB-server', 'MariaDB-client', 'MariaDB-devel', 'MariaDB-common',
-          'MariaDB-shared', 'zlib-devel', 'openssl-devel', 'python3-PyMySQL']
+    name: ['expect',
+           'zlib-devel', 'openssl-devel', 'python3-PyMySQL']
     state: latest
   notify:
   - restart mariadb
+### removed 'MariaDB-shared','mariadb-client', 'mariadb-server',   included in dnf install
 
-- name: install mariadb (MySQL) packages on centos 7
-  yum:
-    name: ['MariaDB-compat', 'MySQL-python', 'python2-PyMySQL']
-    state: latest
-  notify:
-  - restart mariadb
-  when: ansible_facts['distribution_major_version'] == '7'
+- name: ensure mysql standalone error directories exist
+  ansible.builtin.file:
+    path: /var/log/mysql
+    state: directory
+    owner: mysql
+    group: root
 
 - name: ensure mariadb is running and enabled with service
   service: name=mariadb state=restarted enabled=yes

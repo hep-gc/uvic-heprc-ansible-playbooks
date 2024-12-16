@@ -2,10 +2,10 @@
 timezone: America/Vancouver
 
 # Admin email for root mail forwarding
-admin_email: root@localhost
+admin_email: root@{{ csv2_ci_fqdn }}
 
 # Branch for ci server to follow
-csv2_branch: stable-2.10
+csv2_branch: stable-2.11
 
 # FQDN for the ci server (for both web hosting and certificate purposes
 csv2_ci_fqdn: <REPLACE ME>
@@ -13,6 +13,8 @@ csv2_ci_fqdn: <REPLACE ME>
 # password for the JKS file and conversion steps
 jenkins_ssl_pw: <REPLACE ME>
 
+# If set to 'true', firewalld will be installed if it is not already present and rules will be added. This should be set to 'false' if you are using an external firewall.
+use_firewalld: <REPLACE ME>
 
 i_service_connection:
 -
@@ -23,3 +25,8 @@ i_virtualhosts:
 -
     virtualhost: '{{ i_service_connection.0.ipv4fqdn }}'
 
+# location of credentials file for web tests
+csv2_ci_web_credentials_path: <REPLACE ME>
+
+#location of private ssh key for remote
+csv2_ci_ssh_key_path: <REPLACE ME>

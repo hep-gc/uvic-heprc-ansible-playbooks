@@ -1,15 +1,47 @@
 ---
 # install_configure_httpd.yaml
+- name: Open ports required for http
+  ansible.posix.firewalld:
+    zone: public
+    state: enabled
+    permanent: true
+    port: "{{ item }}"
+  loop:
+    - 80/tcp          # http
+    - 443/tcp         # https
+  ignore_errors: true
+  notify: restart firewalld
 
-- name: install packages required by httpd
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Install packages required by httpd
   yum:
     name: ['httpd', 'httpd-tools', 'mod_ssl']
     state: latest
   notify:
   - restart httpd
 
-- name: enable and start httpd
-  systemd:
+- name: Register if httpd conf file already present
+  ansible.builtin.stat:
+    path: /etc/httpd/conf.d/csv2_ssl.conf
+  register: csv2_conf
+  when: "'csv2' in ansible_play_role_names"
+
+- name: Set up port 80 listener virtualhost host for each i_virtualhosts (required for letsencrypt)
+  ansible.builtin.template:
+    src: etc_httpd_conf.d_virtualhost.conf.j2
+    dest: /etc/httpd/conf.d/{{ item.virtualhost }}.conf
+    owner: root
+    mode: "0644"
+    force: false
+  loop: "{{ i_virtualhosts }}"
+  when: csv2_conf is undefined or 
+        csv2_conf.stat.exists == False
+
+- name: Enable and start httpd
+  ansible.builtin.systemd:
     name: httpd
-    enabled: yes
+    enabled: true
     state: restarted
+...

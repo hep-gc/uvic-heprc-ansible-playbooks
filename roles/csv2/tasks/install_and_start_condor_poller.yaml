@@ -1,6 +1,17 @@
+---
+# install_and_start_condor_poller.yaml
 
-- name: install and start the condor poller
-  shell: |
+- name: Register if condor poller is installed
+  ansible.builtin.shell: >-
+    systemctl status condor.service;
+    systemctl status csv2-condor-poller.service
+  register: condor_out
+  ignore_errors: true
+  failed_when: false
+  changed_when: false
+
+- name: Install and start the condor poller
+  ansible.builtin.shell: |
     rm -rfv /tmp/cloudscheduler
     cd /tmp
     tar -xzf /opt/cloudscheduler/repository/condor_poller.tar.gz
@@ -10,3 +21,6 @@
     rm -rfv /tmp/cloudscheduler
     rm -f /etc/condor/config.d/00-minicondor
     systemctl restart condor
+  when: "condor_out.rc != 0"
+  changed_when: true
+...
