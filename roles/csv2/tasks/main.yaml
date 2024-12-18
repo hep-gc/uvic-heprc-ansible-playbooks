@@ -27,6 +27,9 @@
 - name: Create installation directories
   ansible.builtin.import_tasks: create_installation_directories.yaml
 
+- name: Configure backup directory 
+  ansible.builtin.import_tasks: configure_backup_directory.yaml
+
 - name: Configure other required repositories
   ansible.builtin.import_tasks: configure_other_required_repositories.yaml
 
@@ -47,9 +50,6 @@
 
 - name: Install configure MariaDB
   ansible.builtin.import_tasks: install_configure_MariaDB.yaml
-
-- name: Create mysql db
-  ansible.builtin.import_tasks: create_mysqldb_csv2.yaml
 
 - name: Configure httpd
   ansible.builtin.include_tasks: install_configure_httpd.yaml

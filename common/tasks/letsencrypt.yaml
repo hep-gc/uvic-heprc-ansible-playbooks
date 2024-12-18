@@ -1,20 +1,26 @@
 ---
-# file: roles/osctl/tasks/letsencrypt.yaml
+# file: common/tasks/letsencrypt.yaml
 #
 # Note: Set the variable "letsencrypt_test: true" to use the letsencrypt test
 # server. This variable is referenced by the handler "run get_letsencrypt_cert".
-
-# Note: This file used to handle backing up letsencrypt
-# certificates to a tar.gz in /etc/letsencrypt
-# and restoring from this backup if it is present
-# through usr_local_sbin_get_letsencrypt_cert.j2
-# This is no longer done. A new method for handling
-# backups is yet to be decided
 
 - name: stat letsencrypt status
   stat:
     path: /etc/letsencrypt
   register: initial_letsencrypt_status
+
+- name: stat letsencrypt archive status
+  ansible.builtin.stat:
+    path: "/mnt/hosts/{{i_service_connection.0.ipv4fqdn }}/letsencrypt/latest"
+  register: archive_status
+
+- name: Ensure letsencrypt backup directory exists
+  ansible.builtin.file:
+    dest: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
 
 - name: set timezone
   community.general.timezone:
@@ -36,6 +42,26 @@
 - name: update the TLS root certificates
   command: update-ca-trust
   when: initial_letsencrypt_status.stat.exists == False
+
+- name: ensure the letsencrypt management directory exists
+  file:
+    dest: /etc/letsencrypt
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when:
+    - not initial_letsencrypt_status.stat.exists
+    - not archive_status.stat.exists
+
+- name: Install the current SSL tar file
+  ansible.builtin.unarchive:
+    src: "/mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt/latest"
+    dest: /etc/
+    remote_src: true
+  when:
+    - not initial_letsencrypt_status.stat.exists
+    - archive_status.stat.exists
 
 # --- certbot install ---
 - name: Install snapd for certbot
@@ -96,7 +122,6 @@
 - name: Register deploy hooks
   ansible.builtin.find:
     paths: /etc/letsencrypt/renewal-hooks/deploy
-  # when: hooks_present.stat.exists
   register: deploy_hook_find
 
 - name: Set deploy hook fact
@@ -144,13 +169,23 @@
   when: not item.stat.exists and 'httpd.service' in services
   changed_when: not item.stat.exists
   register: apache_certs
-# deploy hooks in /etc/letsencrypt/renewal-hooks/deploy do not run on the initial deployment, only renewals
+# deploy hooks in /etc/letsencrypt/renewal-hooks/deploy do not run on the initial deployment
+
+# this step deploys certs on apcahe virtualhosts if they were restored from a backup
+- name: Redeploy certs on virtualhosts (apache)
+  ansible.builtin.command: >-
+    certbot -n --apache -d {{ item.item.virtualhost }} --agree-tos
+    --email {{ admin_email }}
+    --reuse-key
+  loop: "{{ i_virtualhosts_certificates_store.results }}"
+  when: archive_status.stat.exists and 'httpd.service' in services
+  register: backup_certs
 
 - name: Run hooks after obtaining the initial certificate
   ansible.builtin.shell: >-
     {{ deploy_hooks }}
   ignore_errors: True
-  when: apache_certs is changed or standalone_certs is changed
+  when: apache_certs is changed or standalone_certs is changed or backup_certs is changed
 
 - name: Certbot renew certificates
   ansible.builtin.command: certbot -n renew

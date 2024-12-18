@@ -1,0 +1,5 @@
+current_time=$(date '+%Y%m%d%H%M%S')
+# archive letsencrypt directory
+tar -cz /etc/letsencrypt -f /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt/{{ i_service_connection.0.ipv4fqdn }}_$current_time.tar.gz
+# update latest symlink
+ln -sf /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt/{{ i_service_connection.0.ipv4fqdn }}_$current_time.tar.gz /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt/latest

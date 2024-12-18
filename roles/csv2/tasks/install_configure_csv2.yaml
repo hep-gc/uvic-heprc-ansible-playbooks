@@ -487,11 +487,28 @@
 ### cloudscheduler #############################################################################################################################################
 
 # this task may be able to be skipped as it is handled with a certbot deploy hook
+
 - name: import_tasks
   import_tasks: copy_certificates_to_users.yaml
 
 - name: import_tasks
   import_tasks: configure_EL7_HTCondor.yaml
+
+- name: Register output of csv2 db status check
+  ansible.builtin.shell: >-
+    echo "SELECT SCHEMA_NAME
+    FROM INFORMATION_SCHEMA.SCHEMATA
+    WHERE SCHEMA_NAME = 'csv2';"
+    | mariadb
+  register: csv2_db_status
+  changed_when: false
+
+- name: Set csv2_db_exists status
+  ansible.builtin.set_fact:
+    csv2_db_exists: "{{ ['SCHEMA_NAME', 'csv2'] == csv2_db_status.stdout_lines }}"
+
+- name: include create_mysqldb_csv2.yaml
+  ansible.builtin.include_tasks: create_mysqldb_csv2.yaml
 
 - name: Open ports required for influxdb
   ansible.posix.firewalld:
@@ -563,13 +580,45 @@
     group: cloudscheduler
     mode: "0774"
     state: directory
-  with_items:  
+  with_items:
     - /var/local/cloudscheduler/ec2
     - /var/local/cloudscheduler/image_cache
     - /var/local/cloudscheduler/run
-    - /var/local/cloudscheduler/schema_backups
     - /var/local/cloudscheduler/signals
     - /var/log/cloudscheduler
+
+- name: Stat database archive status
+  ansible.builtin.stat:
+    path: "/mnt/hosts/{{i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups/latest"
+  register: db_archive_status
+
+- name: Ensure cloudscheduler backup directory is present
+  ansible.builtin.file:
+    path: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups
+    owner: cloudscheduler
+    group: cloudscheduler
+    mode: "0774"
+    state: directory
+
+- name: Link user_data_backup_dir to backup directory
+  ansible.builtin.file:
+    path: /var/local/cloudscheduler/schema_backups
+    src: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups
+    force: true
+    owner: cloudscheduler
+    group: cloudscheduler
+    mode: "0744"
+    state: link
+
+- name: Link host backup_dir location to backup directory
+  ansible.builtin.file:
+    path: /opt/cloudscheduler/schema/schema_backup/{{ i_service_connection.0.ipv4fqdn }}
+    src: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups/latest/
+    force: true
+    owner: cloudscheduler
+    group: cloudscheduler
+    mode: "0744"
+    state: link
 
 - name: create empty cloudscheduler log files (owner=cloudscheduler, group=cloudscheduler)
   file:
@@ -618,7 +667,6 @@
     - csv2-vm-data
     - csv2-signals
 
-
 - name: install csv2 sudoers
   copy:
     remote_src: yes
@@ -652,7 +700,7 @@
     name: mariadb
     state: restarted
 
-- name: install csv2 database schema
+- name: install csv2 database schema and restore from backup if present
   command: "/opt/cloudscheduler/utilities/db_upgrade {{ schema_model }} -i {{ db_upgrade_file }} -r live"
   register: db_upgrade
 
@@ -672,12 +720,6 @@
   with_items: "{{ mysql_privileges.results }}"
   when: mysql_privileges is defined
 
-- name: debug
-  debug:
-    msg: "{{ item }}"
-  with_nested: "{{ stderr_lines }}"
-  when: mysql_privileges is defined
-
 - name: set_fact
   set_fact:
     stdout_lines: []
@@ -692,7 +734,7 @@
 - name: define csv2 database remote users and priveleges
   command: "mysql -u root -p'{{ database_user_passwords['root'] }}' -e '{{ item }}' csv2"
   with_items: "{{ stdout_lines }}"
-  when: mysql_privileges is defined
+  when: mysql_privileges is defined 
 
 - name: generate schema
   command: /opt/cloudscheduler/utilities/generate_schema.py
@@ -744,20 +786,24 @@
 - name: create csv2_default user for csv2
   command: "{{ mysql_command }} -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 -e 'INSERT INTO csv2_user (username, password, is_superuser, join_date) VALUES (\"csv2_default\", \"{{ blowfish.hash }}\", 1, \"2018-04-01\")'"
   ignore_errors: yes
+  when: not db_archive_status.stat.exists
 
 - name: create csv2-group for the default csv2 user
   command: "{{ mysql_command }} -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 -e 'INSERT INTO csv2_groups (group_name, htcondor_fqdn, job_cpus, job_ram, job_disk, job_scratch, job_swap, vm_keep_alive) VALUES (\"csv2-group\", \"{{ condor_manager }}\", \"1\", \"1000\", \"5\", \"0\", \"0\", \"0\")'"
   ignore_errors: yes
+  when: not db_archive_status.stat.exists
 
 - name: add default csv2 user to csv2-group
   command: "{{ mysql_command }} -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 -e 'INSERT INTO csv2_user_groups (username, group_name) VALUES (\"csv2_default\", \"csv2-group\")'"
   ignore_errors: yes
+  when: not db_archive_status.stat.exists
 
 - name: add metadata files for csv2-group
   command: "{{ mysql_command }} -u root --password=\"{{ database_user_passwords['root'] }}\" -D csv2 -e 'INSERT INTO csv2_group_metadata (group_name, metadata_name, enabled, priority, metadata, mime_type) VALUES (\"csv2-group\", \"{{ item }}\", \"1\", \"0\", LOAD_FILE(\"/opt/cloudscheduler/metadata/{{ item }}\"), \"cloud-config\")'"
   ignore_errors: yes
   with_items:
     - default.yaml.j2
+  when: not db_archive_status.stat.exists
 
 - name: ensure public index file exists
   copy:
@@ -800,7 +846,6 @@
     src: "/opt/cloudscheduler/cli/bin/cloudscheduler"
     dest: /usr/bin/cloudscheduler
     state: link
-
 
 - name: create influx reader user
   command: influx -ssl -unsafeSsl -database 'csv2_timeseries' -username admin -password {{ influx_admin_pass }} -execute "CREATE USER csv2_read WITH PASSWORD 'csv2_public'"
@@ -850,6 +895,7 @@
     - "'HTTP response code' in default_out.stdout"
   changed_when:
     - "'successfully added' in default_out.stdout"
+  when: not db_archive_status.stat.exists
 
 - name: Remove old setup group csv2_default
   ansible.builtin.command: >-
@@ -865,6 +911,7 @@
     - "'HTTP response code' in csv2_default_out.stdout"
   changed_when:
     - "'succesfully deleted' in csv2_default_out.stdout"
+  when: not db_archive_status.stat.exists
 
 - name: TEST STEP DISABLE EC2
   systemd:
