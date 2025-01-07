@@ -1,20 +1,5 @@
 # install_database_server.yaml
 
-- name: setup the MariaDB repository
-  copy:
-    src: etc_yum.repos.d_MariaDB.repo
-    dest: /etc/yum.repos.d/MariaDB.repo
-    owner: root
-    group: root
-    mode: 0644
-
-- name: update MariaDB repo for Alma 9
-  replace:
-    path: /etc/yum.repos.d/MariaDB.repo
-    regexp: '^baseurl = .*'
-    replace: 'baseurl = http://mirror.mariadb.org/yum/11.2.1/rhel9-amd64/'
-  when: ansible_facts['distribution_major_version'] == '9'
-
 - name: install mariadb
   yum:
     name: MariaDB-server
