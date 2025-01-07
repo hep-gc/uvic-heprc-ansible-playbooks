@@ -35,6 +35,8 @@
   git:
     repo: "https://github.com/hep-gc/shoal.git"
     dest: /opt/shoal/
+    single_branch: yes
+    version: "{{ branch }}"
     force: yes
     update: yes
 
@@ -62,7 +64,7 @@
     executable: pip3
 
 - name: run script for database setup
-  shell: /opt/shoal/shoal-server/shoal_server/setup-db/setup_db.sh
+  shell: /opt/shoal/shoal-server/shoal_server/setup-db/setup_db.sh "{{extension}}"
 
 - name: Run install script to install shoal server
   shell: |
