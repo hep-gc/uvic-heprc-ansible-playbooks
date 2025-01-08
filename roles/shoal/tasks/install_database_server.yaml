@@ -2,7 +2,7 @@
 
 - name: install mariadb
   yum:
-    name: MariaDB-server
+    name: mariadb-server
     state: latest
 
 - name: start up and enable mariadb
