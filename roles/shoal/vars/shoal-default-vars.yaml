@@ -6,7 +6,7 @@ amqp_use_credentials: False
 
 extension: csv
 
-branch: payne-update
+branch: master
 
 amqp_users: shoal
 amqp_user_passwords:
