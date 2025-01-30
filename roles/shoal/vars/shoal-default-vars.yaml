@@ -4,6 +4,10 @@ amqp_server_url: shoal.heprc.uvic.ca
 
 amqp_use_credentials: False
 
+extension: csv
+
+branch: master
+
 amqp_users: shoal
 amqp_user_passwords:
   shoal: CHANGE_ME
