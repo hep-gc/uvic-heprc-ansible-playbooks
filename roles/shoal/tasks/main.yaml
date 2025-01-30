@@ -1,5 +1,4 @@
 - include_vars: shoal-default-vars.yaml
-- include: install_configure_httpd.yaml
 
 - import_tasks: install_python3.yaml
 - import_tasks: create_localhost_cert.yaml
