@@ -76,6 +76,10 @@
     path: /etc/shoal
     state: directory
 
+- file:
+    path: /var/www/shoal
+    state: directory
+
 # copy files to proper locations
 - name: Add shoal configuration template file to correct position
   template:
