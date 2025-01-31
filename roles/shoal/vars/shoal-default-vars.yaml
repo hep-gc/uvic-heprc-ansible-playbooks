@@ -4,7 +4,7 @@ amqp_server_url: shoal.heprc.uvic.ca
 
 amqp_use_credentials: False
 
-extension: csv
+extension: mmdb
 
 branch: master
 
