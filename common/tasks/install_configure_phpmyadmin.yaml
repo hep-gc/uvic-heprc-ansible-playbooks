@@ -29,7 +29,7 @@
     dest: /etc/phpMyAdmin
     state: directory
     owner: root
-    group: apache
+    group: cloudscheduler
     mode: 0750
 
 - name: ensure correct permissions on php home directory
@@ -37,15 +37,24 @@
     dest: /var/lib/php
     state: directory
     owner: root
-    group: apache
+    group: cloudscheduler
     mode: 0755
+
+- name: ensure correct permissions on php-fpm log directory
+  file:
+    dest: /var/log/php-fpm
+    state: directory
+    owner: root
+    group: cloudscheduler
+    mode: 0755
+
 
 - name: configure phMyAdmin server
   template:
     src: etc_phpMyAdmin_config.inc.php.j2
     dest: /etc/phpMyAdmin/config.inc.php
     owner: root
-    group: apache
+    group: cloudscheduler
     mode: 0640
   notify:
   - restart httpd
