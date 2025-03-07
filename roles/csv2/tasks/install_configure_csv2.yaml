@@ -43,6 +43,16 @@
   user:
     name: cloudscheduler
 
+- name: install php-fpm config file
+  ansible.builtin.copy:
+    src: etc_php-fpm.d_www.conf
+    dest: /etc/php-fpm.d/www.conf
+    remote_src: false
+    owner: root
+    group: root
+    mode: "0644"
+  when: (install_phpMyAdmin is defined) and (install_phpMyAdmin == True)
+
 - name: change the group ownership of the phpmyadmin directories
   file:
     dest: "{{ item }}"
@@ -52,7 +62,9 @@
   with_items:
     - /etc/phpMyAdmin
     - /var/log/php-log
+    - /var/lib/php
     - /run/php-fpm
+    - /var/run/php-fpm
   when:
     - (install_phpMyAdmin is defined) and (install_phpMyAdmin == True)
 
@@ -90,6 +102,19 @@
     - /etc/phpMyAdmin/config.inc.php
   when:
     - (install_phpMyAdmin is defined) and (install_phpMyAdmin == True)
+
+
+- name: reload daemons 
+  command: systemctl daemon-reload
+
+- name: restart php-fpm with new configuration
+  systemd:
+    name: php-fpm.service
+    enabled: true
+    state: restarted
+  when:
+    - (install_phpMyAdmin is defined) and (install_phpMyAdmin == True)
+
 
 ### install software ###########################################################################################################################################
 
@@ -356,11 +381,15 @@
 
 - name: Remove httpd config files from letsencrypt
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "/etc/httpd/conf.d/{{ item.virtualhost }}.conf"
     state: absent
-  loop:
-    - /etc/httpd/conf.d/elephant98.heprc.uvic.ca.conf
-    - /etc/httpd/conf.d/elephant98.heprc.uvic.ca-le-ssl.conf
+  loop: "{{ i_virtualhosts }}"
+
+- name: Remove httpd letsencrypt ssl config files from letsencrypt
+  ansible.builtin.file:
+    path: "/etc/httpd/conf.d/{{ item.virtualhost }}-le-ssl.conf"
+    state: absent
+  loop: "{{ i_virtualhosts }}"
 
 ### HAProxy ####################################################################################################################################################
 
@@ -585,7 +614,17 @@
     - /var/local/cloudscheduler/image_cache
     - /var/local/cloudscheduler/run
     - /var/local/cloudscheduler/signals
+    - /var/local/cloudscheduler/oracle
     - /var/log/cloudscheduler
+
+- name: install oracle flavors file
+  copy:
+    remote_src: yes
+    src: "/opt/cloudscheduler/files/oracle/flavors.yaml"
+    dest: "/var/local/cloudscheduler/oracle/flavors.yaml"
+    owner: cloudscheduler
+    owner: cloudscheduler
+    mode: "0644"
 
 - name: Stat database archive status
   ansible.builtin.stat:

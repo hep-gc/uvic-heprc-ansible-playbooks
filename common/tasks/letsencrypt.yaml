@@ -53,6 +53,7 @@
   when:
     - not initial_letsencrypt_status.stat.exists
     - not archive_status.stat.exists
+#logic around when to do these steps needs work
 
 - name: Install the current SSL tar file
   ansible.builtin.unarchive:
@@ -178,6 +179,7 @@
     --email {{ admin_email }}
     --reuse-key
   loop: "{{ i_virtualhosts_certificates_store.results }}"
+  ignore_errors: True
   when: archive_status.stat.exists and 'httpd.service' in services
   register: backup_certs
 

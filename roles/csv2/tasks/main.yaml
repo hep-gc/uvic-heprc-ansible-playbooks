@@ -54,6 +54,10 @@
 - name: Configure httpd
   ansible.builtin.include_tasks: install_configure_httpd.yaml
 
+- name: Configure letsencrypt certificates
+  ansible.builtin.include_tasks: letsencrypt.yaml
+  when: (local_web is undefined) or (not local_web)
+
 - name: Install and configure phpmyadmin
   ansible.builtin.import_tasks: install_configure_phpmyadmin.yaml
   when:
@@ -74,10 +78,6 @@
 
 - name: Install and configure csv2
   ansible.builtin.import_tasks: install_configure_csv2.yaml
-
-- name: Configure letsencrypt certificates
-  ansible.builtin.include_tasks: letsencrypt.yaml
-  when: (local_web is undefined) or (not local_web)
 
 - name: Configure CI target
   ansible.builtin.import_tasks: configure_ci_target.yaml
