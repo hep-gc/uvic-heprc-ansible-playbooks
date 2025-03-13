@@ -391,6 +391,14 @@
     state: absent
   loop: "{{ i_virtualhosts }}"
 
+- name: add apache mpm config
+  ansible.builtin.file:
+    src: etc_httpd_conf.modules.d_00-mpm.conf
+    dest: /etc/httpd/conf.modules.d/00-mpm.conf
+    owner: root
+    group: root
+    mode: "0644"
+
 ### HAProxy ####################################################################################################################################################
 
 - name: Install haproxy
@@ -628,19 +636,25 @@
 
 - name: Stat database archive status
   ansible.builtin.stat:
-    path: "/mnt/hosts/{{i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups/latest"
+    path: "/mnt/hosts/{{i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups/ephemeral/latest"
   register: db_archive_status
 
-- name: Ensure cloudscheduler backup directory is present
+- name: Ensure cloudscheduler ephemeral backup directory is present
   ansible.builtin.file:
-    path: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups
+    path: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups/ephemeral
+    mode: "777"
+    state: directory
+
+- name: Ensure cloudscheduler private backup directory is present
+  ansible.builtin.file:
+    path: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups/private
     mode: "777"
     state: directory
 
 - name: Link user_data_backup_dir to backup directory
   ansible.builtin.file:
     path: /var/local/cloudscheduler/schema_backups
-    src: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups
+    src: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups/private/
     force: true
     mode: "777"
     state: link
@@ -648,7 +662,7 @@
 - name: Link host backup_dir location to backup directory
   ansible.builtin.file:
     path: /opt/cloudscheduler/schema/schema_backup/{{ i_service_connection.0.ipv4fqdn }}
-    src: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups/latest/
+    src: /mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/cloudscheduler/schema_backups/ephemeral/
     force: true
     mode: "777"
     state: link
