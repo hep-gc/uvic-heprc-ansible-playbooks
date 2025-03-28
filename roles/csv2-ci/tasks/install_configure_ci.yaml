@@ -67,9 +67,9 @@
     - pytest-rerunfailures
     - selenium
     - requests-toolbelt
-    - python-openstackclient
-    - python-keystoneclient
-    - python-novaclient
+    - python3-openstackclient
+    - python3-keystoneclient
+    - python3-novaclient
 
 - name: Run web test setup script
   ansible.builtin.shell: yes | /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_alma9.sh ci_install
