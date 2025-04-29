@@ -16,6 +16,9 @@ DBDKeep 8
 DBDMax 20
 DBDExptime 300
 
+# max upload size - mostly relevent for large vm image files (0 is unlimited)
+LimitRequestBody 0
+
 <VirtualHost {{ csv2_host }}:80>
  Redirect Permanent / https://{{csv2_host}}/
 </VirtualHost>
