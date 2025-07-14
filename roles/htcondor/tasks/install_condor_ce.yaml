@@ -1,0 +1,35 @@
+#
+# Requirements:
+# SSL, SSL cert, forward/reverse DNS, port 9619, htcondor
+#
+# yum package: htcondor-ce-condor
+#
+#Check if certificate installed?
+#
+
+- name: install HTCondor Compute Entrypoit (htcondor-ce) package
+  yum:
+    name: ['htcondor-ce-condor']
+    state: latest
+
+- name: Copy atlas condor-ce configuration
+  ansible.builtin.copy:
+    src: "{{item}}"
+    dest: "/etc/condor-ce/config.d/{{item}}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+   - 01-ce-auth.conf
+   - 10-scitokens.conf
+  when: (atlas_enabled is defined) and (atlas_enabled == True)
+
+- name: copy atlas condor-ce routing config
+  template:
+    src: "{{item}}"
+    dest: "/etc/condor-ce/config.d/{{item}}"
+  with_items:
+   - 01-ce-router.conf
+   - 02-ce-condor.conf
+  when: (atlas_enabled is defined) and (atlas_enabled == True)
+
