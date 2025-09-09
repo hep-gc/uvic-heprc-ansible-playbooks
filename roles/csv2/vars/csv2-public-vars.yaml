@@ -3,16 +3,17 @@
 # Timezone
 timezone: America/Vancouver
  
-csv2_fqdn: <REPLACE ME> #full domain name of your target csv2 host ex
+csv2_fqdn: elephant190.heprc.uvic.ca #full domain name of your target csv2 host ex
 
 cs_git_branch: stable-2.11
 db_upgrade_file: none
-schema_model: stable-2.11.1.rc1
+schema_model: stable-2.11.2.rc1
 
-admin_email: <REPLACE ME> # Email address you'd like to recieve admin mail to, usually the root on the csv2 host
+admin_email: s99lee@uvic.ca # Email address you'd like to recieve admin mail to, usually the root on the csv2 host
 
-use_firewalld: <REPLACE ME> # If set to 'true', firewalld will be installed if it is not already present and rules will be added. This should be set to 'false' if you are using an external firewall.
-install_phpMyAdmin: False
+use_firewalld: false # If set to 'true', firewalld will be installed if it is not already present and rules will be added. This should be set to 'false' if you are using an external firewall.
+install_phpMyAdmin: false
+
 web_debug: False
 
 favicon_colour: red
@@ -20,12 +21,12 @@ favicon_colour: red
 container: False
 local_web: False
 
-openstack_vm: False
+openstack_vm: true
 ci_target: False
 
 i_service_connection:
 -
-    ipv4: <REPLACE ME> # IPV4 address of your target csv2 host
+    ipv4:      206.12.154.190 # IPV4 address of your target csv2 host
     ipv4fqdn: '{{ csv2_fqdn }}'
 
 i_virtualhosts:

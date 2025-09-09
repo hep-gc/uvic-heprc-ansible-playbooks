@@ -1,5 +1,0 @@
-amqp_use_credentials: False
-
-amqp_users: shoal
-amqp_user_passwords:
-  shoal: CHANGE_ME
