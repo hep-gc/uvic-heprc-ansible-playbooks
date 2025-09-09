@@ -392,11 +392,13 @@
   loop: "{{ i_virtualhosts }}"
 
 - name: add apache mpm config
-  ansible.builtin.file:
-    src: etc_httpd_conf.modules.d_00-mpm.conf
+  ansible.builtin.copy:
+    src: etc_httpd_conf.modules.d_00-mpm.conf 
     dest: /etc/httpd/conf.modules.d/00-mpm.conf
+
     owner: root
     group: root
+  
     mode: "0644"
 
 ### HAProxy ####################################################################################################################################################
