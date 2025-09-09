@@ -1,0 +1,4 @@
+# squid server setup yaml
+- import_tasks: install_packages.yaml
+
+

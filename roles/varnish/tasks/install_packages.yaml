@@ -1,0 +1,29 @@
+# install_packages.yaml
+
+- name: ensure varnish directory exists
+  file:
+    path: /etc/varnish
+    state: directory
+
+- name: disable SELinux state
+  selinux:
+    state: disabled
+
+- name: change SELinux to permissive
+  shell: sed -i 's/^SELINUX=/SELINUX=permissive \#/g' /etc/sysconfig/selinux
+
+
+    
+- name: download installer for varnish
+  get_url:
+    url: https://packagecloud.io/install/repositories/varnishcache/varnish60lts/script.rpm.sh
+    dest: /tmp/varnish-install.sh
+    mode: '0755'
+
+- name: run installer for varnish
+  command: /bin/bash /tmp/varnish-install.sh
+    
+- name: install varnish
+  yum:
+    name: varnish
+    state: present
