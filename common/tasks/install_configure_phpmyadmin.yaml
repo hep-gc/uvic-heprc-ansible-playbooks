@@ -62,7 +62,6 @@
 - name: set_fact
   set_fact:
     myadmin_vhost: '{{ i_virtualhosts.1.virtualhost }}'
-    myadmin_vhost: '{{ i_virtualhosts.1.virtualhost | default(i_virtualhosts.0.virtualhost) }}'
     myadmin_port: 443
     myadmin_ssl_cert: /etc/letsencrypt/live/{{ i_virtualhosts.1.virtualhost }}/fullchain.pem      
     myadmin_ssl_key: /etc/letsencrypt/live/{{ i_virtualhosts.1.virtualhost }}/privkey.pem
