@@ -66,23 +66,6 @@
   loop:
     - "    condor_worker_cert:"
     - "    condor_worker_key:"
-    
-- name: Create logrotate file
-  copy:
-    dest: /etc/logrotate.d/csv2_condor
-    owner: root
-    group: root
-    mode: '0644'
-    content: |
-      /var/log/cloudscheduler/condor_poller.log {
-        weekly
-        su root cloudscheduler
-        notifempty
-        missingok
-        compress
-        copytruncate
-        create 0644 condor condor
-      }
 
 - name: Generate repository index.html
   ansible.builtin.template:
