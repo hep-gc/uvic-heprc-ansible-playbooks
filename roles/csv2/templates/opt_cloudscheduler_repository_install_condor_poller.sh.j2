@@ -7,6 +7,17 @@ cd /tmp
 wget --no-check-certificate https://{{ inventory_hostname }}/repo/condor_poller.tar.gz
 tar -xzvf /tmp/condor_poller.tar.gz
 
+echo "/var/log/cloudscheduler/condor_poller.log {
+ weekly
+ su root cloudscheduler
+ notifempty
+ missingok
+ compress
+ copytruncate
+ create 0644 condor condor
+}" | sudo tee /etc/logrotate.d/csv2_condor 
+
+
 if [ -f "$OLD_CFG" ]; then
 
     cp $OLD_CFG "$OLD_CFG.old"
