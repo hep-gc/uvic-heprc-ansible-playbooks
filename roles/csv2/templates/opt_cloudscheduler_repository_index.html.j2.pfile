@@ -56,7 +56,7 @@
                 rsync -av cloudscheduler /opt<br>
 		echo "/var/log/cloudscheduler/condor_poller.log {<br>
 		&emsp;weekly
-		<br>&emsp;su root cloudscheduler
+		<br>&emsp;su root
 		<br>&emsp;notifempty
 		<br>&emsp;missingok
 		<br>&emsp;compress
