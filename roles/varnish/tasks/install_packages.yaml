@@ -1,29 +1,55 @@
-# install_packages.yaml
-
-- name: ensure varnish directory exists
+- name: Ensure varnish directory exists
   file:
     path: /etc/varnish
     state: directory
-
-- name: disable SELinux state
+    mode: '0755'
+  
+- name: Disable SELinux
   selinux:
     state: disabled
+  register: selinux_result
 
-- name: change SELinux to permissive
-  shell: sed -i 's/^SELINUX=/SELINUX=permissive \#/g' /etc/sysconfig/selinux
-
-
-    
-- name: download installer for varnish
-  get_url:
-    url: https://packagecloud.io/install/repositories/varnishcache/varnish60lts/script.rpm.sh
-    dest: /tmp/varnish-install.sh
-    mode: '0755'
-
-- name: run installer for varnish
-  command: /bin/bash /tmp/varnish-install.sh
-    
-- name: install varnish
+- name: Install required packages
   yum:
-    name: varnish
+    name:
+      - epel-release
+      - varnish
+      - git
     state: present
+
+- name: Clone setup repository
+  git:
+    repo: https://github.com/ivukotic/v4A.git
+    dest: /tmp/v4A
+    version: frontier
+    force: yes
+
+- name: Copy setup files to /usr/local
+  copy:
+    src: /tmp/v4A/VM/usr/local/
+    dest: /usr/local/
+    remote_src: yes
+    mode: preserve
+
+- name: Copy start files to root
+  copy:
+    src: /tmp/v4A/
+    dest: /root/v4A/
+    remote_src: yes
+    mode: preserve
+
+- name: Create sysconfig file for Varnish
+  copy:
+    dest: /etc/sysconfig/frontier-varnish
+    mode: '0644'
+    content: |
+      # varnish
+      SITE="{{ varnish_site }}"
+      INSTANCE="{{ varnish_instance }}"
+      VARNISH_TRANSIENT_MEM="{{ varnish_transient_mem }}"
+      VARNISH_MEM="{{ varnish_mem }}"
+      VARNISH_PORT="{{ varnish_port }}"
+      FRONTIER_CONF="{{ frontier_conf }}"
+      # monitor
+      URL_ML="{{ url_ml }}"
+      URL_ML_ACCESS="{{ url_ml_access }}"

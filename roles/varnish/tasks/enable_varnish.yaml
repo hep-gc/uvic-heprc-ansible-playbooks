@@ -1,0 +1,8 @@
+- name: Source configuration and run setup script
+  shell: |
+    source /etc/sysconfig/frontier-varnish
+    source /root/v4A/runme.sh &
+  args:
+    executable: /bin/bash
+  register: setup_result
+

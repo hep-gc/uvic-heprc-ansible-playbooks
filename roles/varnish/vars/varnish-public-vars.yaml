@@ -1,0 +1,12 @@
+# Varnish Configuration Variables
+varnish_site: CERN #CHANGE
+varnish_instance: ATLAS-FRONTIER-1
+varnish_transient_mem: 1G
+varnish_mem: 2G #CHANGE
+varnish_port: 6081
+frontier_conf: https://raw.githubusercontent.com/ivukotic/v4A/cvmfs/configurations
+
+# Monitoring URLs
+url_ml: http://varnish.atlas-ml.org:80/
+url_ml_access: http://varnish-accesses.atlas-ml.org:80/
+
