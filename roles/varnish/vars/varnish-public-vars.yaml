@@ -1,8 +1,8 @@
 # Varnish Configuration Variables
-varnish_site: CERN #CHANGE
-varnish_instance: ATLAS-FRONTIER-1
-varnish_transient_mem: 1G
-varnish_mem: 2G #CHANGE
+varnish_site: <REPLACE_ME>
+varnish_instance: <REPLACE_ME> 
+varnish_transient_mem: 500M #Change to Match System
+varnish_mem: 8G #Change to Match System
 varnish_port: 6081
 frontier_conf: https://raw.githubusercontent.com/ivukotic/v4A/cvmfs/configurations
 

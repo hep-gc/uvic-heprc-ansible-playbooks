@@ -21,7 +21,7 @@
   git:
     repo: https://github.com/ivukotic/v4A.git
     dest: /tmp/v4A
-    version: frontier
+    version: cvmfs #Change to 'frontier' if deploying frontier
     force: yes
 
 - name: Copy setup files to /usr/local

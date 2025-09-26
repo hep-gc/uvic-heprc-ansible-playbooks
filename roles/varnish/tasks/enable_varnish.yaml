@@ -1,4 +1,4 @@
-- name: Source configuration and run setup script
+- name: Source and run setup script
   shell: |
     source /etc/sysconfig/frontier-varnish
     source /root/v4A/runme.sh &
@@ -6,3 +6,8 @@
     executable: /bin/bash
   register: setup_result
 
+- name: Enable and start varnish service
+  systemd:
+    name: varnish
+    enabled: yes
+    state: started
