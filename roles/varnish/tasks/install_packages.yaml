@@ -31,6 +31,13 @@
     remote_src: yes
     mode: preserve
 
+- name: Copy setup files to /etc/
+  copy:
+    src: /tmp/v4A/VM/etc/
+    dest: /etc/
+    remote_src: yes
+    mode: preserve
+
 - name: Copy start files to root
   copy:
     src: /tmp/v4A/
