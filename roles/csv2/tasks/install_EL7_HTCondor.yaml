@@ -43,7 +43,7 @@
 
 - name: install HTCondor
   yum:
-    name: ['condor-all']
+    name: ['condor-all-9.0.x']
     state: latest
   when: ansible_facts['distribution_major_version'] == '7'
 ...
