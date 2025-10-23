@@ -17,10 +17,11 @@
   when: ansible_facts['distribution_major_version'] == '9'
 
 - name: download htcondor script
-  ansible.builtin.copy:
-    src: condor_install
+  get_url: 
+    url: https://get.htcondor.org
     dest: /tmp/install_htcondor.sh
-    mode: '0755'
+    validate_certs: yes
+  when: ansible_facts['distribution_major_version'] == '9' and "Nothing to do" not in htcondor_installed.msg
 
 - name: Run the HTCondor install script
   ansible.builtin.shell: >-
@@ -28,7 +29,6 @@
     --no-dry-run
     --central-manager {{ i_service_connection.0.ipv4fqdn }}
     --password {{ amqp_user_passwords['condor_poller'] }}
-    --channel lts
   when: ansible_facts['distribution_major_version'] == '9' and "Nothing to do" not in htcondor_installed.msg
   changed_when: True
 
@@ -43,7 +43,7 @@
 
 - name: install HTCondor
   yum:
-    name: ['condor-24.12.13']
+    name: ['condor-all']
     state: latest
   when: ansible_facts['distribution_major_version'] == '7'
 ...
