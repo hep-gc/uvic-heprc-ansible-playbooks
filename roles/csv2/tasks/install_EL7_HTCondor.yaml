@@ -17,11 +17,18 @@
   when: ansible_facts['distribution_major_version'] == '9'
 
 - name: download htcondor script
-  ansible.builtin.copy:
-    src: condor_install
+  get_url: 
+    url: https://get.htcondor.org
     dest: /tmp/install_htcondor.sh
-    mode: '0755'
+    validate_certs: yes
+  when: ansible_facts['distribution_major_version'] == '9' and "Nothing to do" not in htcondor_installed.msg
 
+- name: Replace an existing line using a regular expression
+  ansible.builtin.replace:
+    path: /tmp/install_htcondor.sh
+    regexp: "CHANNEL_DIR=25.0"
+    replace: "CHANNEL_DIR=24.x"
+        
 - name: Run the HTCondor install script
   ansible.builtin.shell: >-
     /bin/bash /tmp/install_htcondor.sh
