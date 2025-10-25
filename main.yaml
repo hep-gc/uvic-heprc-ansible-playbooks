@@ -6,3 +6,4 @@
 - import_playbook: htcondor.yaml
 - import_playbook: shoal.yaml
 - import_playbook: squid.yaml
+- import_playbook: varnish.yaml
