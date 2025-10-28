@@ -15,7 +15,7 @@ echo "/var/log/cloudscheduler/condor_poller.log {
  compress
  copytruncate
  create 0644 condor condor
-}" | sudo tee /etc/logrotate.d/csv2_condor 
+}" >  /etc/logrotate.d/csv2_condor
 
 
 if [ -f "$OLD_CFG" ]; then
