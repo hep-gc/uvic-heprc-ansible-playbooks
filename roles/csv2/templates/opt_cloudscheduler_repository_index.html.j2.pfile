@@ -62,7 +62,7 @@
 		<br>&emsp;compress
 		<br>&emsp;copytruncate
 		<br>&emsp;create 0644 condor condor
-		<br>}" >  /etc/logrotate.d/csv2_condor
+		<br>}" >  /etc/logrotate.d/csv2-condor
             </div>
 
             <p>When these steps have been completed, the condor poller service will need to be enabled. If you
