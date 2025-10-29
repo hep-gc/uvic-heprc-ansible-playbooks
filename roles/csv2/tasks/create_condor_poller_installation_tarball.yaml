@@ -91,6 +91,6 @@
 - name: remove the temporary condor_poller gentgz directory
   file:
     path: /tmp/gentgz
-    state: absent
+    state: absent                                
 
 ...

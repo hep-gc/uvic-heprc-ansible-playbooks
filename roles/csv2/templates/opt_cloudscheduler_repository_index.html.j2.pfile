@@ -53,7 +53,16 @@
                 cd /tmp <br>
                 wget <a href="https://{{ inventory_hostname }}/repo/condor_poller.tar.gz">https://{{ inventory_hostname }}/repo/condor_poller.tar.gz</a><br>
                 tar -xzvf condor_poller.tar.gz<br>
-                rsync -av cloudscheduler /opt
+                rsync -av cloudscheduler /opt<br>
+		echo "/var/log/cloudscheduler/condor_poller.log {<br>
+		&emsp;weekly
+		<br>&emsp;su root
+		<br>&emsp;notifempty
+		<br>&emsp;missingok
+		<br>&emsp;compress
+		<br>&emsp;copytruncate
+		<br>&emsp;create 0644 condor condor
+		<br>}" >  /etc/logrotate.d/csv2-condor
             </div>
 
             <p>When these steps have been completed, the condor poller service will need to be enabled. If you
