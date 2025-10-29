@@ -23,6 +23,12 @@
     validate_certs: yes
   when: ansible_facts['distribution_major_version'] == '9' and "Nothing to do" not in htcondor_installed.msg
 
+- name: replace lts with correct version
+  ansible.builtin.replace:
+    path: /tmp/install_htcondor.sh
+    regexp: "CHANNEL_DIR=25.0"
+    replace: "CHANNEL_DIR=24.x"
+        
 - name: Run the HTCondor install script
   ansible.builtin.shell: >-
     /bin/bash /tmp/install_htcondor.sh
