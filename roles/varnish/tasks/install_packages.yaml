@@ -21,7 +21,7 @@
   git:
     repo: https://github.com/ivukotic/v4A.git
     dest: /tmp/v4A
-    version: cvmfs #Change to 'frontier' if deploying frontier
+    version: "{{ upstream }}"
     force: yes
 
 - name: Copy setup files to /usr/local
@@ -45,18 +45,15 @@
     remote_src: yes
     mode: preserve
 
-- name: Create sysconfig file for Varnish
-  copy:
-    dest: /etc/sysconfig/frontier-varnish
-    mode: '0644'
-    content: |
-      # varnish
-      SITE="{{ varnish_site }}"
-      INSTANCE="{{ varnish_instance }}"
-      VARNISH_TRANSIENT_MEM="{{ varnish_transient_mem }}"
-      VARNISH_MEM="{{ varnish_mem }}"
-      VARNISH_PORT="{{ varnish_port }}"
-      FRONTIER_CONF="{{ frontier_conf }}"
-      # monitor
-      URL_ML="{{ url_ml }}"
-      URL_ML_ACCESS="{{ url_ml_access }}"
+- name: Update config file with playbook specific vars
+  lineinfile:
+    path: /etc/sysconfig/{{ 'cvmfs-varnish' if upstream == 'cvmfs' else 'frontier-varnish' }}
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - { regexp: '^SITE=', line: 'SITE={{ varnish_site }}' }
+    - { regexp: '^INSTANCE=', line: 'INSTANCE={{ varnish_instance }}' }
+    - { regexp: '^VARNISH_TRANSIENT_MEM=', line: 'VARNISH_TRANSIENT_MEM={{ varnish_transient_mem }}' }
+    - { regexp: '^VARNISH_MEM=', line: 'VARNISH_MEM={{ varnish_mem }}' }
+    - { regexp: '^VARNISH_PORT=', line: 'VARNISH_PORT={{ varnish_port }}' }
+    - { regexp: '^FRONTIER_CONF=', line: 'FRONTIER_CONF={{ frontier_conf }}' }
