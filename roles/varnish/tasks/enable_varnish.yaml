@@ -1,6 +1,6 @@
 - name: Source and run setup script
   shell: |
-    source /etc/sysconfig/frontier-varnish
+    source /etc/sysconfig/{{ 'cvmfs-varnish' if upstream == 'cvmfs' else 'frontier-varnish' }}
     source /root/v4A/runme.sh &
   args:
     executable: /bin/bash
