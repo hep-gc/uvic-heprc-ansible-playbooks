@@ -50,7 +50,7 @@
   lineinfile:
     path: /root/v4A/runme.sh
     insertafter: 'curl -s "https://raw.githubusercontent.com/ivukotic/v4A/cvmfs/configurations/\$nfile.vcl" -o /tmp/\$nfile.vcl'
-    line: "sed -i '/^import dynamic;/d' /tmp/$nfile.vcl"
+    line: "sed -i '/import dynamic;/d' /tmp/$nfile.vcl"
     state: present
     
 - name: Update config file with playbook specific vars
