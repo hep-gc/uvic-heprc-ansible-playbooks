@@ -64,3 +64,4 @@
     - { regexp: '^VARNISH_TRANSIENT_MEM=', line: 'VARNISH_TRANSIENT_MEM={{ varnish_transient_mem }}' }
     - { regexp: '^VARNISH_MEM=', line: 'VARNISH_MEM={{ varnish_mem }}' }
     - { regexp: '^VARNISH_PORT=', line: 'VARNISH_PORT={{ varnish_port }}' }
+    - { regexp: '^FRONTIER_CONF=', line: 'FRONTIER_CONF={{ frontier_conf }}' }
