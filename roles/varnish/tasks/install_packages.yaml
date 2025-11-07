@@ -13,11 +13,54 @@
   yum:
     name:
       - epel-release
-      - varnish
-      - jq
+      
+- name: Install Varnish repository via script
+  shell: |
+     curl -s https://packagecloud.io/install/repositories/varnishcache/varnish77/script.rpm.sh | bash
+  args:
+     creates: /etc/yum.repos.d/varnishcache_varnish77.repo
+ 
+- name: Install required packages
+  yum:
+    name:
+      - epel-release
       - git
-    state: present
+      - varnish
+      - varnish-devel
+      - libcurl-devel
+      - gcc
+      - make
+      - automake
+      - autoconf
+      - libtool
+      - python3-docutils
+      - jemalloc-devel
+      - pkgconfig
 
+- name: Clone vmod dynamic repository
+  git:
+    repo: https://github.com/nigoroll/libvmod-dynamic.git
+    dest: /tmp/libvmod-dynamic
+    version: 7.7
+    force: yes
+  when: not vmod_dynamic_installed.stat.exists
+
+- name: Install vmod dynamic
+  shell: |
+      cd /tmp/libvmod-dynamic
+      ./autogen.sh
+      ./configure
+      make
+      make install
+  args:
+      creates: /usr/lib64/varnish/vmods/libvmod_dynamic.so
+  when: not vmod_dynamic_installed.stat.exists
+
+- name: Verify vmod dynamic installation
+  command: ls -la /usr/lib64/varnish/vmods/libvmod_dynamic.so
+  register: vmod_check
+  changed_when: false
+      
 - name: Clone setup repository
   git:
     repo: https://github.com/ivukotic/v4A.git
@@ -30,7 +73,7 @@
     src: /tmp/v4A/VM/usr/local/
     dest: /usr/local/
     remote_src: yes
-    mode: preserve
+    mode: '0644'
 
 - name: Copy setup files to /etc/
   copy:
@@ -38,21 +81,30 @@
     dest: /etc/
     remote_src: yes
     mode: preserve
-
-- name: Copy start files to root
+    
+- name: Copy systemd service files
+  copy:
+    src: /tmp/v4A/VM/etc/systemd/system/
+    dest: /etc/systemd/system/
+    remote_src: yes
+    mode: '0644'
+    
+- name: Copy files to root
   copy:
     src: /tmp/v4A/
     dest: /root/v4A/
     remote_src: yes
     mode: preserve
-    
-- name: Patch runme.sh 
-  lineinfile:
-    path: /root/v4A/runme.sh
-    insertafter: 'curl -s "https://raw.githubusercontent.com/ivukotic/v4A/cvmfs/configurations/\$nfile.vcl" -o /tmp/\$nfile.vcl'
-    line: "sed -i '/import dynamic;/d' /tmp/$nfile.vcl"
-    state: present
-    
+ 
+- name: Ensure scripts are executable
+  file:
+    path: "{{ item }}"
+    mode: '0755'
+  loop:
+    - /usr/local/bin/{{ 'cvmfs-varnish' if upstream == 'cvmfs' else 'frontier-varnish' }}.sh
+    - /usr/local/bin/reconfiguration.sh
+  ignore_errors: yes
+  
 - name: Update config file with playbook specific vars
   lineinfile:
     path: /etc/sysconfig/{{ 'cvmfs-varnish' if upstream == 'cvmfs' else 'frontier-varnish' }}
