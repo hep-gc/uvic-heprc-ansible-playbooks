@@ -1,0 +1,81 @@
+---
+# install_certificates.yaml
+- name: define certificate variables
+  set_fact:
+    htcondor_cert: "/etc/grid-security/hostcert.pem"
+    htcondor_key: "/etc/grid-security/hostkey.pem"
+    htcondor_worker_cert: "/etc/grid-security/hostcert.pem"
+    htcondor_worker_key: "/etc/grid-security/hostkey.pem"
+  when: htcondor_cert is undefined
+
+- name: create condor group
+  group:
+    name: condor
+
+- name: create condor user
+  user:
+    name: condor
+    group: condor
+    
+- name: create grid-security directory
+  file:
+    path: /etc/grid-security
+    state: directory
+    mode: '0755'
+
+- name: create x509 certificate distribution directories
+  file:
+    dest: "{{ item }}"
+    state: directory
+    owner: condor
+    group: condor
+    mode: "0700"
+  with_items:
+    - "/usr/local/etc/certificates"
+    - "/usr/local/etc/certificates/{{ ansible_fqdn }}"
+    - "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}"
+    - "/etc/grid-security/condor-worker"
+    - "/var/lib/condor/.globus"
+
+- name: install x509 certificates
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: condor
+    group: condor
+    mode: "0400"
+    remote_src: yes   
+  with_items:
+    - {src: "{{ htcondor_cert }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/cert.pem"}
+    - {src: "{{ htcondor_cert }}", dest: "/etc/grid-security/hostcert.pem"}
+    - {src: "{{ htcondor_worker_cert }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/cert.pem"}
+    - {src: "{{ htcondor_worker_cert }}", dest: "/var/lib/condor/.globus/usercert.pem"}
+    - {src: "{{ htcondor_worker_cert }}", dest: "/etc/grid-security/condor-worker/hostcert.pem"}
+
+- name: install x509 keys
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: condor
+    group: condor
+    mode: "0400"
+    remote_src: yes   
+  with_items:
+    - {src: "{{ htcondor_key }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/privkey.pem"}
+    - {src: "{{ htcondor_key }}", dest: "/etc/grid-security/hostkey.pem"}
+    - {src: "{{ htcondor_worker_key }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/privkey.pem"}
+    - {src: "{{ htcondor_worker_key }}", dest: "/var/lib/condor/.globus/userkey.pem"}
+    - {src: "{{ htcondor_worker_key }}", dest: "/etc/grid-security/condor-worker/hostkey.pem"}
+
+- name: install Influxdb certificates
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: influxdb
+    mode: "0644"
+    remote_src: yes
+  with_items:
+    - {src: "{{ htcondor_cert }}", dest: "/etc/ssl/hostcert.pem"}
+    - {src: "{{ htcondor_key }}", dest: "/etc/ssl/hostkey.pem"}
+

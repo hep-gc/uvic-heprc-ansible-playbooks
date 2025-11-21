@@ -565,22 +565,6 @@
 - name: include create_mysqldb_csv2.yaml
   ansible.builtin.include_tasks: create_mysqldb_csv2.yaml
   
-- name: Copy host certificate for InfluxDB
-  copy:
-    src: "files/host_certificates/{{ inventory_hostname }}/hostcert.pem"
-    dest: /etc/ssl/hostcert.pem
-    owner: root
-    group: influxdb
-    mode: '0640'
-
-- name: Copy host key for InfluxDB
-  copy:
-    src: "files/host_certificates/{{ inventory_hostname }}/hostkey.pem"
-    dest: /etc/ssl/hostkey.pem
-    owner: root
-    group: influxdb
-    mode: '0640'
-    
 - name: Open ports required for influxdb
   ansible.posix.firewalld:
     zone: public
