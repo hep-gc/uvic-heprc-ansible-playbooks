@@ -70,9 +70,6 @@
 - name: Install fetch-crl
   ansible.builtin.import_tasks: install_fetch_crl.yaml
 
-- name: Install EL7 HTCondor
-  ansible.builtin.import_tasks: install_EL7_HTCondor.yaml
-
 - name: Install influxdb
   ansible.builtin.import_tasks: install_influxdb.yaml
 
@@ -84,12 +81,6 @@
   when:
     - ci_target is defined
     - ci_target
-
-- name: Create condor poller installation tarball
-  ansible.builtin.import_tasks: create_condor_poller_installation_tarball.yaml
-
-- name: Install and start condor poller
-  ansible.builtin.import_tasks: install_and_start_condor_poller.yaml
 
 - name: Install and configure filebeat
   ansible.builtin.import_tasks: install_configure_filebeat.yaml

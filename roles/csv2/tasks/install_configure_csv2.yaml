@@ -39,6 +39,16 @@
   set_fact:
     hostname: "{{ i_service_connection.0.ipv4fqdn }}"
 
+
+- name: create condor group
+  group:
+    name: condor
+
+- name: create condor user
+  user:
+    name: condor
+    group: condor
+    
 - name: create cloudscheduler user
   user:
     name: cloudscheduler
@@ -539,12 +549,6 @@
 
 # this task may be able to be skipped as it is handled with a certbot deploy hook
 
-- name: import_tasks
-  import_tasks: copy_certificates_to_users.yaml
-
-- name: import_tasks
-  import_tasks: configure_EL7_HTCondor.yaml
-
 - name: Register output of csv2 db status check
   ansible.builtin.shell: >-
     echo "SELECT SCHEMA_NAME
@@ -560,7 +564,23 @@
 
 - name: include create_mysqldb_csv2.yaml
   ansible.builtin.include_tasks: create_mysqldb_csv2.yaml
+  
+- name: Copy host certificate for InfluxDB
+  copy:
+    src: "files/host_certificates/{{ inventory_hostname }}/hostcert.pem"
+    dest: /etc/ssl/hostcert.pem
+    owner: root
+    group: influxdb
+    mode: '0640'
 
+- name: Copy host key for InfluxDB
+  copy:
+    src: "files/host_certificates/{{ inventory_hostname }}/hostkey.pem"
+    dest: /etc/ssl/hostkey.pem
+    owner: root
+    group: influxdb
+    mode: '0640'
+    
 - name: Open ports required for influxdb
   ansible.posix.firewalld:
     zone: public
