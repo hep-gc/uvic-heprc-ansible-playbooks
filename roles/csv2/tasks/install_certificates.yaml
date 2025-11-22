@@ -1,13 +1,13 @@
 ---
 # install_certificates.yaml
-- name: define certificate variables
+- name: define certificate variables 
   set_fact:
-    htcondor_cert: "/etc/grid-security/hostcert.pem"
-    htcondor_key: "/etc/grid-security/hostkey.pem"
-    htcondor_worker_cert: "/etc/grid-security/hostcert.pem"
-    htcondor_worker_key: "/etc/grid-security/hostkey.pem"
+    htcondor_cert: "/etc/letsencrypt/live/{{ ansible_fqdn }}/cert.pem"
+    htcondor_key: "/etc/letsencrypt/live/{{ ansible_fqdn }}/privkey.pem"
+    htcondor_worker_cert: "/etc/letsencrypt/live/{{ ansible_fqdn }}/cert.pem"
+    htcondor_worker_key: "/etc/letsencrypt/live/{{ ansible_fqdn }}/privkey.pem"
   when: htcondor_cert is undefined
-
+  
 - name: create condor group
   group:
     name: condor
@@ -16,6 +16,12 @@
   user:
     name: condor
     group: condor
+    
+- name: create influxdb group     
+  group:
+    name: influxdb
+    state: present
+    system: yes
     
 - name: create grid-security directory
   file:
@@ -66,7 +72,7 @@
     - {src: "{{ htcondor_worker_key }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/privkey.pem"}
     - {src: "{{ htcondor_worker_key }}", dest: "/var/lib/condor/.globus/userkey.pem"}
     - {src: "{{ htcondor_worker_key }}", dest: "/etc/grid-security/condor-worker/hostkey.pem"}
-
+    
 - name: install Influxdb certificates
   copy:
     src: "{{ item.src }}"

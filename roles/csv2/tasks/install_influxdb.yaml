@@ -40,6 +40,17 @@
     name: ['influxdb']
     state: latest
 
+- name: create influxdb user
+  user:
+    name: influxdb
+    group: influxdb
+    
+- name: ensure directory ownership  
+  file:
+    path: /var/lib/influxdb
+    owner: influxdb
+    group: influxdb
+    
 - name: Start service InfluxDB
   service:
     name: influxdb
