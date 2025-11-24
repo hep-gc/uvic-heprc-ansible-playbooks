@@ -173,6 +173,11 @@
     executable: pip3
     state: latest
 
+- name: install crccheck
+  pip:
+    name: crccheck
+    executable: pip3
+    
 - name: determine django package version
   set_fact:
     django_package: "{{ 'django' if ansible_facts['distribution_major_version'] == '9' else 'django==2.0.5'}}"
