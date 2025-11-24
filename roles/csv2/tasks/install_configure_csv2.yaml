@@ -193,6 +193,13 @@
     name: ["mysqlclient", "mysql-connector", "sqlparse"]
     executable: pip3
 
+- name: update dateutil to latest
+  pip:
+    name: python-dateutil
+    state: latest
+    executable: pip3
+    extra_args: "--target=/usr/local/lib/python3.9/site-packages"
+    
 - name: save any changes in the git repository that we are about to pull down
   git_reposave:
     dest: /opt/cloudscheduler/
