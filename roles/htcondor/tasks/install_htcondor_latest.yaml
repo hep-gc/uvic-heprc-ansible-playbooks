@@ -1,5 +1,13 @@
 # install_htcondor_latest.yaml
 
+- name: check status of htcondor install
+  yum:
+    name: htcondor-release
+    state: installed
+  register: htcondor_installed
+  ignore_errors: yes
+  when: ansible_facts['distribution_major_version'] == '9'
+
 - name: download htcondor script
   get_url:
     url: https://get.htcondor.org

@@ -1,5 +1,6 @@
 # htcondor server setup yaml
 - include_vars: htcondor-public-default-vars.yaml
+- include_vars: htcondor-public-secrets.yaml
 - include_vars: htcondor-public-vars.yaml
 
   #- import_tasks: create_installation_directories.yaml
