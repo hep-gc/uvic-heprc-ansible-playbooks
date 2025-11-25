@@ -87,7 +87,7 @@
     - {src: "{{ htcondor_worker_key }}", dest: "/var/lib/condor/.globus/userkey.pem"}
     - {src: "{{ htcondor_worker_key }}", dest: "/etc/grid-security/condor-worker/hostkey.pem"}
     - {src: "{{ htcondor_key }}", dest: "/var/lib/mysql/.globus/userkey.pem", owner: "mysql", group: "mysql", mode: "0400"}
-   when:
+  when:
     - htcondor_cert is defined
     - htcondor_key is defined
     - htcondor_worker_cert is defined
