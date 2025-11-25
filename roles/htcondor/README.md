@@ -18,6 +18,6 @@
 ### Steps to install htcondor on a pre-configured host
 
 - Ensure that you have root access
-- Modify the vars ('htcondor-public-vars.yaml') and secrets ('htcondor-public-secrets.yaml') files in vars/ with correct info
+- Modify the vars (`htcondor-public-vars.yaml`) and secrets (`htcondor-public-secrets.yaml`) files in vars/ with correct info
 - Modify the inventory file in the main uvic-heprc-ansible-playbooks/ directory with target information
 - Run the htcondor playbook- see the [uvic-heprc-ansible-playbooks readme](/README.md) for further details
