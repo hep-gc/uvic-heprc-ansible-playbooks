@@ -38,16 +38,6 @@
 - name: set_fact
   set_fact:
     hostname: "{{ i_service_connection.0.ipv4fqdn }}"
-
-
-- name: create condor group
-  group:
-    name: condor
-
-- name: create condor user
-  user:
-    name: condor
-    group: condor
     
 - name: create cloudscheduler user
   user:
@@ -182,11 +172,6 @@
       - setuptools
     executable: pip3
     state: latest
-
-- name: install crccheck
-  pip:
-    name: crccheck
-    executable: pip3
  
 - name: determine django package version
   set_fact:
@@ -202,13 +187,6 @@
     executable: pip3
 #### Removed mqsqlclient and mqsql-connector and sqlparse "mysqlclient==1.3.1", "mysql-connector==2.2.9", "sqlparse==0.2.4"
 #### previously used celery==4.4.6 but there was a metadata issue so now using latest
-
-- name: force upgrade dateutil 
-  pip:
-    name: python-dateutil
-    state: latest
-    executable: pip3
-    extra_args: "--target=/usr/local/lib/python3.9/site-packages"
 
 - name: install mysql python packages
   pip:
