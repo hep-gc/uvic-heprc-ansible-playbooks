@@ -37,6 +37,11 @@
       - jemalloc-devel
       - pkgconfig
 
+- name: Check if vmod dynamic is installed
+  stat:
+    path: /usr/lib64/varnish/vmods/libvmod_dynamic.so
+  register: vmod_dynamic_installed
+
 - name: Clone vmod dynamic repository
   git:
     repo: https://github.com/nigoroll/libvmod-dynamic.git
