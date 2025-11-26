@@ -1,0 +1,106 @@
+---
+# install_certificates.yaml
+
+- name: define certificate variables
+  set_fact:
+    htcondor_cert: "/etc/letsencrypt/live/{{ ansible_fqdn }}/cert.pem"
+    htcondor_key: "/etc/letsencrypt/live/{{ ansible_fqdn }}/privkey.pem"
+    htcondor_worker_cert: "/etc/letsencrypt/live/{{ ansible_fqdn }}/cert.pem"
+    htcondor_worker_key: "/etc/letsencrypt/live/{{ ansible_fqdn }}/privkey.pem"
+
+- name: create condor group
+  group:
+    name: condor
+
+- name: create condor user
+  user:
+    name: condor
+    group: condor
+
+- name: create grid-security directory
+  file:
+    path: /etc/grid-security
+    state: directory
+    mode: '0755'
+
+- name: create x509 certificate distribution directories
+  file:
+    dest: "{{ item }}"
+    state: directory
+    owner: condor
+    group: condor
+    mode: "0700"
+  with_items:
+    - "/usr/local/etc/certificates"
+    - "/usr/local/etc/certificates/{{ ansible_fqdn }}"
+    - "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}"
+    - "/etc/grid-security/condor-worker"
+    - "/var/lib/condor/.globus"
+  when:
+    - htcondor_cert is defined
+    - htcondor_key is defined
+    - htcondor_worker_cert is defined
+    - htcondor_worker_key is defined
+    
+- name: create mysql globus directory
+  file:
+    path: /var/lib/mysql/.globus
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: '0700'
+  ignore_errors: yes 
+
+- name: install x509 certificates
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner | default('condor') }}"
+    group: "{{ item.group | default('condor') }}"
+    mode: "{{ item.mode | default('0400') }}"
+    remote_src: yes 
+  with_items:
+    - {src: "{{ htcondor_cert }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/cert.pem"}
+    - {src: "{{ htcondor_cert }}", dest: "/etc/grid-security/hostcert.pem", owner: "root", group: "root", mode: "0644"}
+    - {src: "{{ htcondor_worker_cert }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/cert.pem"}
+    - {src: "{{ htcondor_worker_cert }}", dest: "/var/lib/condor/.globus/usercert.pem"}
+    - {src: "{{ htcondor_worker_cert }}", dest: "/etc/grid-security/condor-worker/hostcert.pem"}
+    - {src: "{{ htcondor_cert }}", dest: "/var/lib/mysql/.globus/usercert.pem", owner: "mysql", group: "mysql", mode: "0400"}
+  when:
+    - htcondor_cert is defined
+    - htcondor_key is defined
+    - htcondor_worker_cert is defined
+    - htcondor_worker_key is defined
+    
+- name: install x509 keys
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner | default('condor') }}"
+    group: "{{ item.group | default('condor') }}"
+    mode: "{{ item.mode | default('0400') }}"
+    remote_src: yes 
+  with_items:
+    - {src: "{{ htcondor_key }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/privkey.pem"}
+    - {src: "{{ htcondor_key }}", dest: "/etc/grid-security/hostkey.pem", owner: "root", group: "root", mode: "0644"}
+    - {src: "{{ htcondor_worker_key }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/privkey.pem"}
+    - {src: "{{ htcondor_worker_key }}", dest: "/var/lib/condor/.globus/userkey.pem"}
+    - {src: "{{ htcondor_worker_key }}", dest: "/etc/grid-security/condor-worker/hostkey.pem"}
+    - {src: "{{ htcondor_key }}", dest: "/var/lib/mysql/.globus/userkey.pem", owner: "mysql", group: "mysql", mode: "0400"}
+  when:
+    - htcondor_cert is defined
+    - htcondor_key is defined
+    - htcondor_worker_cert is defined
+    - htcondor_worker_key is defined
+
+- name: install influxdb certificates
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "0644"
+    remote_src: yes
+  with_items:
+    - {src: "{{ htcondor_cert }}", dest: "/etc/ssl/hostcert.pem"}
+    - {src: "{{ htcondor_key }}", dest: "/etc/ssl/hostkey.pem"}

@@ -1,5 +1,6 @@
 # htcondor server setup yaml
 - include_vars: htcondor-public-default-vars.yaml
+- include_vars: htcondor-public-secrets.yaml
 - include_vars: htcondor-public-vars.yaml
 
   #- import_tasks: create_installation_directories.yaml
@@ -25,6 +26,5 @@
 - import_tasks: configure_htcondor.yaml
 - import_tasks: install_condor_ce.yaml
   when: (condor_ce is defined) and (condor_ce == True)
-- import_tasks: install_condor_poller.yaml
-  when: csv2_fqdn is defined
+
 

@@ -38,7 +38,7 @@
 - name: set_fact
   set_fact:
     hostname: "{{ i_service_connection.0.ipv4fqdn }}"
-
+    
 - name: create cloudscheduler user
   user:
     name: cloudscheduler
@@ -172,12 +172,7 @@
       - setuptools
     executable: pip3
     state: latest
-
-- name: install crccheck
-  pip:
-    name: crccheck
-    executable: pip3
-    
+ 
 - name: determine django package version
   set_fact:
     django_package: "{{ 'django' if ansible_facts['distribution_major_version'] == '9' else 'django==2.0.5'}}"
@@ -532,12 +527,6 @@
 
 # this task may be able to be skipped as it is handled with a certbot deploy hook
 
-- name: import_tasks
-  import_tasks: copy_certificates_to_users.yaml
-
-- name: import_tasks
-  import_tasks: configure_EL7_HTCondor.yaml
-
 - name: Register output of csv2 db status check
   ansible.builtin.shell: >-
     echo "SELECT SCHEMA_NAME
@@ -553,7 +542,7 @@
 
 - name: include create_mysqldb_csv2.yaml
   ansible.builtin.include_tasks: create_mysqldb_csv2.yaml
-
+  
 - name: Open ports required for influxdb
   ansible.posix.firewalld:
     zone: public

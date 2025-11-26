@@ -70,9 +70,9 @@
 - name: Install fetch-crl
   ansible.builtin.import_tasks: install_fetch_crl.yaml
 
-- name: Install EL7 HTCondor
-  ansible.builtin.import_tasks: install_EL7_HTCondor.yaml
-
+- name: Install Certificates
+  ansible.builtin.import_tasks: install_certificates.yaml
+  
 - name: Install influxdb
   ansible.builtin.import_tasks: install_influxdb.yaml
 
