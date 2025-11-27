@@ -9,13 +9,23 @@
     rsync -av cloudscheduler /opt
     rm -rfv /tmp/cloudscheduler
 
+- name: check if HTCondor is installed
+  ansible.builtin.shell: which condor_version
+  register: condor_installed
+  when: install_condor_poller
+
+- name: warn if HTCondor is not installed
+  ansible.builtin.debug:
+    msg: "WARNING: HTCondor is not installed. Please install HTCondor before configuring the condor poller."
+  when:
+    - install_condor_poller
+    - condor_installed.rc != 0
+
 - name: check if condor poller is already running
   ansible.builtin.shell: >-
     systemctl status csv2-condor-poller.service
   register: condor_poller_out
-  ignore_errors: true
-  failed_when: false
-  changed_when: false
+  when: install_condor_poller
 
 - name: configure and start the condor poller service
   ansible.builtin.shell: |
@@ -23,8 +33,7 @@
     /opt/cloudscheduler/utilities/service_enable_condor_poller
     rm -f /etc/condor/config.d/00-minicondor
     systemctl restart condor
-  when: 
-    - install_condor_poller 
+  when:
+    - install_condor_poller
     - condor_poller_out.rc != 0
-  changed_when: true
-  ignore_errors: true
+    - condor_installed.rc == 0
