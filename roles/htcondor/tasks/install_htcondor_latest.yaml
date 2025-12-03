@@ -39,7 +39,9 @@
     key: http://research.cs.wisc.edu/htcondor/yum/RPM-GPG-KEY-HTCondor
     state: present
 
+
 - name: install HTCondor
   yum:
-    name: ['condor-24.12.13']
+    name: ['condor-all']
     state: latest
+  when: ansible_facts['distribution_major_version'] == '7'
