@@ -38,5 +38,5 @@
     systemctl restart condor
   when:
     - install_condor_poller
-    - condor_poller_out.rc != 0
     - condor_installed.rc == 0
+    - condor_poller_out.rc != 0
