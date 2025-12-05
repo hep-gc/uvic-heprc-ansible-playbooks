@@ -28,7 +28,7 @@
   register: condor_poller_out
   when: 
     - install_condor_poller
-    - condor_installed.rc != 0
+    - condor_installed.rc == 0
   
 - name: configure and start the condor poller service
   ansible.builtin.shell: |
