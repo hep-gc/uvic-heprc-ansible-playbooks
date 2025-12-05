@@ -13,7 +13,8 @@
   ansible.builtin.shell: which condor_version
   register: condor_installed
   when: install_condor_poller
-
+  ignore_errors: true
+  
 - name: warn if HTCondor is not installed
   ansible.builtin.debug:
     msg: "WARNING: HTCondor is not installed. Please install HTCondor before configuring the condor poller."
@@ -25,8 +26,10 @@
   ansible.builtin.shell: >-
     systemctl status csv2-condor-poller.service
   register: condor_poller_out
-  when: install_condor_poller
-
+  when: 
+    - install_condor_poller
+    - condor_installed.rc != 0
+  
 - name: configure and start the condor poller service
   ansible.builtin.shell: |
     /opt/cloudscheduler/utilities/service_disable_condor_poller
