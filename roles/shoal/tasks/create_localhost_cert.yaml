@@ -31,5 +31,21 @@
       - localhost.crt
       - localhost.key
 
+- name: copy localhost.crt for httpd
+  copy:
+    src: /local_ssl/localhost.crt
+    dest: /etc/pki/tls/certs/localhost.crt
+    owner: root
+    group: root
+    remote_src: true
+
+- name: copy localhost.key for httpd
+  copy:
+    src: /local_ssl/localhost.key
+    dest: /etc/pki/tls/private/localhost.key
+    owner: root
+    group: root
+    remote_src: true
+    
 - name: Run update-ca-trust
   command: update-ca-trust
