@@ -683,6 +683,15 @@
     - timeseriesPoller.log
     - watch_csv2.logging
 
+- name: ensure condor group exists
+  group:
+    name: condor
+
+- name: ensure condor user exists
+  user:
+    name: condor
+    group: condor
+    
 - name: Create condor poller log file
   ansible.builtin.file:
     path: "/var/log/cloudscheduler/condor_poller.log"
