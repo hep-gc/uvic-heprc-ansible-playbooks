@@ -41,3 +41,15 @@
     - install_condor_poller
     - condor_installed.rc == 0
     - condor_poller_out.rc != 0
+
+- name: Create condor poller log file
+  ansible.builtin.file:
+    path: "/var/log/cloudscheduler/condor_poller.log"
+    owner: condor
+    group: condor
+    mode: "0644"
+    state: touch
+  when:
+    - install_condor_poller
+    - condor_installed.rc == 0
+    - condor_poller_out.rc != 0
