@@ -50,6 +50,17 @@
   - {src: /opt/cloudscheduler/utilities/service_disable_condor_poller,              dest: /tmp/gentgz/cloudscheduler/utilities/service_disable_condor_poller,              mode: '0744'}
   - {src: /opt/cloudscheduler/utilities/service_enable_condor_poller,               dest: /tmp/gentgz/cloudscheduler/utilities/service_enable_condor_poller,               mode: '0744'}
 
+- name: ensure condor group exists
+  group:
+    name: condor
+    state: present
+
+- name: ensure condor user exists
+  user:
+    name: condor
+    group: condor
+    state: present
+
 - name: generate condor_poller configuration file
   template:
     src: "tmp_gentgz_cloudscheduler_etc_cloudscheduler_condor_poller.yaml.j2.pfile"
