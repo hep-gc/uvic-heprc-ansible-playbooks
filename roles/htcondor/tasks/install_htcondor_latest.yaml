@@ -38,6 +38,11 @@
   rpm_key:
     key: http://research.cs.wisc.edu/htcondor/yum/RPM-GPG-KEY-HTCondor
     state: present
+
+- name: ensure pip is installed
+  yum:
+    name: pip
+    state: present
     
 - name: install htcondor python package
   pip:
