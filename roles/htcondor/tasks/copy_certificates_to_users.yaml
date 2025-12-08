@@ -93,4 +93,11 @@
   with_items:
   - "{{ certificate_users }}"
 
+- name: Install renewal hook for HTCondor
+  ansible.builtin.template:
+    src: etc_letsencrypt_renewal-hooks_deploy_htcondor.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/deploy_htcondor_certs.sh
+    owner: root
+    group: root
+    mode: "0700"
 
