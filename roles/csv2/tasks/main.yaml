@@ -69,9 +69,6 @@
 
 - name: Install fetch-crl
   ansible.builtin.import_tasks: install_fetch_crl.yaml
-
-- name: Install Certificates
-  ansible.builtin.import_tasks: install_certificates.yaml
   
 - name: Install influxdb
   ansible.builtin.import_tasks: install_influxdb.yaml
