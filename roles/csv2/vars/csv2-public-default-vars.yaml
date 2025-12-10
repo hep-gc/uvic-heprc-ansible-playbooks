@@ -16,7 +16,6 @@ certificate_users:
     - { host: "{{ ansible_fqdn }}",                                  owner: root,            group: root,            globus: '/etc/grid-security',            pfx: 'host'}
     - { host: "{{ ansible_fqdn }}",                                  owner: root,            group: root,            globus: '/root/.globus',                 pfx: 'user'}
     - { host: "{{ ansible_fqdn }}",                                  owner: cloudscheduler,  group: cloudscheduler,  globus: '/home/cloudscheduler/.globus',  pfx: 'user'}
-    - { host: "{{ ansible_fqdn }}",                                  owner: condor,          group: condor,          globus: '/var/lib/condor/.globus',       pfx: 'user'}
     - { host: "{{ ansible_fqdn }}",                                  owner: mysql,           group: mysql,           globus: '/var/lib/mysql/.globus',        pfx: 'user'}
     - { host: "{{ ansible_fqdn }}",                                  owner: influxdb,        group: influxdb,        globus: '/etc/ssl',                     pfx: 'host'}
 
