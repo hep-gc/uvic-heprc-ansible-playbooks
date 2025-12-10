@@ -1,0 +1,104 @@
+---
+# copy_certificates_to_users.yaml
+
+- name: create grid-security directory
+  file:
+    path: /etc/grid-security
+    state: directory
+    mode: '0755'
+
+- name: create mysql globus directory
+  file:
+    path: /var/lib/mysql/.globus
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: '0700'
+  ignore_errors: yes 
+
+- name: install x509 certificates 
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+    remote_src: yes 
+  with_items:
+    - {src: "{{ htcondor_cert }}", dest: "/var/lib/mysql/.globus/usercert.pem", owner: "mysql", group: "mysql", mode: "0400"}
+    - {src: "{{ htcondor_cert }}", dest: "/etc/grid-security/hostcert.pem", owner: "root", group: "root", mode: "0644"}
+  when:
+    - htcondor_cert is defined
+    - htcondor_key is defined
+
+- name: install x509 keys 
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+    remote_src: yes 
+  with_items:
+    - {src: "{{ htcondor_key }}", dest: "/var/lib/mysql/.globus/userkey.pem", owner: "mysql", group: "mysql", mode: "0400"}
+    - {src: "{{ htcondor_key }}", dest: "/etc/grid-security/hostkey.pem", owner: "root", group: "root", mode: "0600"}
+  when:
+    - htcondor_cert is defined
+    - htcondor_key is defined
+
+- name: set_fact
+  set_fact:
+    certificate_users: []
+  when: certificate_users is undefined
+
+- name: set_fact
+  set_fact:
+    certificate_users: "{{ certificate_users + [item] }}"
+  with_items: "{{ additional_certificate_users }}"
+  when: additional_certificate_users is defined
+
+- name: create user certificate directories
+  file:
+    dest: "{{ item.globus }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "0755"
+  with_items:
+    - "{{ certificate_users }}"
+
+- name: create empty usercert pem files for certificate users
+  file:
+    dest: "{{ item.globus }}/{{ item.pfx }}cert.pem"
+    state: touch
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "0444"
+  with_items:
+    - "{{ certificate_users }}"
+
+- name: Create empty userkey pem files for certificate users
+  file:
+    dest: "{{ item.globus }}/{{ item.pfx }}key.pem"
+    state: touch
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "0400"
+  with_items:
+    - "{{ certificate_users }}"
+
+- name: Install bash script to update cert and key for certificate users and restart httpd
+  ansible.builtin.template:
+    src: etc_letsencrypt_renewal-hooks_deploy_copy_certificates_to_users.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/copy_certificates_to_users.sh
+    owner: root
+    group: root
+    mode: "0700"
+  when:
+    - certificate_users is defined
+
+- name: Copy certificates to users
+  ansible.builtin.command:
+    cmd: /etc/letsencrypt/renewal-hooks/deploy/copy_certificates_to_users.sh
+  when:
+    - certificate_users is defined
