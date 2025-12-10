@@ -533,6 +533,10 @@
 
 # this task may be able to be skipped as it is handled with a certbot deploy hook
 
+
+- name: import_tasks
+  import_tasks: copy_certificates_to_users.yaml
+  
 - name: Register output of csv2 db status check
   ansible.builtin.shell: >-
     echo "SELECT SCHEMA_NAME
