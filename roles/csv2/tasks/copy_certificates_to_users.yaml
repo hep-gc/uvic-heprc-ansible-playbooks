@@ -1,20 +1,17 @@
 ---
 # copy_certificates_to_users.yaml
 
-- name: create grid-security directory
+- name: create x509 certificate distribution directories
   file:
-    path: /etc/grid-security
+    path: "{{ item.path }}"
     state: directory
-    mode: '0755'
-
-- name: create mysql globus directory
-  file:
-    path: /var/lib/mysql/.globus
-    state: directory
-    owner: mysql
-    group: mysql
-    mode: '0700'
-  ignore_errors: yes 
+    mode: "{{ item.mode }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+  with_items:
+    - { path: '/etc/grid-security', mode: '0755', owner: 'root', group: 'root' }
+    - { path: '/var/lib/mysql/.globus', mode: '0700', owner: 'mysql', group: 'mysql' }
+  ignore_errors: yes
 
 - name: install x509 certificates 
   copy:
