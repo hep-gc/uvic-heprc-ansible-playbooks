@@ -88,11 +88,6 @@
     dest: /root/.ssh/id_rsa
     mode: "0600"
 
-- name: Enable ssh-agent and add key
-  ansible.builtin.shell: |
-    eval "$(ssh-agent)"
-    ssh-add
-
 # edit ssh config here accoridng to wiki
 - name: Configure ssh-config
   ansible.builtin.lineinfile:
