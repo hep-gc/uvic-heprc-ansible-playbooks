@@ -5,6 +5,7 @@
   command: /usr/bin/update-ca-trust
 
 - name: pull down uvic-heprc-ansible-playbooks
+  become: yes
   git:
     repo: https://github.com/hep-gc/uvic-heprc-ansible-playbooks.git
     dest: /opt/deployment/uvic-heprc-ansible-playbooks/
@@ -12,7 +13,6 @@
     update: yes
     version: master
     accept_hostkey: yes
-  become: no
 
 - name: pull down cloudscheduler repo
   git:
@@ -67,9 +67,9 @@
     - pytest-rerunfailures
     - selenium
     - requests-toolbelt
-    - python3-openstackclient
-    - python3-keystoneclient
-    - python3-novaclient
+    - python-openstackclient
+    - python-keystoneclient
+    - python-novaclient
 
 - name: Run web test setup script
   ansible.builtin.shell: yes | /root/cloudscheduler/unit_tests/web_tests/setup_scripts/web_test_setup_full_alma9.sh ci_install
