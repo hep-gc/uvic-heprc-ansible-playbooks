@@ -19,9 +19,6 @@ certificate_users:
     - { host: "{{ ansible_fqdn }}",                                  owner: mysql,           group: mysql,           globus: '/var/lib/mysql/.globus',        pfx: 'user'}
     - { host: "{{ ansible_fqdn }}",                                  owner: influxdb,        group: influxdb,        globus: '/etc/ssl',                     pfx: 'host'}
 
-htcondor_cert: "/etc/letsencrypt/live/{{ ansible_fqdn }}/cert.pem"
-htcondor_key: "/etc/letsencrypt/live/{{ ansible_fqdn }}/privkey.pem"
-
 htcondor_collector_port: 9618
 htcondor_low_port: 40000
 htcondor_high_port: 50000

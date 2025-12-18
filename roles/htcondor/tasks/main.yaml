@@ -7,10 +7,9 @@
   #- import_tasks: install_other_required_packages.yaml
   #- import_tasks: install_python3.yaml
 
-- import_tasks: create_localhost_cert.yaml
-  when: 
-  - local_web is defined
-  - local_web == True
+- name: Configure letsencrypt certificates
+  ansible.builtin.include_tasks: letsencrypt.yaml
+  when: (local_web is undefined) or (not local_web)
 
 - include: install_configure_httpd.yaml
 - import_tasks: install_EGI_trust_anchors.yaml
