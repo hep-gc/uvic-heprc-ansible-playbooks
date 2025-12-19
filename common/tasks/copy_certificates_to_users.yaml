@@ -11,42 +11,58 @@
     group: condor
     state: present
 
-- name: create x509 certificate distribution directories
+- name: Create local cert directory
   file:
-    dest: "{{ item }}"
+    path: "/usr/local/etc/certificates/{{ ansible_fqdn }}"
     state: directory
     owner: condor
     group: condor
     mode: "0700"
-  with_items:
-    - "/usr/local/etc/certificates"
-    - "/usr/local/etc/certificates/{{ ansible_fqdn }}"
-    - "/etc/grid-security"
+    recurse: true
 
-- name: install x509 certificates
+- name: Create grid security directory
+  file:
+    path: "/etc/grid-security"
+    state: directory
+    owner: condor
+    group: condor
+    mode: "0700"
+
+- name: Install local cert
   copy:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
+    src: "{{ htcondor_cert | default('/etc/letsencrypt/live/' + ansible_fqdn + '/cert.pem') }}"
+    dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/cert.pem"
     owner: condor
     group: condor
     mode: "0400"
     remote_src: yes
-  with_items:
-    - {src: "{{ htcondor_cert | default('/etc/letsencrypt/live/' + ansible_fqdn + '/cert.pem') }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/cert.pem"}
-    - {src: "{{ htcondor_cert |  default('/etc/letsencrypt/live/' + ansible_fqdn + '/cert.pem') }}", dest: "/etc/grid-security/hostcert.pem"}
 
-- name: install x509 keys
+- name: Install grid security hostcert
   copy:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
+    src: "{{ htcondor_cert | default('/etc/letsencrypt/live/' + ansible_fqdn + '/cert.pem') }}"
+    dest: "/etc/grid-security/hostcert.pem"
     owner: condor
     group: condor
     mode: "0400"
     remote_src: yes
-  with_items:
-    - {src: "{{ htcondor_key | default('/etc/letsencrypt/live/' + ansible_fqdn + '/privkey.pem') }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/privkey.pem"}
-    - {src: "{{ htcondor_key | default('/etc/letsencrypt/live/' + ansible_fqdn + '/privkey.pem') }}", dest: "/etc/grid-security/hostkey.pem"}
 
+- name: Install local key
+  copy:
+    src: "{{ htcondor_key | default('/etc/letsencrypt/live/' + ansible_fqdn + '/privkey.pem') }}"
+    dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/privkey.pem"
+    owner: condor
+    group: condor
+    mode: "0400"
+    remote_src: yes
+
+- name: Install grid security hostkey
+  copy:
+    src: "{{ htcondor_key | default('/etc/letsencrypt/live/' + ansible_fqdn + '/privkey.pem') }}"
+    dest: "/etc/grid-security/hostkey.pem"
+    owner: condor
+    group: condor
+    mode: "0400"
+    remote_src: yes
 
 - name: set_fact
   set_fact:

@@ -1,14 +1,24 @@
 #!/bin/bash
 
 R=0
+
+{% set cert_fqdn = csv2_fqdn | default(htcondor_fqdn) | default(ansible_fqdn) %}
+
 M=$(
-{% if csv2_fqdn is defined %}
+
+/bin/cp -f /etc/letsencrypt/live/{{ cert_fqdn }}/cert.pem /usr/local/etc/certificates/{{ ansible_fqdn }}/cert.pem 2>&1 &&
+/bin/cp -f /etc/letsencrypt/live/{{ cert_fqdn }}/privkey.pem /usr/local/etc/certificates/{{ ansible_fqdn }}/privkey.pem 2>&1 &&
+/bin/cp -f /etc/letsencrypt/live/{{ cert_fqdn }}/cert.pem /etc/grid-security/hostcert.pem 2>&1 &&
+/bin/cp -f /etc/letsencrypt/live/{{ cert_fqdn }}/privkey.pem /etc/grid-security/hostkey.pem 2>&1 &&
+
+
+{% if cert_fqdn is defined %}
     {% for user in certificate_users %}
-/bin/cp -f /etc/letsencrypt/live/{{ csv2_fqdn }}/fullchain.pem {{ user.globus }}/{{ user.pfx }}cert.pem 2>&1 &&
+/bin/cp -f /etc/letsencrypt/live/{{ cert_fqdn }}/fullchain.pem {{ user.globus }}/{{ user.pfx }}cert.pem 2>&1 &&
         {% if loop.last %}
-/bin/cp -f /etc/letsencrypt/live/{{ csv2_fqdn }}/privkey.pem {{ user.globus }}/{{ user.pfx }}key.pem 2>&1
+/bin/cp -f /etc/letsencrypt/live/{{ cert_fqdn }}/privkey.pem {{ user.globus }}/{{ user.pfx }}key.pem 2>&1
         {% else %}
-/bin/cp -f /etc/letsencrypt/live/{{ csv2_fqdn }}/privkey.pem {{ user.globus }}/{{ user.pfx }}key.pem 2>&1 &&
+/bin/cp -f /etc/letsencrypt/live/{{ cert_fqdn }}/privkey.pem {{ user.globus }}/{{ user.pfx }}key.pem 2>&1 &&
         {% endif %}
     {% endfor %}
 {% else %}

@@ -4,8 +4,10 @@
 - include_vars: htcondor-public-vars.yaml
 
   #- import_tasks: create_installation_directories.yaml
-  #- import_tasks: install_other_required_packages.yaml
   #- import_tasks: install_python3.yaml
+
+- name: Install other required packages
+  ansible.builtin.include_tasks: install_other_required_packages.yaml
 
 - name: Configure letsencrypt certificates
   ansible.builtin.include_tasks: letsencrypt.yaml
