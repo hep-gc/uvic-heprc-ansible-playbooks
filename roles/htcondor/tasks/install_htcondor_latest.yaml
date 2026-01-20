@@ -53,4 +53,3 @@
   yum:
     name: ['condor-all']
     state: latest
-  when: ansible_facts['distribution_major_version'] == '7'

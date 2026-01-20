@@ -6,7 +6,7 @@
 
 ### Recommended Configuration for the HTCondor machine
 
-- OS: CentOS 7 or Alma 9
+- OS: Alma 9
 
 ### Configuration Specifications
 
