@@ -1,61 +1,68 @@
 # copy_certificates_to_users.yaml
 
-- name: create x509 certificate distribution directories
+- name: Ensure condor group exists
+  group:
+    name: condor
+    state: present
+
+- name: Ensure condor user exists
+  user:
+    name: condor
+    group: condor
+    state: present
+
+- name: Create local cert directory
   file:
-    dest: "{{ item }}"
+    path: "/usr/local/etc/certificates/{{ ansible_fqdn }}"
     state: directory
     owner: condor
     group: condor
     mode: "0700"
-  with_items:
-    - "/usr/local/etc/certificates"
-    - "/usr/local/etc/certificates/{{ ansible_fqdn }}"
-    - "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}"
-    - "/etc/grid-security/condor-worker"
-    - "/var/lib/condor/.globus"
-  when:
-    - htcondor_cert is defined
-    - htcondor_key is defined
-    - htcondor_worker_cert is defined
-    - htcondor_worker_key is defined
+    recurse: true
 
-- name: install x509 certificates
+- name: Create grid security directory
+  file:
+    path: "/etc/grid-security"
+    state: directory
+    owner: condor
+    group: condor
+    mode: "0700"
+
+- name: Install local cert
   copy:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
+    src: "{{ htcondor_cert | default('/etc/letsencrypt/live/' + ansible_fqdn + '/cert.pem') }}"
+    dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/cert.pem"
     owner: condor
     group: condor
     mode: "0400"
-  with_items:
-    - {src: "{{ htcondor_cert }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/cert.pem"}
-    - {src: "{{ htcondor_cert }}", dest: "/etc/grid-security/hostcert.pem"}
-    - {src: "{{ htcondor_worker_cert }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/cert.pem"}
-    - {src: "{{ htcondor_worker_cert }}", dest: "/var/lib/condor/.globus/usercert.pem"}
-    - {src: "{{ htcondor_worker_cert }}", dest: "/etc/grid-security/condor-worker/hostcert.pem"}
-  when:
-    - htcondor_cert is defined
-    - htcondor_key is defined
-    - htcondor_worker_cert is defined
-    - htcondor_worker_key is defined
+    remote_src: yes
 
-- name: install x509 keys
+- name: Install grid security hostcert
   copy:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
+    src: "{{ htcondor_cert | default('/etc/letsencrypt/live/' + ansible_fqdn + '/cert.pem') }}"
+    dest: "/etc/grid-security/hostcert.pem"
     owner: condor
     group: condor
     mode: "0400"
-  with_items:
-    - {src: "{{ htcondor_key }}", dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/privkey.pem"}
-    - {src: "{{ htcondor_key }}", dest: "/etc/grid-security/hostkey.pem"}
-    - {src: "{{ htcondor_worker_key }}", dest: "/usr/local/etc/certificates/{{ ansible_hostname }}-worker.{{ ansible_domain }}/privkey.pem"}
-    - {src: "{{ htcondor_worker_key }}", dest: "/var/lib/condor/.globus/userkey.pem"}
-    - {src: "{{ htcondor_worker_key }}", dest: "/etc/grid-security/condor-worker/hostkey.pem"}
-  when:
-    - htcondor_cert is defined
-    - htcondor_key is defined
-    - htcondor_worker_cert is defined
-    - htcondor_worker_key is defined
+    remote_src: yes
+
+- name: Install local key
+  copy:
+    src: "{{ htcondor_key | default('/etc/letsencrypt/live/' + ansible_fqdn + '/privkey.pem') }}"
+    dest: "/usr/local/etc/certificates/{{ ansible_fqdn }}/privkey.pem"
+    owner: condor
+    group: condor
+    mode: "0400"
+    remote_src: yes
+
+- name: Install grid security hostkey
+  copy:
+    src: "{{ htcondor_key | default('/etc/letsencrypt/live/' + ansible_fqdn + '/privkey.pem') }}"
+    dest: "/etc/grid-security/hostkey.pem"
+    owner: condor
+    group: condor
+    mode: "0400"
+    remote_src: yes
 
 - name: set_fact
   set_fact:
@@ -113,3 +120,4 @@
     cmd: /etc/letsencrypt/renewal-hooks/deploy/copy_certificates_to_users.sh
   when:
     - certificate_users is defined
+

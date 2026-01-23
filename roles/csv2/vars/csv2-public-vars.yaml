@@ -7,11 +7,12 @@ csv2_fqdn: <REPLACE ME> #full domain name of your target csv2 host ex
 
 cs_git_branch: stable-2.11
 db_upgrade_file: none
-schema_model: stable-2.11.1.rc1
+schema_model: stable-2.12.0.rc1
 
 admin_email: <REPLACE ME> # Email address you'd like to recieve admin mail to, usually the root on the csv2 host
 
 use_firewalld: <REPLACE ME> # If set to 'true', firewalld will be installed if it is not already present and rules will be added. This should be set to 'false' if you are using an external firewall.
+install_condor_poller: False
 install_phpMyAdmin: False
 web_debug: False
 
