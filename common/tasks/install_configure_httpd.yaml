@@ -25,8 +25,8 @@
 - name: Register if httpd conf file already present
   ansible.builtin.stat:
     path: /etc/httpd/conf.d/csv2_ssl.conf
-  register: csv2_conf
-  when: "'csv2' in ansible_play_role_names"
+    register: csv2_conf
+  when: "'csv2' in ansible_play_role_names "
 
 - name: Set up port 80 listener virtualhost host for each i_virtualhosts (required for letsencrypt)
   ansible.builtin.template:
@@ -37,11 +37,11 @@
     force: false
   loop: "{{ i_virtualhosts }}"
   when: csv2_conf is undefined or 
-        csv2_conf.stat.exists == False
+        not csv2_conf.stat.exists
 
 - name: Enable and start httpd
   ansible.builtin.systemd:
     name: httpd
     enabled: true
     state: restarted
-...
+
