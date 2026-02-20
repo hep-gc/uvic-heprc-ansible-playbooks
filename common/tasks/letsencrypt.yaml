@@ -213,14 +213,14 @@
     group: root
     mode: 755
 
-- name: install letsencrypt certificate chain
-  shell: |
-    git clone https://github.com/cilogon/letsencrypt-certificates.git
-    cd letsencrypt-certificates/
-    make check
-    sudo make install
-  args:
-    executable: /bin/bash
+#- name: install letsencrypt certificate chain
+#  shell: |
+#    git clone https://github.com/cilogon/letsencrypt-certificates.git
+#    cd letsencrypt-certificates/
+#    make check
+#    sudo make install
+#  args:
+#    executable: /bin/bash
 
 - name: meta
   meta: flush_handlers
