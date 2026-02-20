@@ -38,7 +38,7 @@
 - name: set_fact
   set_fact:
     hostname: "{{ i_service_connection.0.ipv4fqdn }}"
-
+    
 - name: create cloudscheduler user
   user:
     name: cloudscheduler
@@ -172,7 +172,7 @@
       - setuptools
     executable: pip3
     state: latest
-
+    
 - name: install crccheck
   pip:
     name: crccheck
@@ -187,7 +187,7 @@
     name: ["bcrypt==3.1.4", "boto3>=1.9.130", "pika", "python-keystoneclient",
            "openstacksdk==0.57.0", "python-dateutil",
            "pyyaml", "jinja2", "libvirt-python", "py-dateutil", "urllib3", "django-mathfilters",
-           "htcondor", "PyMySQL", "psutil", "celery", "{{ django_package }}",
+           "PyMySQL", "psutil", "celery", "{{ django_package }}",
            "django-debug-toolbar", "python-magic", "oci"]
     executable: pip3
     extra_args: --ignore-installed
@@ -533,12 +533,10 @@
 
 # this task may be able to be skipped as it is handled with a certbot deploy hook
 
+
 - name: import_tasks
   import_tasks: copy_certificates_to_users.yaml
-
-- name: import_tasks
-  import_tasks: configure_EL7_HTCondor.yaml
-
+  
 - name: Register output of csv2 db status check
   ansible.builtin.shell: >-
     echo "SELECT SCHEMA_NAME
@@ -554,7 +552,7 @@
 
 - name: include create_mysqldb_csv2.yaml
   ansible.builtin.include_tasks: create_mysqldb_csv2.yaml
-
+  
 - name: Open ports required for influxdb
   ansible.posix.firewalld:
     zone: public
@@ -689,14 +687,6 @@
     - openstackpoller.log
     - timeseriesPoller.log
     - watch_csv2.logging
-
-- name: Create condor poller log file
-  ansible.builtin.file:
-    path: "/var/log/cloudscheduler/condor_poller.log"
-    owner: condor
-    group: condor
-    mode: "0644"
-    state: touch
 
 - name: create empty cloudscheduler log files (owner=root, group=root)
   file:

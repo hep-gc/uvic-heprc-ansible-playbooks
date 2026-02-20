@@ -1,0 +1,30 @@
+---
+# add_letsencrypt_hooks.yaml
+
+- name: Ensure deploy hooks directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    recurse: true
+  loop:
+    - /etc/letsencrypt/renewal-hooks/deploy
+    - /etc/letsencrypt/renewal-hooks/pre
+    - /etc/letsencrypt/renewal-hooks/post
+
+
+- name: Add deploy renewal-hook for web-crt-key
+  ansible.builtin.template:
+    src: etc_letsencrypt_renewal-hooks_deploy_update-web-crt-key.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/update-web-crt-key.sh
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Install letsencrypt deploy hook to create backup
+  ansible.builtin.template:
+    src: etc_letsencrypt_renewal-hooks_deploy_make_backup.sh.j2
+    dest: /etc/letsencrypt/renewal-hooks/deploy/make_backup.sh
+    owner: root
+    group: root
+    mode: "0700"
+...

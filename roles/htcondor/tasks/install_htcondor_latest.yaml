@@ -1,14 +1,34 @@
 # install_htcondor_latest.yaml
 
+- name: check status of htcondor install
+  yum:
+    name: htcondor-release
+    state: installed
+  register: htcondor_installed
+  ignore_errors: yes
+  when: ansible_facts['distribution_major_version'] == '9'
+
 - name: download htcondor script
   get_url:
     url: https://get.htcondor.org
     dest: /tmp/install_htcondor.sh
     validate_certs: yes
 
-- name: run the script
-  shell: /bin/bash /tmp/install_htcondor.sh --no-dry-run --channel stable
-  ignore_errors: yes
+- name: replace lts with correct version
+  ansible.builtin.replace:
+    path: /tmp/install_htcondor.sh
+    regexp: "CHANNEL_DIR=25.0"
+    replace: "CHANNEL_DIR=24.x"
+        
+- name: Run the HTCondor install script
+  ansible.builtin.shell: >-
+    /bin/bash /tmp/install_htcondor.sh
+    --no-dry-run
+    --central-manager {{ i_service_connection.0.ipv4fqdn }}
+    --password {{ amqp_user_passwords['condor_poller'] }}
+    --channel lts
+  when: ansible_facts['distribution_major_version'] == '9' and "Nothing to do" not in htcondor_installed.msg
+  changed_when: True
 
 - name: allow SHA1 Hashing
   shell: update-crypto-policies --set DEFAULT:SHA1
@@ -19,11 +39,16 @@
     key: http://research.cs.wisc.edu/htcondor/yum/RPM-GPG-KEY-HTCondor
     state: present
 
+- name: ensure pip is installed
+  yum:
+    name: pip
+    state: present
+    
 - name: install htcondor python package
   pip:
     name: htcondor<25.0.1
     executable: pip3
-    
+
 - name: install HTCondor
   yum:
     name: ['condor-all']
