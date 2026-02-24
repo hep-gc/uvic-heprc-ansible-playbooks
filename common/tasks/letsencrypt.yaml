@@ -52,7 +52,6 @@
     mode: "755"
   when:
     - not initial_letsencrypt_status.stat.exists
-    - not archive_status.stat.exists
 #logic around when to do these steps needs work
 
 - name: Install the current SSL tar file
@@ -61,7 +60,6 @@
     dest: /etc/
     remote_src: true
   when:
-    - not initial_letsencrypt_status.stat.exists
     - archive_status.stat.exists
 
 # --- certbot install ---
@@ -224,4 +222,3 @@
 
 - name: meta
   meta: flush_handlers
-...
