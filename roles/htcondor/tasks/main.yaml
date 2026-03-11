@@ -9,11 +9,11 @@
 - name: Install other required packages
   ansible.builtin.include_tasks: install_other_required_packages.yaml
 
-- name: Configure letsencrypt certificates
-  ansible.builtin.include_tasks: letsencrypt.yaml
-  when: (local_web is undefined) or (not local_web)
+    #- name: Configure letsencrypt certificates
+    #  ansible.builtin.include_tasks: letsencrypt.yaml
+    #  when: (local_web is undefined) or (not local_web)
 
-- include: install_configure_httpd.yaml
+    #- include: install_configure_httpd.yaml
 - import_tasks: install_EGI_trust_anchors.yaml
 - import_tasks: install_fetch_crl.yaml
   when: (htcondor_gsi is defined) and (htcondor_gsi == True)

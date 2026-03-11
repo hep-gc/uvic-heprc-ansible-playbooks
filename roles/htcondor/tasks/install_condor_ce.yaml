@@ -12,6 +12,10 @@
     name: ['htcondor-ce-condor']
     state: latest
 
+- name: open HTCondor ce service port
+  firewalld: zone=public port="9619/tcp"  state=enabled immediate=yes permanent=yes
+  ignore_errors: yes
+
 - name: Copy atlas condor-ce configuration
   ansible.builtin.copy:
     src: "{{item}}"
