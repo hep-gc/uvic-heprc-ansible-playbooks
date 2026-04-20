@@ -1,0 +1,5 @@
+---
+# file: ml-ai.yaml
+- hosts: ml-ai
+  roles:
+    - ml-ai

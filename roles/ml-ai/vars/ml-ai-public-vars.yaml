@@ -1,0 +1,7 @@
+#where to install env default is home of target_user
+target_user: "almalinux"
+base_dir: "/home/{{ target_user }}"
+
+venv_dir: "{{ base_dir }}/venv"
+
+

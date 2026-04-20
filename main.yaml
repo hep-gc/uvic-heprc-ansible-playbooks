@@ -7,3 +7,4 @@
 - import_playbook: shoal.yaml
 - import_playbook: squid.yaml
 - import_playbook: varnish.yaml
+- import_playbook: ml-ai.yaml
