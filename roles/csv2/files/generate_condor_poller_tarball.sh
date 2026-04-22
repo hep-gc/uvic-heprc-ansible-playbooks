@@ -1,13 +1,17 @@
 #!/bin/bash
 #this script assumes sudo/root
 
+SRC="/opt/cloudscheduler/"
+DEST="/tmp/gentgz/cloudscheduler/"
+
+
 #create condor_poller directory structure
-STAGE_DIRS=("/tmp/gentgz/cloudscheduler/data_collectors/condor"
-            "/tmp/gentgz/cloudscheduler/etc/cloudscheduler"
-            "/tmp/gentgz/cloudscheduler/etc/init.d"
-            "/tmp/gentgz/cloudscheduler/etc/systemd/system"
-            "/tmp/gentgz/cloudscheduler/lib"
-            "/tmp/gentgz/cloudscheduler/utilities")
+STAGE_DIRS=("${DEST}data_collectors/condor"
+            "${DEST}etc/cloudscheduler"
+            "${DEST}etc/init.d"
+            "${DEST}etc/systemd/system"
+            "${DEST}lib"
+            "${DEST}utilities")
 
 for dir in "${STAGE_DIRS[@]}"; do
     mkdir -p -v "$dir" -m 0755
@@ -15,13 +19,10 @@ for dir in "${STAGE_DIRS[@]}"; do
 done
 
 #create symlink for cloudscheduler in tmp
-rel_path=$(realpath --relative-to="/tmp/gentgz/cloudscheduler/data_collectors/condor" "/tmp/gentgz/cloudscheduler")
-ln -s -f -n "$rel_path" "/tmp/gentgz/cloudscheduler/data_collectors/condor/cloudscheduler"
+rel_path=$(realpath --relative-to="${DEST}data_collectors/condor" "/tmp/gentgz/cloudscheduler")
+ln -s -f -n "$rel_path" "${DEST}data_collectors/condor/cloudscheduler"
 
 #copy condor_poller files
-SRC="/opt/cloudscheduler/"
-DEST="/tmp/gentgz/cloudscheduler/"
-
 declare -A FILE_MODE=(
   ["data_collectors/condor/condor_poller.py"]="0644"
   ["etc/init.d/csv2-condor-poller.pfile"]="0644"
@@ -47,13 +48,13 @@ for file in "${!FILE_MODE[@]}"; do
 done
 
 #copy config file
-src="/opt/cloudscheduler/etc/cloudscheduler/condor_poller.yaml"
-dest="/tmp/gentgz/cloudscheduler/etc/cloudscheduler/condor_poller.yaml"
+src="${SRC}etc/cloudscheduler/condor_poller.yaml"
+dest="${DEST}etc/cloudscheduler/condor_poller.yaml"
 
 install -m 0400 "$src" "$dest"
 
 #remove certs
-file="/tmp/gentgz/cloudscheduler/etc/cloudscheduler/condor_poller.yaml"
+file="${DEST}etc/cloudscheduler/condor_poller.yaml"
 sed -i 's/^condor_worker_cert:.*/    condor_worker_cert:/' "$file"
 sed -i 's/^condor_worker_key:.*/    condor_worker_key:/' "$file"
 
