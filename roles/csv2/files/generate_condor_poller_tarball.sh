@@ -59,7 +59,6 @@ sed -i 's/^condor_worker_cert:.*/    condor_worker_cert:/' "$file"
 sed -i 's/^condor_worker_key:.*/    condor_worker_key:/' "$file"
 
 #build tarball
-src_dir="/tmp/gentgz/cloudscheduler"
 tmp_dir="/tmp/gentgz"
 
 cd "$tmp_dir"
