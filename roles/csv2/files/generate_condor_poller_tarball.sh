@@ -19,7 +19,7 @@ for dir in "${STAGE_DIRS[@]}"; do
 done
 
 #create symlink for cloudscheduler in tmp
-rel_path=$(realpath --relative-to="${DEST}data_collectors/condor" "/tmp/gentgz/cloudscheduler")
+rel_path=$(realpath --relative-to="${DEST}data_collectors/condor" "${DEST%/}")
 ln -s -f -n "$rel_path" "${DEST}data_collectors/condor/cloudscheduler"
 
 #copy condor_poller files
@@ -59,10 +59,10 @@ sed -i 's/^condor_worker_cert:.*/    condor_worker_cert:/' "$file"
 sed -i 's/^condor_worker_key:.*/    condor_worker_key:/' "$file"
 
 #build tarball
-tmp_dir="/tmp/gentgz"
+dir = "${DEST%/*}"
 
-cd "$tmp_dir"
-tar -czvf /opt/cloudscheduler/repository/condor_poller.tar.gz cloudscheduler
+cd "$dir"
+tar -czvf "${SRC}repository/condor_poller.tar.gz" cloudscheduler
 
 #remove dir
-rm -rf "$tmp_dir"
+rm -rf "$dir"
