@@ -59,7 +59,7 @@ sed -i 's/^condor_worker_cert:.*/    condor_worker_cert:/' "$file"
 sed -i 's/^condor_worker_key:.*/    condor_worker_key:/' "$file"
 
 #build tarball
-dir = "${DEST%/*}"
+dir="${DEST%/}"; dir="${dir%/*}"
 
 cd "$dir"
 tar -czvf "${SRC}repository/condor_poller.tar.gz" cloudscheduler
