@@ -65,4 +65,5 @@ cd "$dir"
 tar -czvf "${SRC}repository/condor_poller.tar.gz" cloudscheduler
 
 #remove dir
+cd /
 rm -rf "$dir"
