@@ -57,7 +57,7 @@
 - name: Install the current SSL tar file
   ansible.builtin.unarchive:
     src: "/mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt/latest"
-    dest: /etc/
+    dest: /
     remote_src: true
   when:
     - archive_status.stat.exists
@@ -203,13 +203,13 @@
     state: started
   when: "'haproxy.service' in services"
 
-- name: create certificates directory
-  file:
-    dest: /etc/grid-security/certificates
-    state: directory
-    owner: root
-    group: root
-    mode: 755
+#- name: create certificates directory
+#  file:
+#    dest: /etc/grid-security/certificates
+#    state: directory
+#    owner: root
+#    group: root
+#    mode: 755
 
 #- name: install letsencrypt certificate chain
 #  shell: |
