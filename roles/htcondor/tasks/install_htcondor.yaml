@@ -1,0 +1,23 @@
+# htcondor server setup yaml
+- include_vars: htcondor-public-default-vars.yaml
+- include_vars: htcondor-public-secrets.yaml
+- include_vars: htcondor-public-vars.yaml
+
+
+    #- name: Configure letsencrypt certificates
+    #  ansible.builtin.include_tasks: letsencrypt.yaml
+    #  when: (local_web is undefined) or (not local_web)
+
+    #- include: install_configure_httpd.yaml
+
+- import_tasks: install_htcondor_latest.yaml
+  when: (htcondor_gsi is undefined) or (htcondor_gsi == False)
+- import_tasks: install_htcondor_8.yaml
+  when: (htcondor_gsi is defined) and (htcondor_gsi == True)
+- import_tasks: copy_certificates_to_users.yaml
+  when: (htcondor_gsi is defined) and (htcondor_gsi == True)
+- import_tasks: configure_htcondor.yaml
+- import_tasks: install_condor_ce.yaml
+  when: (condor_ce is defined) and (condor_ce == True)
+
+

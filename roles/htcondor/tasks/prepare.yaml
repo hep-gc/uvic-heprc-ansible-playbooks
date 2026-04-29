@@ -1,0 +1,11 @@
+---
+- import_tasks: create_installation_directories.yaml
+- import_tasks: install_python3.yaml
+
+- name: Install other required packages
+  ansible.builtin.include_tasks: install_other_required_packages.yaml
+
+- import_tasks: install_EGI_trust_anchors.yaml
+
+- import_tasks: install_fetch_crl.yaml
+  when: (htcondor_gsi is defined) and (htcondor_gsi == True)
