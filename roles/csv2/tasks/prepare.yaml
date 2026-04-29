@@ -1,0 +1,13 @@
+---
+
+- name: Create installation directories
+  ansible.builtin.import_tasks: create_installation_directories.yaml
+
+- name: Configure other required repositories
+  ansible.builtin.import_tasks: configure_other_required_repositories.yaml
+
+- name: Perform yum updates
+  ansible.builtin.import_tasks: perform_yum_updates.yaml
+
+- name: Install other required packages
+  ansible.builtin.import_tasks: install_other_required_packages.yaml
