@@ -6,8 +6,8 @@ R=0
 
 M=$(
 
-/bin/cp -f /etc/letsencrypt/live/{{ cert_fqdn }}/cert.pem /usr/local/etc/certificates/{{ ansible_fqdn }}/cert.pem 2>&1 &&
-/bin/cp -f /etc/letsencrypt/live/{{ cert_fqdn }}/privkey.pem /usr/local/etc/certificates/{{ ansible_fqdn }}/privkey.pem 2>&1 &&
+#/bin/cp -f /etc/letsencrypt/live/{{ cert_fqdn }}/cert.pem /usr/local/etc/certificates/{{ ansible_fqdn }}/cert.pem 2>&1 &&
+#/bin/cp -f /etc/letsencrypt/live/{{ cert_fqdn }}/privkey.pem /usr/local/etc/certificates/{{ ansible_fqdn }}/privkey.pem 2>&1 &&
 /bin/cp -f /etc/letsencrypt/live/{{ cert_fqdn }}/cert.pem /etc/grid-security/hostcert.pem 2>&1 &&
 /bin/cp -f /etc/letsencrypt/live/{{ cert_fqdn }}/privkey.pem /etc/grid-security/hostkey.pem 2>&1 &&
 

@@ -10,4 +10,4 @@
   ansible.builtin.import_tasks: perform_yum_updates.yaml
 
 - name: Install other required packages
-  ansible.builtin.import_tasks: install_other_required_packages.yaml
+  ansible.builtin.import_tasks: install_other_required_packages_csv2.yaml
