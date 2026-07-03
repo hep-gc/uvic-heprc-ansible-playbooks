@@ -25,8 +25,8 @@
     /bin/bash /tmp/install_htcondor.sh
     --no-dry-run
     --central-manager {{ i_service_connection.0.ipv4fqdn }}
-    --password {{ amqp_user_passwords['condor_poller'] }}
     --channel lts
+    --password {{ condor_pass }}
   when: ansible_facts['distribution_major_version'] == '9' and "Nothing to do" not in htcondor_installed.msg
   changed_when: True
 
