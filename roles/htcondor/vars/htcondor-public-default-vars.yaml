@@ -3,7 +3,7 @@ htcondor_low_port: 40000
 htcondor_high_port: 50000
 
 # Set the default for token authentication and GSI authentication.
-htcondor_token_auth: False
+htcondor_token_auth: True
 htcondor_gsi: False
 
   #certificate_users:
