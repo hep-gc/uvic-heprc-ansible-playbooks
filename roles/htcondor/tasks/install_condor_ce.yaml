@@ -32,8 +32,18 @@
     src: "{{item}}"
     dest: "/etc/condor-ce/config.d/{{item}}"
   with_items:
-   - 01-ce-auth.conf
    - 01-ce-router.conf
    - 02-ce-condor.conf
+  when: (atlas_enabled is defined) and (atlas_enabled == True)
+
+- name: copy atlas condor-ce auth config
+  copy:
+    src: "{{item}}"
+    dest: "/etc/condor-ce/config.d/{{item}}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+   - 01-ce-auth.conf
   when: (atlas_enabled is defined) and (atlas_enabled == True)
 
