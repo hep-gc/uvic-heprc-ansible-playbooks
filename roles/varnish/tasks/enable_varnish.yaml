@@ -1,0 +1,21 @@
+- name: Set Vars
+  shell: |
+      export SITE={{varnish_site}}
+      export INSTANCE={{varnish_instance}}
+      export VARNISH_TRANSIENT_MEM={{varnish_transient_mem}}
+      export VARNISH_MEM={{varnish_mem}}
+
+- name: Ensure scripts are executable
+  file:
+    path:  /usr/local
+    mode: '0755'
+  
+- name: Reload daemon
+  systemd:
+    daemon_reload: yes
+ 
+- name: Enable and start varnish service
+  systemd:
+    name: frontier-varnish
+    enabled: yes 
+    state: started

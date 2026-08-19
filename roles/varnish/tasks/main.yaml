@@ -1,0 +1,7 @@
+# varnish server setup yaml
+- name: Include vars varnish-public-vars.yaml
+  ansible.builtin.include_vars: "./vars/varnish-public-vars.yaml"
+  when: internal_system_install is not defined
+ 
+- import_tasks: install_packages.yaml
+- import_tasks: enable_varnish.yaml

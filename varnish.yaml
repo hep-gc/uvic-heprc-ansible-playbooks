@@ -1,0 +1,5 @@
+---
+# file: varnish.yaml
+- hosts: varnish
+  roles:
+    - varnish

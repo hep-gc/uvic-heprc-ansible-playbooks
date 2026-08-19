@@ -1,6 +1,5 @@
 ---
 # InfluxDb 
-
 - name: Install python2 pip
   yum:
     name: python2-pip
@@ -40,7 +39,7 @@
   yum:
     name: ['influxdb']
     state: latest
-
+    
 - name: Start service InfluxDB
   service:
     name: influxdb

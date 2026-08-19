@@ -1,2 +1,1 @@
-# Try to prevent jobs from running more than once. If this works, change to periodic remove?
-#SYSTEM_PERIODIC_HOLD = NumJobStarts >= 1 && JobStatus == 1
+../../htcondor/files/etc_condor_config.d_system_hold

@@ -52,16 +52,14 @@
     mode: "755"
   when:
     - not initial_letsencrypt_status.stat.exists
-    - not archive_status.stat.exists
 #logic around when to do these steps needs work
 
 - name: Install the current SSL tar file
   ansible.builtin.unarchive:
     src: "/mnt/hosts/{{ i_service_connection.0.ipv4fqdn }}/letsencrypt/latest"
-    dest: /etc/
+    dest: /
     remote_src: true
   when:
-    - not initial_letsencrypt_status.stat.exists
     - archive_status.stat.exists
 
 # --- certbot install ---
@@ -212,23 +210,22 @@
     state: started
   when: "'haproxy.service' in services"
 
-- name: create certificates directory
-  file:
-    dest: /etc/grid-security/certificates
-    state: directory
-    owner: root
-    group: root
-    mode: 755
+#- name: create certificates directory
+#  file:
+#    dest: /etc/grid-security/certificates
+#    state: directory
+#    owner: root
+#    group: root
+#    mode: 755
 
-- name: install letsencrypt certificate chain
-  shell: |
-    git clone https://github.com/cilogon/letsencrypt-certificates.git
-    cd letsencrypt-certificates/
-    make check
-    sudo make install
-  args:
-    executable: /bin/bash
+#- name: install letsencrypt certificate chain
+#  shell: |
+#    git clone https://github.com/cilogon/letsencrypt-certificates.git
+#    cd letsencrypt-certificates/
+#    make check
+#    sudo make install
+#  args:
+#    executable: /bin/bash
 
 - name: meta
   meta: flush_handlers
-...

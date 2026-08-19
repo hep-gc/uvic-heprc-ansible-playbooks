@@ -12,15 +12,18 @@
     name: ['htcondor-ce-condor']
     state: latest
 
+- name: open HTCondor ce service port
+  firewalld: zone=public port="9619/tcp"  state=enabled immediate=yes permanent=yes
+  ignore_errors: yes
+
 - name: Copy atlas condor-ce configuration
   ansible.builtin.copy:
     src: "{{item}}"
-    dest: "/etc/condor-ce/config.d/{{item}}"
+    dest: "/etc/condor-ce/mapfiles.d/{{item}}"
     owner: root
     group: root
     mode: '0644'
   with_items:
-   - 01-ce-auth.conf
    - 10-scitokens.conf
   when: (atlas_enabled is defined) and (atlas_enabled == True)
 
@@ -29,6 +32,7 @@
     src: "{{item}}"
     dest: "/etc/condor-ce/config.d/{{item}}"
   with_items:
+   - 01-ce-auth.conf
    - 01-ce-router.conf
    - 02-ce-condor.conf
   when: (atlas_enabled is defined) and (atlas_enabled == True)

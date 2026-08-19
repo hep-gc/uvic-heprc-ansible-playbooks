@@ -12,6 +12,8 @@
 - name: change SELinux to permissive
   shell: sed -i 's/^SELINUX=/SELINUX=permissive \#/g' /etc/sysconfig/selinux
 
+
+    
 - name: download installer for frontier
   get_url:
     url: http://frontier.cern.ch/dist/rpms/RPMS/noarch/frontier-release-1.2-1.noarch.rpm
@@ -21,7 +23,8 @@
   yum:
     name: '/etc/squid/frontier-release-1.2-1.noarch.rpm'
     state: present
-
+    disable_gpg_check: yes 
+    
 - name: install frontier packages
   yum:
     name: ['frontier-squid', 'epel-release']

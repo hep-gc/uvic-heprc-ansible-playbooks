@@ -1,2 +1,1 @@
-COLLECTOR_SOCKET_CACHE_SIZE=10000
-COLLECTOR.MAX_FILE_DESCRIPTORS = 10000
+../../htcondor/files/etc_condor_config.d_scaling
