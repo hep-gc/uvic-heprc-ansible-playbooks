@@ -17,8 +17,8 @@
 - name: replace lts with correct version
   ansible.builtin.replace:
     path: /tmp/install_htcondor.sh
-    regexp: "CHANNEL_DIR=25.0"
-    replace: "CHANNEL_DIR=24.x"
+    regexp: "CHANNEL_DIR=\"25.0\""
+    replace: "CHANNEL_DIR=\"24.x\""
         
 - name: Run the HTCondor install script
   ansible.builtin.shell: >-
