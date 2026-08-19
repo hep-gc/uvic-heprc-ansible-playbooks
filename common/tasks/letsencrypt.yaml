@@ -199,6 +199,13 @@
     msg: "{{ out.stdout }}"
   when: out is not search("No renewals were attempted")
 
+- name: Create combined fullchain/privkey file needed by HAproxy
+  ansible.builtin.shell: >- 
+    cd /etc/letsencrypt/live/{{ item.virtualhost }};
+    cat fullchain.pem privkey.pem > web_crt_key.pem
+  loop: "{{ i_virtualhosts }}"
+  when: "'haproxy.service' in services"
+
 - name: Start HAProxy service if present
   ansible.builtin.systemd_service:
     name: haproxy.service
