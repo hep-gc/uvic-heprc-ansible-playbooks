@@ -7,7 +7,7 @@
 #Check if certificate installed?
 #
 
-- name: install HTCondor Compute Entrypoit (htcondor-ce) package
+- name: install HTCondor Compute Entrypoint (htcondor-ce) package
   yum:
     name: ['htcondor-ce-condor']
     state: latest
@@ -16,34 +16,88 @@
   firewalld: zone=public port="9619/tcp"  state=enabled immediate=yes permanent=yes
   ignore_errors: yes
 
-- name: Copy atlas condor-ce configuration
+- name: Ensure group exists for user to run jobs (atlas, dune, etc.)
+  group:
+    name: "{{ instance }}"
+    state: present
+
+- name: Ensure user exists for running jobs (atlas, dune, etc.)
+  user:
+    name: "{{ instance }}"
+    group: "{{ instance }}"
+    state: present
+
+- name: Copy atlas condor-ce mapfiles
   ansible.builtin.copy:
-    src: "{{item}}"
+    src: "etc_condor-ce_mapfiles.d_{{item}}"
     dest: "/etc/condor-ce/mapfiles.d/{{item}}"
     owner: root
     group: root
     mode: '0644'
   with_items:
    - 10-scitokens.conf
-  when: (atlas_enabled is defined) and (atlas_enabled == True)
+   - 10-ssl.conf
+  when: instance == "atlas"
 
-- name: copy atlas condor-ce routing config
+- name: Copy dune condor-ce mapfile
+  ansible.builtin.copy:
+    src: "etc_condor-ce_mapfiles.d_10-scitokens-dune.conf"
+    dest: "/etc/condor-ce/mapfiles.d/10-scitokens.conf"
+    owner: root
+    group: root
+    mode: '0644'
+  when: instance == "dune"
+
+- name: copy condor-ce routing config
   template:
-    src: "{{item}}"
+    src: "etc_condor-ce_config.d_{{item}}"
     dest: "/etc/condor-ce/config.d/{{item}}"
   with_items:
    - 01-ce-router.conf
    - 02-ce-condor.conf
-  when: (atlas_enabled is defined) and (atlas_enabled == True)
 
 - name: copy atlas condor-ce auth config
   copy:
-    src: "{{item}}"
+    src: "etc_condor-ce_config.d_{{item}}"
     dest: "/etc/condor-ce/config.d/{{item}}"
     owner: root
     group: root
     mode: '0644'
   with_items:
    - 01-ce-auth.conf
-  when: (atlas_enabled is defined) and (atlas_enabled == True)
+   - 99-voms.conf
+   - 99-ssl.conf
+   - 99-fix-client-auth.conf
+  when: instance == "atlas"
 
+- name: copy dune condor-ce local config
+  template:
+    src: "etc_condor-ce_config.d_{{item}}.j2"
+    dest: "/etc/condor-ce/config.d/{{item}}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+   - 99-local.conf
+  when: instance == "dune"
+
+- name: Install atlas and ops voms rpms
+  dnf:
+    name: 
+      - https://linuxsoft.cern.ch/wlcg/el9/x86_64/wlcg-iam-lsc-atlas-4.0.0-1.el9.noarch.rpm
+      - https://linuxsoft.cern.ch/wlcg/el9/x86_64/wlcg-iam-lsc-ops-3.0.0-1.el9.noarch.rpm
+    state: present
+    disable_gpg_check: true
+  when: instance == "atlas"
+
+- name: Copy lsc files for Dune (couldn't find rpm)
+  copy:
+    src: "etc_grid-security_vomsdir_dune_{{item}}"
+    dest: "/etc/grid-security/vomsdir/dune/{{item}}"
+    owner: root
+    group: root
+    mode: '0644'
+  with_items:
+    - voms1.fnal.gov.lsc
+    - voms2.fnal.gov.lsc
+  when: instance == "dune"
