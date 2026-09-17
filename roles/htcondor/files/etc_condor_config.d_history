@@ -1,0 +1,4 @@
+HISTORY=/var/log/condor/history/history
+MAX_HISTORY_LOG=1000000000
+MAX_HISTORY_ROTATIONS=9
+
