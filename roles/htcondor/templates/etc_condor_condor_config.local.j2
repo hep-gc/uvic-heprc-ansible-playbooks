@@ -4,26 +4,61 @@ CONDOR_HOST = $(FULL_HOSTNAME)
 ## Pool's short description
 COLLECTOR_NAME = {{ htcondor_collector_name }}
 
-#DAEMON_LIST = $(DAEMON_LIST), COLLECTOR, NEGOTIATOR
-DAEMON_LIST = COLLECTOR, MASTER, NEGOTIATOR, SCHEDD
-
 ##  When is this machine willing to start a job? 
 START = TRUE
 SUSPEND = FALSE
 PREEMPT = FALSE
-KILL = FALSE
 
 ## Disable UID_DOMAIN check when submit a job
 TRUST_UID_DOMAIN = TRUE
 
-#ALL_DEBUG  = D_HOSTNAME
-
-#SPOOL		= /storage/condor/spool
-#EXECUTE		= /storage/condor/execute
-# DELEGATE_JOB_GSI_CREDENTIALS_LIFETIME = 0
-
-ALLOW_READ = *
-ALLOW_WRITE = *
-
-
 CONDOR_Q_ONLY_MY_JOBS = False
+CONDOR_Q_DASH_BATCH_IS_DEFAULT = False
+
+# fill machine first before sending jobs to next machine
+NEGOTIATOR_DEPTH_FIRST = True
+
+## How often the Negotaitor starts a negotiation cycle, defined in
+## seconds.
+#NEGOTIATOR_INTERVAL = 30
+
+## Should the Negotiator publish an update to the Collector after   
+## every negotiation cycle. It is useful to have this set to True
+## to get immediate updates on LastNegotiationCycle statistics.
+NEGOTIATOR_UPDATE_AFTER_CYCLE = True
+#NEGOTIATE_ALL_JOBS_IN_CLUSTER = True
+
+NEGOTIATOR_POST_JOB_RANK = (RemoteOwner =?= UNDEFINED) * (CondorLoadAvg - 1.0e10*(Offline=?=True))
+NEGOTIATOR_PRE_JOB_RANK = RemoteOwner =?= UNDEFINED
+
+# WallClockTime 60*60*24*2.5
+# below for testing to remove non running jobs
+SYSTEM_PERIODIC_REMOVE = (JobStatus == 5) ||((JobStatus == 2) && (time() - EnteredCurrentStatus) > (48 * 3600))
+#SYSTEM_PERIODIC_HOLD = ((JobStatus > 1) && ((ServerTime - JobStartDate) > 432000))
+GRACEFULLY_REMOVE_JOBS = False
+
+KILL = (JobStatus == 5 && ServerTime - EnteredCurrentStatus > 360)
+
+##  This macro determines what daemons the condor_master will start and keep its watchful eyes on.
+##  The list is a comma or space separated list of subsystem names
+
+DAEMON_LIST =  COLLECTOR, MASTER, NEGOTIATOR, SCHEDD, defrag
+## Disable UID_DOMAIN check when submit a job
+TRUST_UID_DOMAIN = TRUE
+
+ENABLE_SSH_TO_JOB = true
+SCHEDD_ENABLE_SSH_TO_JOB = true
+SSH_TO_JOB_SSH_CMD = "ssh -oUser=%u -oIdentityFile=%i -oStrictHostKeyChecking=yes -oUserKnownHostsFile=%k -oGlobalKnownHostsFile=%k -oProxyCommand=%x %h"
+SSH_TO_JOB_SCP_CMD = "scp -oUser=%u -oIdentityFile=%i -oStrictHostKeyChecking=yes -oUserKnownHostsFile=%k -oGlobalKnownHostsFile=%k -oProxyCommand=%x"
+SSH_TO_JOB_SSHD = /usr/sbin/sshd
+SSH_TO_JOB_SSHD_ARGS = "-i -e -f %f"
+SSH_TO_JOB_SSHD_CONFIG_TEMPLATE = $(LIB)/condor_ssh_to_job_sshd_config_template
+SSH_TO_JOB_SSH_KEYGEN = /usr/bin/ssh-keygen
+SSH_TO_JOB_SSH_KEYGEN_ARGS = "-N '' -C '' -q -f %f -t rsa"
+
+WantIOProxy = True
+SUBMIT_ATTRS = $(SUBMIT_ATTRS) WantIOProxy
+
+PERIODIC_EXPR_TIMESLICE = 0.02
+MAX_PERIODIC_EXPR_INTERVAL = 300 
+
