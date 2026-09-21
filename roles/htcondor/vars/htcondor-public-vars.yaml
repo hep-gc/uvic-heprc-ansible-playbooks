@@ -49,12 +49,6 @@ job_routes_atlas:
     maxjobs: 3500
     maxidlejobs: 1280
 
-  atlas_cern_extension:
-    requirements: "queue == \"cern-extension\""
-    requirements_two: "(group_name == \"new-atlas\") && (target_alias == \"cern-extension\") && (TARGET.Cpus >= RequestCpus) && (TARGET.Memory >= RequestMemory) && (TARGET.HasFileTransfer)"
-    maxjobs: 3500
-    maxidlejobs: 1280
-
   atlas_uvic:
     requirements: "queue == \"CA-IAAS-T3\""
     requirements_two: "(group_name == \"atlas-uvic\") && (target_alias == \"ca-iaas-t3\") && (TARGET.Cpus >= RequestCpus) && (TARGET.Memory >= RequestMemory) && (TARGET.HasFileTransfer)"
