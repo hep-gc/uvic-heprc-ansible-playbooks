@@ -6,9 +6,6 @@
 
     #- include: install_configure_httpd.yaml
 
-- include_vars: htcondor-public-default-vars.yaml
-  #- include_vars: htcondor-public-secrets.yaml
-- include_vars: htcondor-public-vars.yaml
 
 - import_tasks: install_htcondor_latest.yaml
   when: (htcondor_gsi is undefined) or (htcondor_gsi == False)
