@@ -33,11 +33,11 @@ NEGOTIATOR_PRE_JOB_RANK = RemoteOwner =?= UNDEFINED
 
 # WallClockTime 60*60*24*2.5
 # below for testing to remove non running jobs
-SYSTEM_PERIODIC_REMOVE = (JobStatus == 5) ||((JobStatus == 2) && (time() - EnteredCurrentStatus) > (48 * 3600))
+SYSTEM_PERIODIC_REMOVE = (JobStatus == 2) && (time() - EnteredCurrentStatus) > (48 * 3600)
 #SYSTEM_PERIODIC_HOLD = ((JobStatus > 1) && ((ServerTime - JobStartDate) > 432000))
 GRACEFULLY_REMOVE_JOBS = False
 
-KILL = (JobStatus == 5 && ServerTime - EnteredCurrentStatus > 360)
+KILL = (JobStatus == 5 && ServerTime - EnteredCurrentStatus > 3600)
 
 ##  This macro determines what daemons the condor_master will start and keep its watchful eyes on.
 ##  The list is a comma or space separated list of subsystem names
