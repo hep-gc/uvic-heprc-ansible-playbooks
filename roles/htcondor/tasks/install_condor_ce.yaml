@@ -21,13 +21,24 @@
     name: "{{ instance }}"
     state: present
 
+- name: Ensure ops group exists 
+  group:
+    name: "ops"
+    state: present
+
 - name: Ensure user exists for running jobs (atlas, dune, etc.)
   user:
     name: "{{ instance }}"
     group: "{{ instance }}"
     state: present
 
-- name: Copy atlas condor-ce mapfiles
+- name: Ensure ops user exists
+  user:
+    name: "ops"
+    group: "ops"
+    state: present
+
+- name: Copy condor-ce mapfiles
   ansible.builtin.copy:
     src: "etc_condor-ce_mapfiles.d_{{item}}"
     dest: "/etc/condor-ce/mapfiles.d/{{item}}"
@@ -35,9 +46,8 @@
     group: root
     mode: '0644'
   with_items:
-   - 10-scitokens.conf
-   - 10-ssl.conf
-  when: instance == "atlas"
+   - "10-scitokens-{{ instance }}.conf"
+   - "10-ssl.conf"
 
 - name: Copy dune condor-ce mapfile
   ansible.builtin.copy:
@@ -68,7 +78,6 @@
    - 99-voms.conf
    - 99-ssl.conf
    - 99-fix-client-auth.conf
-  when: instance == "atlas"
 
 - name: copy dune condor-ce local config
   template:
@@ -81,14 +90,28 @@
    - 99-local.conf
   when: instance == "dune"
 
+- name: Install WLCG repo 
+  yum_repository:
+    name: WLCG
+    description: WLCG Linux software repo
+    baseurl: https://linuxsoft.cern.ch/wlcg/el9/x86_64/
+
 - name: Install atlas and ops voms rpms
   dnf:
     name: 
-      - https://linuxsoft.cern.ch/wlcg/el9/x86_64/wlcg-iam-lsc-atlas-4.0.0-1.el9.noarch.rpm
-      - https://linuxsoft.cern.ch/wlcg/el9/x86_64/wlcg-iam-lsc-ops-3.0.0-1.el9.noarch.rpm
+      - wlcg-iam-lsc-atlas
+      - wlcg-iam-lsc-ops
     state: present
-    disable_gpg_check: true
   when: instance == "atlas"
+
+- name: Create voms directory
+  file:
+    path: "/etc/grid-security/vomsdir/dune/"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: instance == "dune"
 
 - name: Copy lsc files for Dune (couldn't find rpm)
   copy:
