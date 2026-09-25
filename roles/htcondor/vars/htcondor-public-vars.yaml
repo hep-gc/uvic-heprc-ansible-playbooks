@@ -1,13 +1,14 @@
-htcondor_fqdn: atlas-condor-dev.heprc.uvic.ca # full domain name of your target htcondor host 
-htcondor_ipv4: 206.12.154.214 # ipv4 address of your target htcondor host 
+htcondor_fqdn: <REPLACE_ME> # full domain name of your target htcondor host 
+htcondor_ipv4: <REPLACE_ME> # ipv4 address of your target htcondor host 
 # csv2_fqdn: <REPLACE ME> # full domain name of your target csv2 host 
 
-admin_email: root@atlas-condor-dev.heprc.uvic.ca # Email address you'd like to recieve admin mail to and generate token with, usually the root on the csv2 host
+admin_email: myemail@mydomain # Email address you'd like to recieve admin mail to and generate token with, usually the root on the condor host
 
 # Set installation status for Condor-ce and the atlas config
 condor_ce: True
 
-# Current possible values are atlas, dune, bellecs, and bellesd
+# Only used when condor_ce is true
+# Current possible values are atlas and dune
 instance: "dune"
 
 # the htcondor install script requires a password
