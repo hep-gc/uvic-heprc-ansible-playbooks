@@ -38,25 +38,22 @@
     group: "ops"
     state: present
 
-- name: Copy condor-ce mapfiles
+# Do the mapfiles in two steps because nested variables don't seem to work
+- name: Copy condor-ce scitokens mapfile
   ansible.builtin.copy:
-    src: "etc_condor-ce_mapfiles.d_{{item}}"
-    dest: "/etc/condor-ce/mapfiles.d/{{item}}"
+    src: "etc_condor-ce_mapfiles.d_10-scitokens-{{ instance }}.conf"
+    dest: "/etc/condor-ce/mapfiles.d/10-scitokens-{{ instance }}.conf"
     owner: root
     group: root
     mode: '0644'
-  with_items:
-   - "10-scitokens-{{ instance }}.conf"
-   - "10-ssl.conf"
 
-- name: Copy dune condor-ce mapfile
+- name: Copy condor-ce SSL mapfiles
   ansible.builtin.copy:
-    src: "etc_condor-ce_mapfiles.d_10-scitokens-dune.conf"
-    dest: "/etc/condor-ce/mapfiles.d/10-scitokens.conf"
+    src: "etc_condor-ce_mapfiles.d_10-ssl.conf"
+    dest: "/etc/condor-ce/mapfiles.d/10-ssl.conf"
     owner: root
     group: root
     mode: '0644'
-  when: instance == "dune"
 
 - name: copy condor-ce routing config
   template:
@@ -102,6 +99,7 @@
       - wlcg-iam-lsc-atlas
       - wlcg-iam-lsc-ops
     state: present
+    disable_gpg_check: true
   when: instance == "atlas"
 
 - name: Create voms directory
@@ -124,3 +122,15 @@
     - voms1.fnal.gov.lsc
     - voms2.fnal.gov.lsc
   when: instance == "dune"
+
+- name: restart HTCondor-ce
+  service:
+    name: condor-ce
+    enabled: yes 
+    state: restarted
+  ignore_errors: yes 
+
+- name: wait for condor-ce
+  wait_for:
+    timeout: 5
+
