@@ -6,10 +6,12 @@
 
     #- include: install_configure_httpd.yaml
 
+
 - import_tasks: install_htcondor_latest.yaml
   when: (htcondor_gsi is undefined) or (htcondor_gsi == False)
 - import_tasks: install_htcondor_8.yaml
   when: (htcondor_gsi is defined) and (htcondor_gsi == True)
+- import_tasks: copy_host_cert_and_key.yaml
 - import_tasks: copy_certificates_to_users.yaml
   when: (htcondor_gsi is defined) and (htcondor_gsi == True)
 - import_tasks: configure_htcondor.yaml
