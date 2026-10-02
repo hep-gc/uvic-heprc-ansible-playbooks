@@ -3,7 +3,7 @@
 
 - name: install packages required by httpd
   yum:
-    name: ['httpd', 'httpd-tools', 'mod_ssl']
+    name: ['httpd', 'httpd-tools']
     state: latest
   notify:
   - restart httpd
