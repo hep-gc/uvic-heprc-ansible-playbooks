@@ -1,0 +1,25 @@
+# copy_host_cert_and_key.yaml
+
+- name: Create grid security directory
+  file:
+    path: "/etc/grid-security"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install grid security hostcert
+  copy:
+    src: "{{ htcondor_cert }}"
+    dest: "/etc/grid-security/hostcert.pem"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Install grid security hostkey
+  copy:
+    src: "{{ htcondor_key }}"
+    dest: "/etc/grid-security/hostkey.pem"
+    owner: root
+    group: root
+    mode: "0600"
