@@ -45,8 +45,8 @@
   with_items:
   - default_request
   - defrag
+  - history
   - scaling
-  - system_hold
   notify:
   - reconfigure condor
 
@@ -62,8 +62,8 @@
   when: (htcondor_gsi is defined) and (htcondor_gsi == True)
 
 - name: enable HTCondor IDTokens configuration
-  template:
-    src: "etc_condor_config.d_idtokens.j2"
+  copy:
+    src: "etc_condor_config.d_idtokens"
     dest: "/etc/condor/config.d/idtokens"
     owner: root
     group: root
@@ -111,7 +111,7 @@
   when: (htcondor_token_auth is defined) and (htcondor_token_auth == True)
 
 - name: create and save a condor token (saved in /etc/condor/tokens.d)
-  shell: "condor_token_create -identity condor@{{ htcondor_fqdn }} -token {{ htcondor_fqdn }}"
+  shell: "condor_token_create -identity condor@{{ i_service_connection.0.ipv4fqdn }} -token {{ i_service_connection.0.ipv4fqdn }}"
   when: (htcondor_token_auth is defined) and (htcondor_token_auth == True)
 
 - name: restart HTCondor
