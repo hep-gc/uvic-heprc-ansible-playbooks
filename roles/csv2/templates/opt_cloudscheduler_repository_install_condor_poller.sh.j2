@@ -8,13 +8,13 @@ wget --no-check-certificate https://{{ inventory_hostname }}/repo/condor_poller.
 tar -xzvf /tmp/condor_poller.tar.gz
 
 echo "/var/log/cloudscheduler/condor_poller.log {
- weekly
- su root
- notifempty
- missingok
- compress
- copytruncate
- create 0644 condor condor
+  weekly
+  su root
+  notifempty
+  missingok
+  compress
+  copytruncate
+  create 0644 condor condor
 }" >  /etc/logrotate.d/csv2-condor
 
 
